@@ -999,8 +999,7 @@ img.sort, .sort {
 /* The framing graphics */
 /* The top bar. */
 #top_section {
-	margin: 0 -5px 0 -5px;
-	padding: 0 5% 1px 5%;
+	padding: 0 5% 0 5%;
 	border-bottom: 1px solid #bbb;
 	box-shadow: 0 1px 4px rgba(0,0,0,0.16);
 	background: #fff;
@@ -1014,7 +1013,7 @@ img.sort, .sort {
 }
 #top_info {
 	margin: 0;
-	padding: 5px 9px 2px 9px;
+	padding: 5px 5px 0 5px;
 	line-height: 1.3em;
 	width: auto;
 }
@@ -1034,7 +1033,7 @@ img.sort, .sort {
 	padding: 4px 9px 0 0;
 }
 #search_form {
-	padding: 4px 10px 0 0;
+	padding: 3px 5px 0 0;
 	text-align: right;
 }
 #search_form .input_text, #search_form select, #search_form .button_submit {
@@ -2615,10 +2614,11 @@ dl.addrules dt.floatleft {
 	margin: 0 auto;
 }
 .popup_heading {
-	margin: 0;
+	margin: 0 0 5px 0;
 	padding: 10px 4px;
 	color: #bf6900;
 	background: none;
+	border-bottom: 1px solid #777;
 }
 .popup_content {
 	color: #222;
