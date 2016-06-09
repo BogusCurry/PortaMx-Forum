@@ -71,7 +71,7 @@
 		border-right: 0;
 	}
 	.dropmenu li a, .dropmenu li:hover a {
-		padding: 5px 0;
+		padding: 5px 0 !important;
 	}
 	.dropmenu li a, .dropmenu li a:hover {
 		text-indent: 10px;
@@ -347,6 +347,18 @@
 	}
 }
 
+@media screen and (max-width: 740px) {
+	#search_form {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 410px) {
+	#languages_form {
+		display: none;
+	}
+}
+
 /* We have shared things... */
 @media screen and (max-width: 720px) {
 	#main_menu, .generic_menu {
@@ -579,7 +591,7 @@
 		width: 60%;
 	}
 	/* Hide me */
-	#inner_wrap, #search_form, #smflogo, #message_index_jump_to, #display_jump_to,
+	#inner_wrap, #smflogo, #message_index_jump_to, #display_jump_to,
 	#siteslogan, th.id_group, th.registered,
 	td.lefttext.id_group, td.lefttext.registered, td.posts, td.statsbar.posts,
 	#main_content_section .navigate_section, .time, .hidden,
