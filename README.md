@@ -21,7 +21,7 @@ by signing off your contributions, you acknowledge that you can and do license y
 * fork the repository. If you are not used to Github, please check out [fork a repository](http://help.github.com/fork-a-repo).
 * branch your repository, to commit the desired changes.
 * sign-off your commits, to acknowledge your submission under the license of the project.
- * It is enough to include in your commit comment "Signed-off by: " followed by your name and email address (for example: `Signed-off-by: Angelina Belle <angelinabelle1@hotmail.com>`)
+ * It is enough to include in your commit comment "Signed-off by: " followed by your name and email address (for example: `Signed-off-by: Feline <support@portamx.com>`)
  * an easy way to do so, is to define an alias for the git commit command, which includes -s switch (reference: [How to create Git aliases](https://git.wiki.kernel.org/index.php/Aliases))
 * send a pull request to us.
 
@@ -30,4 +30,4 @@ by signing off your contributions, you acknowledge that you can and do license y
 * You should never send any pull request against the master branch
 For more informations, the ideal branching we would like to follow is the one described in [this article](http://nvie.com/posts/a-successful-git-branching-model/)
 
-Please, feel free to play around. That's what we're doing. ;)
+Please, feel free to play around. That's what we're doing. ;) 
