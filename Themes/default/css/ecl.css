@@ -1,0 +1,150 @@
+/* CSS file for ecl overlay */
+.ecl_table {
+	width: 100%;
+	border-collapse: collapse;
+	padding: 0;
+}
+#ecl_outer {
+	position: fixed;
+	border: 1px solid #c0c0c0;
+	border-radius: 8px;
+	background: #ffffff;
+	top: 3px;
+	left: 0.01%;
+	right: 0.01%;
+	margin-left: -1px;
+	margin-right: -1px;
+	display: none;
+	z-index: 5;
+}
+.ecl_outer {
+	padding: 5px 10px;
+	border-radius: 6px;
+	background: #557EA0;
+	box-shadow: 0 16px 20px rgba(255, 255, 255, 0.15) inset;
+	box-sizing: border-box;
+	margin: 2px;
+}
+#ecl_outer select {
+	background: #ffffff;
+	border: solid 1px #aaa;
+	border-radius: 0.4em;
+	width: 130px;
+}
+#ecl_outer input {
+	background: #fff;
+	padding: 1px 10px;
+	font-weight: bold;
+	cursor: pointer;
+	margin-top: -3px;
+	margin-bottom:2px;
+	border-radius: 0.4em;
+	width: 130px;
+	text-align: center;
+}
+#ecl_outer input:hover {
+	background: #f49a3a;
+	border: solid 1px #808080;
+	color: #f0f8ff;
+	text-shadow: 1px 1px 1px #505050;
+	font-weight: bold;
+}
+#ecl_inner {
+	padding-top: 2px;
+}
+#privbut {
+	float: right;
+}
+.eclmodal {
+	margin-top: 5px;
+	padding-bottom: 3px;
+	text-align: center;
+}
+#eclmodal {
+	background-color: #d02020;
+	display: inline-block;
+	line-height: 23px;
+	border: 1px solid #f0f0f0;
+	border-radius:4px;
+}
+.eclbutclose {
+	background: #fff;
+	border: solid 1px #aaa;
+	color: #222;
+}
+.eclbutopen {
+	background: #f49a3a !important;
+	border: solid 1px #808080;
+	color: #f0f8ff;
+}
+#ecl_outer,
+#ecl_privacy,
+#ecl_privacytext p strong,
+#ecl_privacytext span strong {
+	font-size: 1em;
+	font-family: "Helvetica Neue", "Nimbus Sans L", Arial, "Liberation Sans", sans-serif;
+	line-height: 1.3em;
+	color: #ffffff;
+}
+#ecl_outer {
+	min-height: 64px;
+}
+.ecl_head {
+	min-height: 20px;
+	margin-top: 2px;
+	line-height:15px;
+}
+.ecl_accept {
+	padding-top: 7px;
+}
+#ecl_privace table {
+	table-layout: fixed;
+}
+#ecl_privacy td {
+	padding: 3px 10px 3px 2px;
+}
+#ecl_privacy td div {
+	border-bottom: 1px solid #e0e0e0;
+}
+#ecl_privacytext p {
+	margin-top: 0px;
+}
+#ecl_privacytext span strong {
+	border-bottom: 1px solid #e0e0e0;
+}
+#ecl_privacy {
+	margin: 5px 0 5px 0;
+	padding: 5px 0 0 0;
+	border-top: solid 1px #e0e0e0;
+	overflow: auto;
+}
+#ecl_privacy .ecl_link:link,
+#ecl_privacy .ecl_link:visited {
+	color: yellow;
+	cursor: pointer;
+}
+#ecl_privacy .ecl_link:hover {
+	text-decoration: underline;
+}
+#ecl_privacy hr {
+	color: #f0f0f0;
+	background-color: #f0f0f0;
+	height: 1px;
+	margin: 5px 0;
+	box-shadow: none;
+}
+.ecl_lang {
+	float: right;
+	margin-left: 10px;
+	min-height: 30px;
+	width: 205px
+}
+.ecl_lang b {
+	display: inline-block;
+	margin-top: 3px;
+	float: right;
+	padding-right: 72%;
+}
+.ecl_lang select {
+	margin-top: -40px;
+}
