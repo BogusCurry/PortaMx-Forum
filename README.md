@@ -1,7 +1,7 @@
 **SMF**, www.simplemachines.org
 **PortaMx**, http://portamx.com
 
-This is a PortaMx/SMF 2.1 development repository.
+This is a PortaMx-SMF 2.1 development repository.
 The software is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
 
 Contributions to documentation are licensed under [CC-by-SA 3](http://creativecommons.org/licenses/by-sa/3.0). Third party libraries or sets of images, are under their own licenses.
