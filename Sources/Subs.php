@@ -145,10 +145,16 @@ function checkECL_Cookie($hideforBots = false)
 */
 function ecl_error($what)
 {
-	global $modSettings;
+	global $modSettings, $txt;
 
 	if(!empty($modSettings['ecl_enabled']))
-		fatal_lang_error('ecl_failed_'. $what, false);
+	{
+		// is the overlay not loaded simple redirect
+		if(isset($txt['ecl_failed_'. $what]))
+			fatal_lang_error('ecl_failed_'. $what, false);
+		else
+			redirectexit();
+	}
 }
 
 /**

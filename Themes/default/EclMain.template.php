@@ -121,7 +121,7 @@ function template_eclmain_above()
 				var LRpos = (bodywith - forumwidth) / 2;
 				document.getElementById("ecl_outer").style.right = Math.floor(LRpos) +"px";
 				document.getElementById("ecl_outer").style.left = Math.floor(LRpos) +"px";
-				window.$("#ecl_outer").delay(500).fadeIn(500);
+				window.$("#ecl_outer").delay(100).fadeIn(200);
 			}
 		}
 		window.onresize = eclResize;

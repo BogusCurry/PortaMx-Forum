@@ -108,17 +108,18 @@ function is_not_guest($message = '')
 	if (isset($_REQUEST['xml']))
 		obExit(false);
 
+	// Attempt to detect if they came from dlattach.
+	if (SMF != 'SSI' && empty($context['theme_loaded']))
+		loadTheme();
+
 	if(!checkECL_Cookie(true))
 	{
-		if(empty($user_info['possibly_robot']))
+		// if the ecl overlay not loaded simple redirect
+		if(isset($txt['ecl_failed_request']))
 			return ecl_error('request');
 		else
 			redirectexit();
 	}
-
-	// Attempt to detect if they came from dlattach.
-	if (SMF != 'SSI' && empty($context['theme_loaded']))
-		loadTheme();
 
 	// Never redirect to an attachment
 	if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
