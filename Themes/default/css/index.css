@@ -453,6 +453,7 @@ a img {
 	overflow: hidden;
 	margin: 0;
 	clear: both;
+	height: 32px;
 }
 .pages:after, .jump_to:after, .code:after {
 	content: ": ";
@@ -1164,7 +1165,7 @@ ul li.greeting {
 }
 .navigate_section ul {
 	margin: 4px 0 0 0;
-	padding: 0 10px;
+	padding: 6px 10px 0 10px;
 	font-size: 0.9em;
 	overflow: hidden;
 	border: 1px solid #ddd;
@@ -1186,7 +1187,7 @@ ul li.greeting {
 }
 .navigate_section ul li span {
 	display: inline-block;
-	margin-top: 8px;
+	margin-top: 2px;
 }
 .navigate_section ul li .dividers {
 	color: #3f6b8c;
@@ -2634,6 +2635,7 @@ dl.addrules dt.floatleft {
 }
 .generic_icons.hide_popup {
 	float: right;
+	margin-top: 2px;
 }
 .popup_heading .icon {
 	vertical-align: middle;
@@ -3750,7 +3752,8 @@ h3.profile_hd {
 /* Some new stuff */
 #display_head {
 	clear: both;
-	margin: -7px 0 15px 0;
+	margin: -7px 0 7px 0;
+	padding-top: 8px;
 }
 #display_head p {
 	color: #959595;

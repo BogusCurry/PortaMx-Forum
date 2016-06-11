@@ -21,7 +21,7 @@
 @media (max-width: 480px) {
 	/* This is general */
 	.popup_window {
-		width: 90%;
+		width: 70%;
 		padding: 0;
 		margin: 0 auto;
 	}
@@ -641,11 +641,20 @@
 		display: none;
 	}
 }
-
 /* Some very big stuff? Dunno... */
 @media (min-width: 856px) and (max-width: 1024px) {
 	div.lastpost {
 		width: 20% !important;
 		margin: 3px 0 0 5px;
 	}
+}
+@media (max-width: 480px) {
+	#mobile_user_menu>div>div.popup_heading {
+		margin-bottom: 0px;
+	}
+}
+
+/* global om mobile */
+.navigate_section ul {
+	padding-top: 4px;
 }
