@@ -1165,7 +1165,7 @@ ul li.greeting {
 }
 .navigate_section ul {
 	margin: 4px 0 0 0;
-	padding: 6px 10px 0 10px;
+	padding: 6px 10px 3px 10px;
 	font-size: 0.9em;
 	overflow: hidden;
 	border: 1px solid #ddd;
@@ -3765,6 +3765,7 @@ h3.profile_hd {
 	font-weight: normal;
 	font-size: 26px;
 	margin-bottom: 0.25em;
+	line-height: 24px;
 }
 
 #reported_posts .generic_icons,
