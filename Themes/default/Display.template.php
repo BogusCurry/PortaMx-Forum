@@ -176,10 +176,20 @@ function template_main()
 	}
 
 	// Show the page index... "Pages: [1]".
-	echo '
+	$haveButtons = template_button_strip($context['normal_buttons'], 'right', array(), true);
+	if(!empty($haveButtons))
+		echo '
 			<div class="pagesection top" id="pagetop">
-				', template_button_strip($context['normal_buttons'], 'right'), '
+				', $haveButtons, '
 				', $context['menu_separator'], '<a href="#bot" class="topbottom floatleft">', $txt['go_down'], '</a>
+				<div class="pagelinks floatleft">
+					', $context['page_index'], '
+				</div>
+			</div>';
+	else
+		echo '
+			<div class="pagesection top" id="pagetop">
+				<a href="#bot" class="topbottom floatleft">', $txt['go_down'], '</a>
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -188,8 +198,8 @@ function template_main()
 	// Mobile action - moderation buttons (top)
 	echo '
 			<div class="mobile_buttons floatright">
-				<a class="button mobile_act">', $txt['mobile_action'],'</a>
-				', ($context['can_moderate_forum'] || $context['user']['is_mod']) ? '<a class="button mobile_mod">'. $txt['mobile_moderation'].'</a>' : '','
+				', (!empty($haveButtons) ? '<a class="button mobile_act">'. $txt['mobile_action'] .'</a>' : ''), '
+				', ($context['can_moderate_forum'] || $context['user']['is_mod'] ? '<a class="button mobile_mod">'. $txt['mobile_moderation'] .'</a>' : ''),'
 			</div>';
 
 	// Show the topic information - icon, subject, etc.
@@ -211,10 +221,19 @@ function template_main()
 			</div>';
 
 	// Show the page index... "Pages: [1]".
+	if(!empty($haveButtons))
 	echo '
 			<div class="pagesection bot" id="bot">
-				', template_button_strip($context['normal_buttons'], 'right'), '
+				', $haveButtons, '
 				', $context['menu_separator'], '<a href="#pagetop" class="topbottom floatleft">', $txt['go_up'], '</a>
+				<div class="pagelinks floatleft">
+					', $context['page_index'], '
+				</div>
+			</div>';
+	else
+		echo '
+			<div class="pagesection bot" id="bot">
+				<a href="#pagetop" class="topbottom floatleft">', $txt['go_up'], '</a>
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -223,8 +242,8 @@ function template_main()
 	// Mobile action - moderation buttons (bottom)
 	echo '
 			<div class="mobile_buttons floatright">
-				<a class="button mobile_act">', $txt['mobile_action'],'</a>
-				', ($context['can_moderate_forum'] || $context['user']['is_mod']) ? '<a class="button mobile_mod">'. $txt['mobile_moderation'].'</a>' : '','
+				', (!empty($haveButtons) ? '<a class="button mobile_act">'. $txt['mobile_action'] .'</a>' : ''), '
+				', ($context['can_moderate_forum'] || $context['user']['is_mod'] ? '<a class="button mobile_mod">'. $txt['mobile_moderation'] .'</a>' : ''),'
 			</div>';
 
 	// Show the lower breadcrumbs.
