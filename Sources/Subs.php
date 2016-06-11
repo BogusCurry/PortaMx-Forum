@@ -3663,7 +3663,7 @@ function custMinify($data, $type, $do_deferred = false)
 		return true;
 
 	// Get all themes. Because reasons!
-	if(isset($_REQUEST['action']) && isset($_REQUEST['area']) && $_REQUEST['area'] != 'theme')
+	if(!isset($_REQUEST['area']) || (isset($_REQUEST['area']) && $_REQUEST['area'] != 'theme'))
 	{ 
 		require_once $sourcedir . '/Subs-Themes.php';
 		get_all_themes(true);

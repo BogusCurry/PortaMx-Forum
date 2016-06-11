@@ -489,8 +489,9 @@
 		float: left !important;
 	}
 	.unread_links a {
-		padding: 5px 0 5px 0 !important;
+		padding: 0 0 5px 0 !important;
 		margin-right: 3px;
+		margin-top: 0px !important;
 	}
 
 	/* BoardIndex */

@@ -1182,7 +1182,7 @@ ul li.greeting {
 }
 .navigate_section ul li a, .navigate_section ul li em {
 	padding: 4px 0 4px;
-	margin-top: -4px;
+	margin-top: -2px;
 	display: inline-block;
 }
 .navigate_section ul li span {
@@ -1203,7 +1203,7 @@ ul li.greeting {
 	float: right;
 }
 .navigate_section .unread_links a {
-	padding: 4px 0 4px 10px;
+	padding: 0 0 4px 10px;
 	margin-top: 4px;
 }
 /* The content section */
@@ -1408,7 +1408,7 @@ ul li.greeting {
 
 /* The jump to box */
 #display_jump_to {
-	padding: 11px 5px 5px 0;
+	padding: 9px 5px 5px 0;
 	margin: 0;
 	border: none;
 	float: right;

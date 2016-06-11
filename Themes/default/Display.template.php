@@ -249,20 +249,27 @@ function template_main()
 	// Show the lower breadcrumbs.
 	theme_linktree();
 
+	// Moderation buttons
+	echo '
+			<div id="moderationbuttons">
+				', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '
+			</div>';
+
 	// Show the jumpto box, or actually...let Javascript do it.
 	echo '
 			<div id="display_jump_to">&nbsp;</div>';
 
 	// Show quickreply
 	if ($context['can_reply'])
-	template_quickreply();
+		template_quickreply();
 
 	// User action pop on mobile screen (or actually small screen), this uses responsive css does not check mobile device.
 	echo '
 			<div id="mobile_action" class="popup_container">
 				<div class="popup_window description">
 					<div class="popup_heading">', $txt['mobile_action'],'
-					<a href="javascript:void(0);" class="generic_icons hide_popup"></a></div>
+						<a href="javascript:void(0);" class="generic_icons hide_popup"></a>
+					</div>
 					', template_button_strip($context['normal_buttons']), '
 				</div>
 			</div>';
@@ -273,10 +280,9 @@ function template_main()
 			<div id="mobile_moderation" class="popup_container">
 				<div class="popup_window description">
 					<div class="popup_heading">', $txt['mobile_moderation'],'
-					<a href="javascript:void(0);" class="generic_icons hide_popup"></a></div>
-					<div id="moderationbuttons_mobile">
-						', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip_mobile')), '
+						<a href="javascript:void(0);" class="generic_icons hide_popup"></a>
 					</div>
+						', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip_mobile')), '
 				</div>
 			</div>';
 
