@@ -200,8 +200,8 @@ function ModifyPostSettings($return_config = false)
 			array('check', 'enableEmbeddedFlash', 'subtext' => $txt['enableEmbeddedFlash_warning']),
 			// Note show the warning as red if: pspell not installed and (enchant not installed or not using UTF-8 and iconv not installed)
 			array('check', 'enableSpellChecking', 'subtext' => ($can_spell_check ? $txt['enableSpellChecking_warning'] : ('<span class="alert">' . $txt['enableSpellChecking_warning'] . '</span>'))),
-			array('check', 'additional_options_collapsable'),
 			array('check', 'disable_wysiwyg'),
+			array('check', 'additional_options_collapsable'),
 		'',
 			array('check', 'add_favicon_to_links'),
 			array('check', 'dont_use_lightbox'),

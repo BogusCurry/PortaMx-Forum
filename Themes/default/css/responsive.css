@@ -126,6 +126,7 @@
 	/* Display (Topic View) */
 	.poster {
 		float: none !important;
+		margin-bottom: 10px;
 	}
 	.postarea {
 		margin: 0 !important;
@@ -533,9 +534,6 @@
 	}
 
 	/* Display (Topics) */
-	.user_info li {
-		display: inline-block;
-	}
 	.user_info li.avatar, .user_info li.poster_ip {
 		display: none;
 	}
@@ -654,7 +652,14 @@
 		margin-bottom: 0px;
 	}
 }
-
+@media (max-width: 600px) {
+	.poster {
+		width: 120px;
+	}
+	.postarea, .moderatorbar {
+		margin-left:120px;
+	}
+}
 /* global om mobile */
 .navigate_section ul {
 	padding-top: 4px;

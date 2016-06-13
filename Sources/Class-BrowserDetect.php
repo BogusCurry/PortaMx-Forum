@@ -24,6 +24,7 @@ if (!defined('SMF'))
  * - Firefox Versions: 1, 2, 3 .... 11 ...
  * - Chrome Versions: 1 ... 18 ...
  * - IE Versions: 4, 5, 5.5, 6, 7, 8, 9, 10 ... mobile and Mac
+ * - MS Edge
  * - Nokia
  */
 class browser_detector
@@ -56,6 +57,9 @@ class browser_detector
 		// One at a time, one at a time, and in this order too
 		if ($this->isOpera())
 			$this->setupOpera();
+		// Meh...
+		elseif ($this->isEdge())
+			$this->setupEdge();
 		// Them webkits need to be set up too
 		elseif ($this->isWebkit())
 			$this->setupWebkit();
@@ -72,9 +76,6 @@ class browser_detector
 
 		// IE11 seems to be fine by itself without being lumped into the "is_ie" category
 		$this->isIe11();
-
-		// edge detection
-		$this->isEdge();
 
 		// Be you robot or human?
 		if ($user_info['possibly_robot'])
@@ -136,16 +137,15 @@ class browser_detector
  	}
 
 	/**
-	* Determine if the browser is Win 10 Edge
+	* Determine if the browser is Edge or not
 	* @return boolean Whether or not the browser is Edge
 	*/
 	function isEdge()
 	{
-		// IE11 is a bit different than earlier versions
-		// The isGecko() part is to ensure we get this right...
-		$this->_browsers['is_edge'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Edge/') !== false;
+		if (!isset($this->_browsers['is_edge']))
+			$this->_browsers['is_edge'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Edge') !== false;
 		return $this->_browsers['is_edge'];
- 	}
+	}
 
 	/**
 	* Determine if the browser is a Webkit based one or not
@@ -349,6 +349,15 @@ class browser_detector
 	}
 
 	/**
+	 * Sets the version number for MS edge.
+	 */
+	private function setupEdge()
+	{
+		if (preg_match('~Edge[\/]([0-9][0-9]?[\.][0-9][0-9])~i', $_SERVER['HTTP_USER_AGENT'], $match) === 1)
+			$this->_browsers['is_edge' . (int) $match[1]] = true;
+	}
+
+	/**
 	 * Get the browser name that we will use in the <body id="this_browser">
 	 *  - The order of each browser in $browser_priority is important
 	 *  - if you want to have id='ie6' and not id='ie' then it must appear first in the list of ie browsers
@@ -370,8 +379,8 @@ class browser_detector
 				'is_ie9' => 'ie9',
 				'is_ie10' => 'ie10',
 				'is_ie11' => 'ie11',
-				'is_edge' => 'edge',
 				'is_ie' => 'ie',
+				'is_edge' => 'edge',
 				'is_firefox' => 'firefox',
 				'is_chrome' => 'chrome',
 				'is_safari' => 'safari',
@@ -421,6 +430,7 @@ class browser_detector
 			'is_chrome' => false,
 			'is_safari' => false,
 			'is_gecko'  => false,
+			'is_edge' => false,
 			'is_ie8' => false,
 			'is_ie7' => false,
 			'is_ie6' => false,
@@ -428,7 +438,6 @@ class browser_detector
 			'is_ie5' => false,
 			'is_ie' => false,
 			'is_ie4' => false,
-			'is_edge' => false,
 			'ie_standards_fix' => false,
 			'needs_size_fix' => false,
 			'possibly_robot' => false,
