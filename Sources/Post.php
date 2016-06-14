@@ -1752,6 +1752,7 @@ function Post2()
 			$post_errors[] = 'session_timeout';
 			unset ($_POST['preview'], $_REQUEST['xml']); // just in case
 		}
+		unset ($_REQUEST['xml']);
 		return Post($post_errors);
 	}
 

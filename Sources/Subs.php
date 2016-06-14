@@ -23,49 +23,54 @@ function jsCookieHandling()
 {
 	global $modSettings;
 
-	$result = '';
-	if($_REQUEST['mode'] == 'get')
+	if(isset($_REQUEST['jscook']))
 	{
-		if($_REQUEST['name'] == 'time' && $_REQUEST['type'] = 'format')
-			$result = timeformat($_REQUEST['value']);
+		ob_end_clean();
 
-		elseif(isset($_COOKIE[$_REQUEST['name']]))
-			$result = $_COOKIE[$_REQUEST['name']];
-	}
-	elseif($_REQUEST['mode'] == 'set')
-	{
-		if($_REQUEST['type'] == 'ecl')
-			setECL_Cookie();
-		elseif(checkECL_Cookie())
+		$result = '';
+		if($_REQUEST['mode'] == 'get')
+		{
+			if($_REQUEST['name'] == 'time' && $_REQUEST['type'] = 'format')
+				$result = timeformat($_REQUEST['value']);
+
+			elseif(isset($_COOKIE[$_REQUEST['name']]))
+				$result = $_COOKIE[$_REQUEST['name']];
+		}
+		elseif($_REQUEST['mode'] == 'set')
+		{
+			if($_REQUEST['type'] == 'ecl')
+				setECL_Cookie();
+			elseif(checkECL_Cookie())
+			{
+				$parts = eclCookieparts();
+				$_REQUEST['value'] = empty($_REQUEST['value']) ? '0' : strval($_REQUEST['value']);
+				setcookie($_REQUEST['name'], $_REQUEST['value'], 0, $parts['path'], $parts['host'], !empty($modSettings['secureCookies']), !empty($modSettings['httponlyCookies']));
+			}
+		}
+		elseif($_REQUEST['mode'] == 'test')
+		{
+			if($_REQUEST['type'] == 'ecl')
+				$result = checkECL_Cookie();
+			if(!empty($_REQUEST['name']))
+			{
+				$result = isset($_COOKIE[$_REQUEST['name']]);
+				if($result && !empty($_REQUEST['value']))
+					$result = $_COOKIE[$_REQUEST['name']] == $_REQUEST['value'];
+			}
+			$result = !empty($result) ? $result : '';
+		}
+		elseif($_REQUEST['mode'] == 'clr')
 		{
 			$parts = eclCookieparts();
-			$_REQUEST['value'] = empty($_REQUEST['value']) ? '0' : strval($_REQUEST['value']);
-			setcookie($_REQUEST['name'], $_REQUEST['value'], 0, $parts['path'], $parts['host'], !empty($modSettings['secureCookies']), !empty($modSettings['httponlyCookies']));
- 		}
-	}
-	elseif($_REQUEST['mode'] == 'test')
-	{
-		if($_REQUEST['type'] == 'ecl')
-			$result = checkECL_Cookie();
-		if(!empty($_REQUEST['name']))
-		{
-			$result = isset($_COOKIE[$_REQUEST['name']]);
-			if($result && !empty($_REQUEST['value']))
-				$result = $_COOKIE[$_REQUEST['name']] == $_REQUEST['value'];
+			setcookie($_REQUEST['name'], $_REQUEST['value'], time()-3600, $parts['path'], $parts['host'], !empty($modSettings['secureCookies']), !empty($modSettings['httponlyCookies']));
 		}
-		$result = !empty($result) ? $result : '';
-	}
-	elseif($_REQUEST['mode'] == 'clr')
-	{
-		$parts = eclCookieparts();
-		setcookie($_REQUEST['name'], $_REQUEST['value'], time()-3600, $parts['path'], $parts['host'], !empty($modSettings['secureCookies']), !empty($modSettings['httponlyCookies']));
-	}
 
-	// resturn result
-	ob_start();
-	echo $result;
-	ob_end_flush();
-	exit;
+		// resturn result
+		ob_start();
+		echo $result;
+		ob_end_flush();
+		exit;
+	}
 }
 
 /**

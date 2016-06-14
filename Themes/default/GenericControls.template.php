@@ -135,7 +135,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
  */
 function template_control_richedit_buttons($editor_id)
 {
-	global $context, $settings, $txt, $modSettings, $scripturl;
+	global $context, $settings, $txt, $modSettings, $scripturl, $topic;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
@@ -155,22 +155,19 @@ function template_control_richedit_buttons($editor_id)
 		$tempTab++;
 
 	// add a cancel button for these actions
-	if(isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('post', 'calendar')))
+	if(isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('post', 'post2', 'calendar')))
 	{
-		$cancelLink = '';
-		if(isset($_REQUEST['msg']) || isset($_REQUEST['last_msg']))
-			$cancelLink = $scripturl . '?topic='. $_REQUEST['topic'] .'.msg'. (isset($_REQUEST['msg']) ? $_REQUEST['msg'] .'#msg'. $_REQUEST['msg'] : $_REQUEST['last_msg'] .'#msg'. $_REQUEST['last_msg']);
-		else if(isset($_REQUEST['board']))
-			$cancelLink = $scripturl . '?board='. $_REQUEST['board']; 
-		else if($_REQUEST['action'] == 'calendar')
-			$cancelLink = $scripturl . '?action='. $_REQUEST['action'];
+		$find = array('/action='. $_REQUEST['action'] .'/', '/'. $_SESSION['session_var'] .'='. $_SESSION['session_value'] .'/', '/board\=[0-9\.]+/', '/start\=[0-9]+/', '/[\;]+/', '/last_msg\=/', '/\?;/');
+		$replace = array('', '', '', '', ';', 'msg=', '?');
+		$cancelLink = preg_replace($find, $replace, $_SERVER['REQUEST_URL']);
+		if(strpos($cancelLink, 'topic') === false)
+			$cancelLink = preg_replace(array('/\?/', '/;;/'), array('?topic='. $topic .'.0;', ';'), $cancelLink);
+		preg_match('/msg\=([0-9]+)/', $cancelLink, $msg);
+		$cancelLink = rtrim($cancelLink, ';') . (isset($msg[1]) ? '#msg'. $msg[1] : '');
 
-		if(!empty($cancelLink))
-		{
-			$tempTab++;
-			echo '
+		$tempTab++;
+		echo '
 		<input type="button" value="'. $txt['modify_cancel'] .'" name="'. $txt['modify_cancel'] .'" tabindex="', $tempTab, '" onclick="window.location.href=\'', $cancelLink ,'\'" accesskey="c" class="button_submit">';
-		}
 	}
 
 	$context['tabindex'] = $tempTab;

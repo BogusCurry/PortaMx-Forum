@@ -138,6 +138,9 @@ function smf_main()
 	// Load the current user's permissions.
 	loadPermissions();
 
+	// handle Javascript cookie requests
+	jsCookieHandling();    
+
 	// Attachments don't require the entire theme to be loaded.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach')
 		detectBrowser();
@@ -149,8 +152,8 @@ function smf_main()
 	is_not_banned();
 
 	// handle Javascript cookie requests
-	if(isset($_REQUEST['jscook']))
-		jsCookieHandling();    
+//	if(isset($_REQUEST['jscook']))
+//		jsCookieHandling();    
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
