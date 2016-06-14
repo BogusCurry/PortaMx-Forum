@@ -10,9 +10,8 @@
  * Because of the way this runs, etc. we do need some of SMF but not everything to try to keep this
  * running a little bit faster.
  *
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD

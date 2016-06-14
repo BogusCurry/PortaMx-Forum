@@ -4,9 +4,8 @@
  * This file doing the job of attachments and avatars maintenance and management.
  * @todo refactor as controller-model
  *
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD

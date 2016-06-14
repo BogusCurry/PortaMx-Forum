@@ -78,6 +78,5 @@ ConsolaMono | © 2012 | This font is licensed under the SIL Open Font License, V
 Phennig | © 2009-2012 | This font is licensed under the SIL Open Font License, Version 1.1
 
 
-
 Copyright
-Portamx Forum 2.1 Beta 3 © 2016, PortaMx/Simple Machines
+Portamx Forum 2.1 Beta 4 © 2016, PortaMx/SMF

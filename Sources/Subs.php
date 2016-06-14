@@ -3,9 +3,8 @@
 /**
  * This file has all the main functions in it that relate to, well, everything.
  *
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
@@ -1265,6 +1264,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'height' => array('optional' => true, 'value' => ' height="$1"', 'match' => '(\d+)'),
 					'alt' => array('optional' => true, 'value' => ' alt="$1"', 'match' => '(\S+)'),
 					'expand' => array('optional' => true, 'value' => ' expand="$1"', 'match' => '(\S+)'),
+					'class' => array('optional' => true, 'value' => ' class="$1"', 'match' => '(\S+)'),
 				),
 				'content' => '$1',
 				'validate' => function (&$tag, &$data, $disabled) use ($modSettings, $sourcedir, $txt)
@@ -1303,6 +1303,11 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						// class for lightbox given?
 						if (isset($context['lbimage_data']['class']) && !empty($context['lbimage_data']['class']))
 							$class = ' class="'. $context['lbimage_data']['class'] .'"';
+						else
+						{
+							preg_match('/class=(\S+)/', $data[1], $tmp);
+							$class = !empty($tmp[1]) ? ' class="'. $tmp[1] .'"' : '';
+						}
 
 						// Ligtbox disable ?
 						preg_match('/expand=(\S+)/', $data[1], $tmp);
@@ -1494,6 +1499,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'width' => array('optional' => true, 'value' => ' width="$1"', 'match' => '(\d+)'),
 					'height' => array('optional' => true, 'value' => ' height="$1"', 'match' => '(\d+)'),
 					'expand' => array('optional' => true, 'value' => ' expand="$1"', 'match' => '(\S+)'),
+					'class' => array('optional' => true, 'value' => ' class="$1"', 'match' => '(\S+)'),
 				),
 				'content' => '$1',
 				'validate' => function (&$tag, &$data, $disabled)
@@ -1519,6 +1525,11 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					// class for lightbox given?
 					if (isset($context['lbimage_data']['class']) && !empty($context['lbimage_data']['class']))
 						$class = ' class="'. $context['lbimage_data']['class'] .'"';
+					else
+					{
+						preg_match('/class=(\S+)/', $data[1], $tmp);
+						$class = !empty($tmp[1]) ? ' class="'. $tmp[1] .'"' : '';
+					}
 
 					// Ligtbox disable ?
 					preg_match('/expand=(\S+)/', $data[1], $tmp);

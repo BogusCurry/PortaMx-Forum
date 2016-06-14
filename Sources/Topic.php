@@ -4,9 +4,8 @@
  * This file takes care of actions on topics:
  * lock/unlock a topic, sticky/unsticky it,
  *
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD

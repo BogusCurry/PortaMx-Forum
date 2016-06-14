@@ -6,9 +6,8 @@
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright 2012 The Authors
  *
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD

@@ -1,6 +1,6 @@
 <?php
 /**
- * PortaMx/SMF Forum
+ * PortaMx Forum
  *
  * @package SMF
  * @author Simple Machines http://www.simplemachines.org

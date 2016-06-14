@@ -3461,8 +3461,8 @@ ul.post_options li {
 	font-size: 0.9em;
 	box-sizing: border-box;
 }
-.signature img {
-	vertical-align: -6px;
+.sigimg {
+	vertical-align: -8px;
 }
 .under_message {
 	overflow: visible;

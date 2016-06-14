@@ -1,8 +1,7 @@
 <?php
 /**
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
@@ -160,8 +159,8 @@ function template_credits()
 				<dd>';
 
 			// Try to make this read nicely.
-			if (count($group['members']) <= 2)
-				echo implode(' ' . $txt['credits_and'] . ' ', $group['members']);
+			if (count($group['members']) <= 1)
+				echo implode($group['members']);
 			else
 			{
 				$last_peep = array_pop($group['members']);

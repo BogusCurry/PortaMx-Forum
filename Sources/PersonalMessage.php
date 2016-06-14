@@ -5,9 +5,8 @@
  * messages. It allows viewing, sending, deleting, and marking personal
  * messages. For compatibility reasons, they are often called "instant messages".
  *
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD

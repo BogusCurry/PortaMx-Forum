@@ -60,7 +60,7 @@ $webmaster_email = 'noreply@myserver.com';
  * Name of the cookie to set for authentication.
  * @var string
  */
-$cookiename = 'SMFCookie11';
+$cookiename = 'PortaMxCookie11';
 
 ########## Database Info ##########
 /**
@@ -78,7 +78,7 @@ $db_server = 'localhost';
  * The database name
  * @var string
  */
-$db_name = 'smf';
+$db_name = 'pmxforum';
 /**
  * Database username
  * @var string
@@ -104,7 +104,7 @@ $ssi_db_passwd = '';
  * This helps to prevent conflicts
  * @var string
  */
-$db_prefix = 'smf_';
+$db_prefix = 'pmx_';
 /**
  * Use a persistent database connection
  * @var int|bool

@@ -7,8 +7,7 @@
  *   prevent any default browser actions
  * - attempts to keep the tooltip on screen
  *
- * PortaMx/SMF Forum
- *
+ * PortaMx Forum
  * @package PortaMx/SMF
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors

@@ -1,9 +1,8 @@
 <?php
 
 /**
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
@@ -4537,7 +4536,7 @@ function template_upgrade_above()
 	<div id="footerfix">
 		<div id="header">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="smflogo" src="', $settings['default_theme_url'], '/images/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum">
+			<img id="smflogo" src="', $settings['default_theme_url'], '/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
 		</div>
 	<div id="wrapper">
 	<div id="upper_section">

@@ -3,9 +3,8 @@
 /**
  * This file handles the administration of languages tasks.
  *
- * PortaMx/SMF Forum
- *
- * @package SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author Simple Machines http://www.simplemachines.org
  * @copyright 2016 Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD

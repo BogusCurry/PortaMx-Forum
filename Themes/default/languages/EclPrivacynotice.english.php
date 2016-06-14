@@ -1,8 +1,7 @@
 <?php
-/*
-	Version: 2.1 Beta 4; EclPrivacynotice
-
-	Additional informations to this file format:
+// Version: 2.1 Beta 4; EclPrivacynotice
+/**
+	Additional informations for this file format:
 	We have 3 tokens, they replaced at run time:
 	@site@   - replace with the Forum name
 	@host@   - replaced with the Domain name

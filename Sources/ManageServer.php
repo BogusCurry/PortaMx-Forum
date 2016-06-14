@@ -49,9 +49,8 @@
  *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
  *  	array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
  *
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD

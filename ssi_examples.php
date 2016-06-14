@@ -1,9 +1,8 @@
 <?php
 
 /**
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
@@ -503,7 +502,7 @@ function template_ssi_above()
 	<body>
 		<div id="header">
 			<h1 class="forumtitle">SMF 2.1 Beta 4 SSI.php Examples</h1>
-			<img id="smflogo" src="Themes/default/images/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum">
+			<img id="smflogo" src="Themes/default/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
 		</div>
 		<div id="wrapper">
 			<div id="upper_section"><p><br></p></div>

@@ -1,8 +1,7 @@
 <?php
 /**
- * PortaMx/SMF Forum
- *
- * @package PortaMx/SMF
+ * PortaMx Forum
+ * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
@@ -167,7 +166,7 @@ function template_credits()
 						<div id="support_credits" class="roundframe">
 							<div class="sub_bar">
 								<h3 class="subbg">
-									', $txt['support_title'], ' <img src="', $settings['images_url'], '/smflogo.png" id="credits_logo" alt="">
+									', $txt['support_title'], ' <img src="', $settings['images_url'], '/portamxlogo.png" id="credits_logo" alt="">
 								</h3>
 							</div>
 							<div class="padding">
