@@ -1332,7 +1332,7 @@ if ($smcFunc['db_num_rows']($file_check) == 0)
 	$smcFunc['db_insert']('',
 		'{db_prefix}admin_info_files',
 		array('filename' => 'string', 'path' => 'string', 'parameters' => 'string', 'data' => 'string', 'filetype' => 'string'),
-		array('latest-versions.txt', '/smf/', 'version=%3$s', '', 'text/plain'),
+		array('latest-versions.txt', '/smf_files/', '', '', 'text/plain'),
 		array('id_file')
 	);
 }
