@@ -2034,14 +2034,15 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 	global $txt, $context, $scripturl, $modSettings;
 	global $smcFunc, $user_info, $sourcedir;
 
+	loadTemplate('PersonalMessage');
+	$context['sub_template'] = 'send';
+
 	if (!isset($_REQUEST['xml']))
 	{
-		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';		$context['sub_template'] = 'send';
+		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
 		loadJavascriptFile('PersonalMessage.js', array('defer' => false), 'smf_pms');
 		loadJavascriptFile('suggest.js', array('defer' => false), 'smf_suggest');
 	}
-	else
-		$context['sub_template'] = 'pm';
 
 	$context['page_title'] = $txt['send_message'];
 

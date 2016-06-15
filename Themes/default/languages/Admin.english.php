@@ -48,7 +48,7 @@ $txt['admin_agreement_select_language_change'] = 'Change';
 $txt['admin_agreement_not_saved'] = 'The agreement changes have not been saved. Perhaps the file permissions on the file were not set correctly.';
 $txt['admin_delete_members'] = 'Delete Selected Members';
 $txt['admin_repair'] = 'Repair All boards and topics';
-$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;. From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br><br>If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page. If the information there doesn\'t help you, feel free to <a href="http://www.simplemachines.org/community/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br>You may also find answers to your questions or problems by clicking the <span class="generic_icons help" title="%3$s"></span> symbols for more information on the related functions.';
+$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;. From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br><br>If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page. If the information there doesn\'t help you, feel free to <a href="http://portamx.com" target="_blank" class="new_win">look to us for help</a> with the problem.<br>You may also find answers to your questions or problems by clicking the <span class="generic_icons help" title="%3$s"></span> symbols for more information on the related functions.';
 $txt['admin_news_desc'] = 'Please place one news item per box. BBC tags, such as <span title="Are you bold?">[b]</span>, <span title="I tall icks!!">[i]</span> and <span title="Brackets are great, no?">[u]</span> are allowed in your news, as well as smileys. Clear a news item\'s text box to remove it.';
 $txt['administrators'] = 'Forum Administrators';
 $txt['admin_reserved_desc'] = 'Reserved names will keep members from registering certain usernames or using these words in their displayed names. Choose the options you wish to use from the bottom before submitting.';
@@ -100,15 +100,15 @@ $txt['attachment_file_size'] = 'File Size';
 $txt['attachmentdir_size_not_set'] = 'No maximum directory size is currently set';
 $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set';
 $txt['attachment_delete_admin'] = '[attachment deleted by admin]';
-$txt['live'] = 'Live from Simple Machines...';
+$txt['live'] = 'Live from PortaMx...';
 $txt['remove_all'] = 'Clear Log';
 $txt['approve_new_members'] = 'Admin must approve all new members';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
 
-$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at <a href="http://www.simplemachines.org/" target="_blank" class="new_win">www.simplemachines.org</a>.';
+$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at <a href="http://portamx.com/" target="_blank" class="new_win">portamx.com</a>.';
 $txt['version_check_more'] = '(more detailed)';
 
-$txt['lfyi'] = 'You are unable to connect to simplemachines.org\'s latest news file.';
+$txt['lfyi'] = 'You are unable to connect to portamx.com\'s latest news file.';
 
 $txt['manage_calendar'] = 'Calendar';
 $txt['manage_search'] = 'Search';
@@ -294,8 +294,8 @@ $txt['confirm_delete_members'] = 'Are you sure you want to delete the selected m
 
 $txt['support_credits_title'] = 'Support and Credits';
 $txt['support_title'] = 'Support Information';
-$txt['support_versions_current'] = 'Current SMF version';
-$txt['support_versions_forum'] = 'Forum version';
+$txt['support_versions_current'] = 'Current version';
+$txt['support_versions_forum'] = 'Your version';
 $txt['support_versions_php'] = 'PHP version';
 $txt['support_versions_db'] = '%1$s version';
 $txt['support_versions_db_engine'] = '%1$s engine';

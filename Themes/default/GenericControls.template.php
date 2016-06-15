@@ -155,19 +155,36 @@ function template_control_richedit_buttons($editor_id)
 		$tempTab++;
 
 	// add a cancel button for these actions
-	if(isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('post', 'post2', 'calendar')))
+	if(isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('post', 'post2', 'calendar', 'pm')))
 	{
-		$find = array('/action='. $_REQUEST['action'] .'/', '/'. $_SESSION['session_var'] .'='. $_SESSION['session_value'] .'/', '/board\=[0-9\.]+/', '/start\=[0-9]+/', '/[\;]+/', '/last_msg\=/', '/\?;/');
-		$replace = array('', '', '', '', ';', 'msg=', '?');
-		$cancelLink = preg_replace($find, $replace, $_SERVER['REQUEST_URL']);
-		if(strpos($cancelLink, 'topic') === false)
-			$cancelLink = preg_replace(array('/\?/', '/;;/'), array('?topic='. $topic .'.0;', ';'), $cancelLink);
-		preg_match('/msg\=([0-9]+)/', $cancelLink, $msg);
-		$cancelLink = rtrim($cancelLink, ';') . (isset($msg[1]) ? '#msg'. $msg[1] : '');
+		if($_REQUEST['action'] == 'pm' && isset($_REQUEST['sa']) && ($_REQUEST['sa'] == 'send' || $_REQUEST['sa'] == 'send2'))
+			$_SESSION['post_cancel_link'] = $scripturl .'?action=pm';
+		else if(!isset($_REQUEST['preview']))
+		{
+			$_SESSION['post_cancel_link'] = preg_replace(array('/prev_next=next/', '/prev_next=prev/'), '', $_SERVER['HTTP_REFERER']);
+			preg_match('/\.msg([0-9]+)/', $_SERVER['HTTP_REFERER'], $msg);
+			if(isset($msg[1]))
+				$_SESSION['post_cancel_link'] .='#msg'. $msg[1];
+			else
+			{
+				preg_match('/(quote=)([0-9]+)/', $_SERVER['QUERY_STRING'], $msg);
+				if(isset($msg[2]))
+				{
+					if(strpos($_SESSION['post_cancel_link'], '.msg') === false)
+						$_SESSION['post_cancel_link'] = str_replace('.0', '.msg'. $msg[2], $_SESSION['post_cancel_link']);
+					$_SESSION['post_cancel_link'] .= '#msg'. $msg[2];
+				}
+				else
+				{
+					if($_REQUEST['action'] != 'pm')
+						$_SESSION['post_cancel_link'] .= '#topic';
+				}
+			}
+		}
 
 		$tempTab++;
 		echo '
-		<input type="button" value="'. $txt['modify_cancel'] .'" name="'. $txt['modify_cancel'] .'" tabindex="', $tempTab, '" onclick="window.location.href=\'', $cancelLink ,'\'" accesskey="c" class="button_submit">';
+			<input type="button" value="'. $txt['modify_cancel'] .'" name="'. $txt['modify_cancel'] .'" tabindex="', $tempTab, '" onclick="window.location.href=\'', $_SESSION['post_cancel_link'] ,'\'" accesskey="c" class="button_submit">';
 	}
 
 	$context['tabindex'] = $tempTab;
