@@ -3756,7 +3756,7 @@ h3.profile_hd {
 #display_head {
 	clear: both;
 	margin: -7px 0 7px 0;
-	padding-top: 8px;
+	padding-top: 4px;
 }
 #display_head p {
 	color: #959595;

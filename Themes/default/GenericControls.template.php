@@ -155,7 +155,7 @@ function template_control_richedit_buttons($editor_id)
 		$tempTab++;
 
 	// add a cancel button for these actions
-	if(isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('post', 'post2', 'calendar', 'pm')))
+	if(!empty($_SERVER['HTTP_REFERER']) && isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('post', 'post2', 'calendar', 'pm')))
 	{
 		if($_REQUEST['action'] == 'pm' && isset($_REQUEST['sa']) && ($_REQUEST['sa'] == 'send' || $_REQUEST['sa'] == 'send2'))
 			$_SESSION['post_cancel_link'] = $scripturl .'?action=pm';
@@ -173,11 +173,6 @@ function template_control_richedit_buttons($editor_id)
 					if(strpos($_SESSION['post_cancel_link'], '.msg') === false)
 						$_SESSION['post_cancel_link'] = str_replace('.0', '.msg'. $msg[2], $_SESSION['post_cancel_link']);
 					$_SESSION['post_cancel_link'] .= '#msg'. $msg[2];
-				}
-				else
-				{
-					if($_REQUEST['action'] != 'pm')
-						$_SESSION['post_cancel_link'] .= '#topic';
 				}
 			}
 		}

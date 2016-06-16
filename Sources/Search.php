@@ -18,9 +18,9 @@ if (!defined('SMF'))
 // This defines two version types for checking the API's are compatible with this version of SMF.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'SMF 2.1 Beta 4',
+	'forum_version' => 'PortaMx-Forum 2.1 Beta 4',
 	// This is the minimum version of SMF that an API could have been written for to work. (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('SMF 2+1=Beta=4', array('+' => '.', '=' => ' ')),
+	'search_version' => strtr('PortaMx-Forum 2+1=Beta=4', array('+' => '.', '=' => ' ')),
 );
 
 /**

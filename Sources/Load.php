@@ -376,10 +376,10 @@ function loadUserSettings($checkOnly = false)
 
 	if (empty($id_member) && isset($_COOKIE[$cookiename]))
 	{
-		$cookie_data = smf_json_decode($_COOKIE[$cookiename], true);
+		$cookie_data = smf_json_decode($_COOKIE[$cookiename], true, false);
 
-		if (is_null($cookie_data))
-			$cookie_data = @unserialize($_COOKIE[$cookiename]);
+		if (empty($cookie_data))
+			$cookie_data = safe_unserialize($_COOKIE[$cookiename]);
 
 		list ($id_member, $password) = $cookie_data;
 		$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
@@ -1982,6 +1982,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'quotefast',
 		'jsmodify',
 		'xmlhttp',
+		'post2',
 	);
 
 	call_integration_hook('integrate_simple_actions', array(&$simpleActions, &$simpleAreas, &$simpleSubActions, &$xmlActions));

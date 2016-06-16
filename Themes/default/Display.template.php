@@ -37,7 +37,6 @@ function template_main()
 
 	// Show new topic info here?
 	echo '
-		<span id="topic"></span>
 		<div id="display_head" class="information">
 			<h2 class="display_title"><span id="top_subject">', $context['subject'], '</span>', ($context['is_locked']) ? ' <span class="generic_icons lock"></span>' : '', ($context['is_sticky']) ? ' <span class="generic_icons sticky"></span>' : '', '</h2>
 			<p>',$txt['started_by'],' ', $context['topic_poster_name'],', ', $context['topic_started_time'],'</p>';
@@ -525,7 +524,7 @@ function template_single_post($message)
 								<li class="postcount">', $txt['member_postcount'], ': ', $message['member']['posts'], '</li>';
 
 		// Show their personal text?
-		if (!empty($modSettings['show_blurb']) && $message['member']['blurb'] != '')
+		if (!empty($modSettings['show_blurb']) && !empty($message['member']['blurb']))
 			echo '
 								<li class="blurb">', $message['member']['blurb'], '</li>';
 
@@ -553,7 +552,7 @@ function template_single_post($message)
 									<ol class="profile_icons">';
 
 			// Don't show an icon if they haven't specified a website.
-			if ($message['member']['website']['url'] != '' && !isset($context['disabled_fields']['website']))
+			if (!empty($message['member']['website']['url']) && !isset($context['disabled_fields']['website']))
 				echo '
 										<li><a href="', $message['member']['website']['url'], '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">', ($settings['use_image_buttons'] ? '<span class="generic_icons www centericon" title="' . $message['member']['website']['title'] . '"></span>' : $txt['www']), '</a></li>';
 
@@ -644,8 +643,11 @@ function template_single_post($message)
 									<span class="smalltext modified" id="modified_', $message['id'], '">';
 
 	if (!empty($modSettings['show_modify']) && !empty($message['modified']['name']))
-		echo $message['modified']['last_edit_text'];
-	echo '</span>';
+		echo
+										$message['modified']['last_edit_text'];
+
+	echo '
+									</span>';
 
 	echo '
 								</h5>

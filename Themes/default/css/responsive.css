@@ -21,7 +21,7 @@
 @media (max-width: 480px) {
 	/* This is general */
 	.popup_window {
-		width: 70%;
+		width: 80%;
 		padding: 0;
 		margin: 0 auto;
 	}
@@ -208,7 +208,7 @@
 	}
 	/* Memberlist */
 	th.website_url,
-	td.website_url, td.reg_group, td.reg_date, td.post_num, td.statsbar {
+	td.website_url, td.reg_date, td.post_num, td.statsbar {
 		display: none;
 	}
 	#mlist .posts {
@@ -591,8 +591,8 @@
 	}
 	/* Hide me */
 	#inner_wrap, #smflogo, #message_index_jump_to, #display_jump_to,
-	#siteslogan, th.id_group, th.registered,
-	td.lefttext.id_group, td.lefttext.registered, td.posts, td.statsbar.posts,
+	#siteslogan, th.website_url, th.registered,
+	td.centertext.website_url, td.centertext.reg_date, td.posts, td.statsbar.posts,
 	#main_content_section .navigate_section, .time, .hidden,
 	#header_custom_profile_fields_field_type, #header_custom_profile_fields_active,
 	#header_custom_profile_fields_placement {
@@ -660,7 +660,10 @@
 		margin-left:120px;
 	}
 }
-/* global om mobile */
+/* global on mobile */
 .navigate_section ul {
 	padding-top: 4px;
+}
+.display_title {
+	font-size: 23px !important;
 }

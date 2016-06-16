@@ -1,6 +1,7 @@
 <?php
 /**
  * PortaMx Forum
+ *
  * @package PortaMx
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors

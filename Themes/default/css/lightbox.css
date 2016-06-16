@@ -10,9 +10,9 @@ body:after{content:url(../images/loading.gif) url(../images/prev.png) url(../ima
 .lb-nav{position:absolute;top:2px;left:0;bottom:5px;width:100%;z-index:10;}.lb-container > .nav{left:0;}
 .lb-nav a{outline:none;background-image:url('data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');}
 .lb-prev,.lb-next{height:100%;cursor:pointer;display:block;}
-.lb-nav a.lb-prev{width:20%;left:0;float:left;background:url(../images/prev.png) left center no-repeat;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=0);opacity:0;-webkit-transition:opacity 0.6s;-moz-transition:opacity 0.6s;-o-transition:opacity 0.6s;transition:opacity 0.6s;-webkit-transform:translateZ(0);}
+.lb-nav a.lb-prev{width:22%;left:0;float:left;background:url(../images/prev.png) left center no-repeat;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=0);opacity:0;-webkit-transition:opacity 0.6s;-moz-transition:opacity 0.6s;-o-transition:opacity 0.6s;transition:opacity 0.6s;-webkit-transform:translateZ(0);}
 .lb-nav a.lb-prev:hover{filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);opacity:1;}
-.lb-nav a.lb-next{width:20%;right:0;float:right;background:url(../images/next.png) right center no-repeat;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=0);opacity:0;-webkit-transition:opacity 0.6s;-moz-transition:opacity 0.6s;-o-transition:opacity 0.6s;transition:opacity 0.6s;-webkit-transform:translateZ(0);}
+.lb-nav a.lb-next{width:22%;right:0;float:right;background:url(../images/next.png) right center no-repeat;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=0);opacity:0;-webkit-transition:opacity 0.6s;-moz-transition:opacity 0.6s;-o-transition:opacity 0.6s;transition:opacity 0.6s;-webkit-transform:translateZ(0);}
 .lb-nav a.lb-next:hover{filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);opacity:1;}
 .lb-dataContainer{margin:0 auto;padding-top:5px;*zoom:1;width:100%;border-bottom-left-radius:0px;border-bottom-right-radius:0px;background-color:#5070a0;}
 .lb-dataContainer:after{content:"";display:table;clear:both;}.lb-data{padding:0 4px;color:#fff;cursor:pointer;}
