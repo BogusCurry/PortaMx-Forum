@@ -1192,12 +1192,12 @@ START TRANSACTION;
 #
 
 INSERT INTO {$db_prefix}admin_info_files
-	(id_file, filename, path, parameters, data, filetype)
+	(id_file, filename, path, parameters, filetype, data)
 VALUES
-	(1, 'current-version.js', '/smf_files/', '', '', 'text/javascript'),
-	(2, 'detailed-version.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
-	(3, 'latest-news.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
-	(4, 'latest-versions.txt', '/smf_files/', '', '', 'text/plain');
+	(1, 'current-version.js', '/smf_files/', '', 'text/javascript', ''),
+	(2, 'detailed-version.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
+	(3, 'latest-news.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
+	(4, 'latest-versions.txt', '/smf_files/', '', 'text/plain', '');
 # --------------------------------------------------------
 
 #

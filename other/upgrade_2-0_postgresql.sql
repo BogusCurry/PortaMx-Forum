@@ -939,12 +939,12 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
 
 ---# Add in the files to get from Simple Machines...
 INSERT IGNORE INTO {$db_prefix}admin_info_files
-	(id_file, filename, path, parameters)
+	(id_file, filename, path, parameters, filetype, data)
 VALUES
-	(1, 'current-version.js', '/smf_files/', '', '', 'text/javascript'),
-	(2, 'detailed-version.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
-	(3, 'latest-news.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
-	(4, 'latest-versions.txt', '/smf_files/', '', '', 'text/plain');
+	(1, 'current-version.js', '/smf_files/', '', 'text/javascript', ''),
+	(2, 'detailed-version.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
+	(3, 'latest-news.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
+	(4, 'latest-versions.txt', '/smf_files/', '', 'text/plain', '');
 ---#
 
 ---# Ensure that the table has the filetype column
