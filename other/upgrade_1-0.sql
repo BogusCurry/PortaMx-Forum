@@ -1930,8 +1930,7 @@ upgrade_query("
 		('defaultMaxMembers', '" . (empty($GLOBALS['MembersPerPage']) ? 20 : $GLOBALS['MembersPerPage']) . "'),
 		('time_offset', '" . @$GLOBALS['timeoffset'] . "'),
 		('cookieTime', '" . (empty($GLOBALS['Cookie_Length']) ? 60 : $GLOBALS['Cookie_Length']) . "'),
-		('requireAgreement', '" . @$GLOBALS['RegAgree'] . "')"),
-		('ecl_topofs', 36);
+		('requireAgreement', '" . @$GLOBALS['RegAgree'] . "')");
 ---}
 
 INSERT IGNORE INTO {$db_prefix}settings

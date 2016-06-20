@@ -527,8 +527,7 @@ VALUES
 	('settings_updated', '0'),
 	('last_mod_report_action', '0'),
 	('search_floodcontrol_time', '5'),
-	('next_task_time', UNIX_TIMESTAMP(),
-	('ecl_topofs', 36));
+	('next_task_time', UNIX_TIMESTAMP());
 ---#
 
 ---# Changing stats settings.
@@ -2055,27 +2054,24 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
 ) ENGINE=MyISAM{$db_collation};
 ---#
 
+---# remove all old settings
+		DELETE FROM {$db_prefix}admin_info_files
+		WHERE id_file > 0;
+---#
+
 ---# Add in the files to get from Simple Machines...
 INSERT IGNORE INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters)
 VALUES
-	(1, 'current-version.js', '/smf/', 'version=%3$s'),
-	(2, 'detailed-version.js', '/smf/', 'language=%1$s&version=%3$s'),
-	(3, 'latest-news.js', '/smf/', 'language=%1$s&format=%2$s'),
-	(4, 'latest-packages.js', '/smf/', 'language=%1$s&version=%3$s'),
-	(5, 'latest-smileys.js', '/smf/', 'language=%1$s&version=%3$s'),
-	(6, 'latest-themes.js', '/smf/', 'language=%1$s&version=%3$s');
+	(1, 'current-version.js', '/smf_files/', '', '', 'text/javascript'),
+	(2, 'detailed-version.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(3, 'latest-news.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(4, 'latest-versions.txt', '/smf_files/', '', '', 'text/plain');
 ---#
 
 ---# Ensure that the table has the filetype column
 ALTER TABLE {$db_prefix}admin_info_files
 ADD filetype varchar(255) NOT NULL default '';
----#
-
----# Set the filetype for the files
-UPDATE {$db_prefix}admin_info_files
-SET filetype='text/javascript'
-WHERE id_file IN (1,2,3,4,5,6,7);
 ---#
 
 ---# Ensure that the files from Simple Machines get updated

@@ -916,6 +916,50 @@ if (!isset($modSettings['attachment_thumb_png']))
 ---#
 
 /******************************************************************************/
+--- Create a repository for the javascript files from Simple Machines...
+/******************************************************************************/
+
+---# Creating repository table ...
+CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
+  id_file tinyint(4) unsigned NOT NULL auto_increment,
+  filename varchar(255) NOT NULL default '',
+  path varchar(255) NOT NULL default '',
+  parameters varchar(255) NOT NULL default '',
+  data text NOT NULL,
+  filetype varchar(255) NOT NULL default '',
+  PRIMARY KEY (id_file),
+  KEY filename (filename(30))
+) ENGINE=MyISAM{$db_collation};
+---#
+
+---# remove all old settings
+		DELETE FROM {$db_prefix}admin_info_files
+		WHERE id_file > 0;
+---#
+
+---# Add in the files to get from Simple Machines...
+INSERT IGNORE INTO {$db_prefix}admin_info_files
+	(id_file, filename, path, parameters)
+VALUES
+	(1, 'current-version.js', '/smf_files/', '', '', 'text/javascript'),
+	(2, 'detailed-version.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(3, 'latest-news.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(4, 'latest-versions.txt', '/smf_files/', '', '', 'text/plain');
+---#
+
+---# Ensure that the table has the filetype column
+ALTER TABLE {$db_prefix}admin_info_files
+ADD filetype varchar(255) NOT NULL default '';
+---#
+
+---# Ensure that the files from Simple Machines get updated
+UPDATE {$db_prefix}scheduled_tasks
+SET next_time = UNIX_TIMESTAMP()
+WHERE id_task = 7
+LIMIT 1;
+---#
+
+/******************************************************************************/
 --- Installing new default theme...
 /******************************************************************************/
 

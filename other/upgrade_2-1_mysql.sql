@@ -185,7 +185,6 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxListItems'
 
 ---# Converting legacy attachments.
 ---{
-
 // Need to know a few things first.
 $custom_av_dir = !empty($modSettings['custom_avatar_dir']) ? $modSettings['custom_avatar_dir'] : $GLOBALS['boarddir'] .'/custom_avatar';
 
@@ -700,6 +699,7 @@ while (!$is_done)
 {
 	nextSubStep($substep);
 	$inserts = array();
+
 	// Skip errors here so we don't croak if the columns don't exist...
 	$request = $smcFunc['db_query']('', '
 		SELECT id_member, notify_regularity, notify_send_body, notify_types
@@ -1309,36 +1309,20 @@ WHERE variable IN ('show_board_desc', 'no_new_reply_warning', 'display_quick_rep
 /******************************************************************************/
 --- Updating files that fetched from simplemachines.org
 /******************************************************************************/
----# We no longer call on several files.
-DELETE FROM {$db_prefix}admin_info_files
-WHERE filename IN ('latest-packages.js', 'latest-smileys.js', 'latest-support.js', 'latest-themes.js')
-	AND path = '/smf/';
+
+---# remove all old settings
+		DELETE FROM {$db_prefix}admin_info_files
+		WHERE id_file > 0;
 ---#
 
----# But we do need new files.
----{
-// Don't insert the info if it's already there...
-$file_check = $smcFunc['db_query']('', '
-	SELECT id_file
-	FROM {db_prefix}admin_info_files
-	WHERE filename = {string:latest-versions}',
-	array(
-		'latest-versions' => 'latest-versions.txt',
-	)
-);
-
-if ($smcFunc['db_num_rows']($file_check) == 0)
-{
-	$smcFunc['db_insert']('',
-		'{db_prefix}admin_info_files',
-		array('filename' => 'string', 'path' => 'string', 'parameters' => 'string', 'data' => 'string', 'filetype' => 'string'),
-		array('latest-versions.txt', '/smf_files/', '', '', 'text/plain'),
-		array('id_file')
-	);
-}
-
-$smcFunc['db_free_result']($file_check);
----}
+---# Add in the files to get from Simple Machines...
+INSERT IGNORE INTO {$db_prefix}admin_info_files
+	(id_file, filename, path, parameters)
+VALUES
+	(1, 'current-version.js', '/smf_files/', '', '', 'text/javascript'),
+	(2, 'detailed-version.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(3, 'latest-news.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(4, 'latest-versions.txt', '/smf_files/', '', '', 'text/plain');
 ---#
 
 /******************************************************************************/

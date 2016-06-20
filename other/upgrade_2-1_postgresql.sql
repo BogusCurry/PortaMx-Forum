@@ -1315,36 +1315,19 @@ WHERE variable IN ('show_board_desc', 'no_new_reply_warning', 'display_quick_rep
 /******************************************************************************/
 --- Updating files that fetched from simplemachines.org
 /******************************************************************************/
----# We no longer call on several files.
-DELETE FROM {$db_prefix}admin_info_files
-WHERE filename IN ('latest-packages.js', 'latest-smileys.js', 'latest-support.js', 'latest-themes.js')
-	AND path = '/smf/';
+---# remove all old settings
+		DELETE FROM {$db_prefix}admin_info_files
+		WHERE id_file > 0;
 ---#
 
----# But we do need new files.
----{
-// Don't insert the info if it's already there...
-$file_check = $smcFunc['db_query']('', '
-	SELECT id_file
-	FROM {db_prefix}admin_info_files
-	WHERE filename = {string:latest-versions}',
-	array(
-		'latest-versions' => 'latest-versions.txt',
-	)
-);
-
-if ($smcFunc['db_num_rows']($file_check) == 0)
-{
-	$smcFunc['db_insert']('',
-		'{db_prefix}admin_info_files',
-		array('filename' => 'string', 'path' => 'string', 'parameters' => 'string', 'data' => 'string', 'filetype' => 'string'),
-		array('latest-versions.txt', '/smf_files/', '', '', 'text/plain'),
-		array('id_file')
-	);
-}
-
-$smcFunc['db_free_result']($file_check);
----}
+---# Add in the files to get from Simple Machines...
+INSERT IGNORE INTO {$db_prefix}admin_info_files
+	(id_file, filename, path, parameters)
+VALUES
+	(1, 'current-version.js', '/smf_files/', '', '', 'text/javascript'),
+	(2, 'detailed-version.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(3, 'latest-news.js', '/smf_files/', '%1$s/', '', 'text/javascript'),
+	(4, 'latest-versions.txt', '/smf_files/', '', '', 'text/plain');
 ---#
 
 /******************************************************************************/
@@ -1973,7 +1956,7 @@ if ($result !== false)
 		$pg_version = $row['server_version_num'];
 	$smcFunc['db_free_result']($result);
 }
-		
+
 if(isset($pg_version) && $pg_version >= 90100)
 {
 	$tables = array('log_online','log_floodcontrol','sessions');
@@ -1985,17 +1968,17 @@ if(isset($pg_version) && $pg_version >= 90100)
 			upgrade_query("
 			alter table {$db_prefix}".$tab." rename to old_{$db_prefix}".$tab.";
 
-			do 
-			$$ 
-			declare r record; 
-			begin 
-				for r in select * from pg_constraint where conrelid='old_{$db_prefix}".$tab."'::regclass loop 
-					execute format('alter table old_{$db_prefix}".$tab." rename constraint %I to %I', r.conname, 'old_' || r.conname); 
-				end loop; 
+			do
+			$$
+			declare r record;
+			begin
+				for r in select * from pg_constraint where conrelid='old_{$db_prefix}".$tab."'::regclass loop
+					execute format('alter table old_{$db_prefix}".$tab." rename constraint %I to %I', r.conname, 'old_' || r.conname);
+				end loop;
 				for r in select * from pg_indexes where tablename='old_{$db_prefix}".$tab."' and indexname !~ '^old_' loop
-					execute format('alter index %I rename to %I', r.indexname, 'old_' || r.indexname); 
-				end loop; 
-			end; 
+					execute format('alter index %I rename to %I', r.indexname, 'old_' || r.indexname);
+				end loop;
+			end;
 			$$;
 
 			create unlogged table {$db_prefix}".$tab." (like old_{$db_prefix}".$tab." including all);
@@ -2018,7 +2001,7 @@ if(isset($pg_version) && $pg_version >= 90100)
 DROP INDEX IF EXISTS {$db_prefix}messages_id_topic;
 DROP INDEX IF EXISTS {$db_prefix}messages_topic;
 ---#
- 
+
 ---# duplicate to topics_last_message_sticky and topics_board_news
 DROP INDEX IF EXISTS {$db_prefix}topics_id_board;
 ---#
@@ -2046,14 +2029,14 @@ CREATE INDEX {$db_prefix}ban_items_id_ban_ip ON {$db_prefix}ban_items (ip_low,ip
 --- helper function for ip convert
 /******************************************************************************/
 ---# the function migrate_inet
-CREATE OR REPLACE FUNCTION migrate_inet(val IN anyelement) RETURNS inet 
-AS 
-$$ 
-BEGIN 
-   RETURN (trim(val))::inet; 
-EXCEPTION 
-   WHEN OTHERS THEN RETURN NULL; 
-END; 
+CREATE OR REPLACE FUNCTION migrate_inet(val IN anyelement) RETURNS inet
+AS
+$$
+BEGIN
+   RETURN (trim(val))::inet;
+EXCEPTION
+   WHEN OTHERS THEN RETURN NULL;
+END;
 $$ LANGUAGE plpgsql;
 ---#
 
@@ -2061,7 +2044,7 @@ $$ LANGUAGE plpgsql;
 --- update log_action ip with ipv6 support
 /******************************************************************************/
 ---# convert column
-ALTER TABLE {$db_prefix}log_actions 
+ALTER TABLE {$db_prefix}log_actions
 	ALTER ip DROP not null,
 	ALTER ip DROP default,
 	ALTER ip TYPE inet USING migrate_inet(ip);
@@ -2071,7 +2054,7 @@ ALTER TABLE {$db_prefix}log_actions
 --- update log_banned ip with ipv6 support
 /******************************************************************************/
 ---# convert old column
-ALTER TABLE {$db_prefix}log_banned 
+ALTER TABLE {$db_prefix}log_banned
 	ALTER ip DROP not null,
 	ALTER ip DROP default,
 	ALTER ip TYPE inet USING migrate_inet(ip);
@@ -2085,7 +2068,7 @@ ALTER TABLE {$db_prefix}log_errors
 	ALTER ip DROP not null,
 	ALTER ip DROP default,
 	ALTER ip TYPE inet USING migrate_inet(ip);
-ALTER TABLE {$db_prefix}members 
+ALTER TABLE {$db_prefix}members
 	ALTER member_ip DROP not null,
 	ALTER member_ip DROP default,
 	ALTER member_ip TYPE inet USING migrate_inet(member_ip);
@@ -2132,7 +2115,7 @@ ALTER TABLE {$db_prefix}log_online
 	ALTER ip DROP not null,
 	ALTER ip DROP default,
 	ALTER ip TYPE inet USING migrate_inet(ip);
----#	
+---#
 
 /******************************************************************************/
 --- update log_reported_comments member_ip with ipv6 support
