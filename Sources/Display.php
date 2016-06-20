@@ -1454,7 +1454,7 @@ function prepareDisplayContext($reset = false)
 
 	// Did they give a reason for editing?
 	if (!empty($output['modified']['name']) && !empty($output['modified']['reason']))
-		$output['modified']['last_edit_text'] .= '<br><span class="edit_reason">' . sprintf($txt['last_edit_reason'], $output['modified']['reason']) .'</span>';
+		$output['modified']['last_edit_text'] .= '<br><span id="edreason'. $message['id_msg'] .'" class="edit_reason">' . sprintf($txt['last_edit_reason'], $output['modified']['reason']) .'</span>';
 
 	// Any custom profile fields?
 	if (!empty($memberContext[$message['id_member']]['custom_fields']))
