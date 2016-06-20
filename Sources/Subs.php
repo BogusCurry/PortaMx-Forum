@@ -25,8 +25,6 @@ function jsCookieHandling()
 
 	if(isset($_REQUEST['jscook']))
 	{
-		ob_end_clean();
-
 		$result = '';
 		if($_REQUEST['mode'] == 'get')
 		{
@@ -66,10 +64,13 @@ function jsCookieHandling()
 		}
 
 		// resturn result
+		ob_end_clean();
 		ob_start();
 		echo $result;
-		ob_end_flush();
-		exit;
+		obExit(false);
+		die;
+//		ob_end_flush();
+//		exit;
 	}
 }
 

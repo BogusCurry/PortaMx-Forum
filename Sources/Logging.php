@@ -61,7 +61,6 @@ function writeLog($force = false)
 			$context['session_var'] = $_SESSION['session_var'];
 
 		unset($serialized['sesc'], $serialized[$context['session_var']]);
-		$serialized = json_encode($serialized);
 	}
 	else
 		$serialized = '';
@@ -93,7 +92,7 @@ function writeLog($force = false)
 
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}log_online
-			SET log_time = {int:log_time}, ip = {inet:ip}, url = {string:url}
+			SET log_time = {int:log_time}, ip = {inet:ip}, url = {json:url}
 			WHERE session = {string:session}',
 			array(
 				'log_time' => time(),
@@ -125,7 +124,7 @@ function writeLog($force = false)
 
 		$smcFunc['db_insert']($do_delete ? 'ignore' : 'replace',
 			'{db_prefix}log_online',
-			array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'inet', 'url' => 'string'),
+			array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'inet', 'url' => 'json'),
 			array($session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), $user_info['ip'], $serialized),
 			array('session')
 		);

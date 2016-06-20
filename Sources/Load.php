@@ -389,7 +389,7 @@ function loadUserSettings($checkOnly = false)
 		// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
 		$cookie_data = smf_json_decode($_SESSION['login_' . $cookiename]);
 
-		if (is_null($cookie_data))
+		if (empty($cookie_data))
 			$cookie_data = safe_unserialize($_SESSION['login_' . $cookiename]);
 
 		list ($id_member, $password, $login_span) = $cookie_data;
@@ -2162,7 +2162,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadCSSFile('lightbox.css', array('defer' => false), 'lightbox');
 		loadJavascriptFile('lightbox.js', array(), 'lightbox');
 	}
-
 	// add favicon?
 	if (!empty($modSettings['add_favicon_to_links']))
 		addInlineJavascript('

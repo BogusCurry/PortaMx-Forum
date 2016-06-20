@@ -509,10 +509,10 @@ function log_error_online($error, $sprintf = array())
 
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}log_online
-			SET url = {string:url}
+			SET url = {json:url}
 			WHERE session = {string:session}',
 			array(
-				'url' => json_encode($url),
+				'url' => $url,
 				'session' => $session_id,
 			)
 		);
