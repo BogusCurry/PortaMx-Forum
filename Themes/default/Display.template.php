@@ -651,10 +651,10 @@ function template_single_post($message)
 									<script>
 										window.addEventListener("resize", TitleResize);
 										function TitleResize(){
-											document.getElementById("subject_'. $message['id'] .'").style.paddingRight = document.getElementById("modified_'. $message['id'] .'").offsetWidth +"px";
 											if(!document.getElementById("edreason'. $message['id'] .'"))
 												document.getElementById("modified_'. $message['id'] .'").style.marginTop = "-2px";
-										}
+											else
+												document.getElementById("subject_'. $message['id'] .'").style.paddingRight = document.getElementById("modified_'. $message['id'] .'").offsetWidth +"px";}
 										TitleResize();
 									</script>
 								</h5>
