@@ -194,6 +194,18 @@ function template_credits()
 	echo '
 							</div>';
 
+	// Point the admin to common support resources.
+	echo '
+							<div id="support_resources" class="sub_bar">
+								<h3 class="subbg">
+									', $txt['support_resources'], '
+								</h3>
+							</div>
+							<div class="padding">
+								<p>', $txt['support_resources_p1'], '</p>
+								<p>', $txt['support_resources_p2'], '</p>
+							</div>';
+
 	// The most important part - the credits :P.
 	echo '
 							<div id="credits_sections" class="sub_bar">

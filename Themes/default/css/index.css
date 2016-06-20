@@ -3198,23 +3198,6 @@ div#pollmoderation {
 	display: table-cell;
 	padding-right: 5px;
 }
-/***
-.profile_icons {
-	margin-bottom: 5px;
-}
-.messageicon {
-	margin: -6px 0 -6px -4px !important;
-}
-.keyinfo h5 {
-	margin-top: 3px;
-}
-.subject_title {
-	margin-top: 2px;
-}
-.postcount {
-	vertical-align: 4px;
-}
-***/
 /* The visible stuff below the avatar. */
 .user_info > li {
 	margin: 3px 0 0 0;
@@ -3274,6 +3257,16 @@ div#pollmoderation {
 	color: #333;
 	font-weight: normal;
 	padding: 2px 0 0 4px;
+	margin-top: -19px;
+	max-width: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.subject_title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .subject_title a {
 	font-size: 1.1em;

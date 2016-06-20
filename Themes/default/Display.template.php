@@ -632,7 +632,7 @@ function template_single_post($message)
 
 	echo '
 								<div class="page_number floatright">
-									', !empty($message['counter']) ? ' #' . $message['counter'] : '', ' ', '
+									', empty($message['modified']['name']) && !empty($message['counter']) ? ' #' . $message['counter'] : '', ' ', '
 								</div>
 								<h5>
 									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter'], ' - ') : '', $message['subject'], '" class="smalltext">', $message['time'], '</a>';
@@ -640,16 +640,19 @@ function template_single_post($message)
 	// Show "<< Last Edit: Time by Person >>" if this post was edited. But we need the div even if it wasn't modified!
 	// Because we insert into it through AJAX and we don't want to stop themers moving it around if they so wish so they can put it where they want it.
 	echo '
-									<span class="smalltext modified" id="modified_', $message['id'], '">';
+									<div class="smalltext modified" id="modified_', $message['id'], '">';
 
 	if (!empty($modSettings['show_modify']) && !empty($message['modified']['name']))
 		echo
 										$message['modified']['last_edit_text'];
 
 	echo '
-									</span>';
-
-	echo '
+									</div>
+									<script>
+										window.addEventListener("resize", TitleResize);
+										function TitleResize(){document.getElementById("subject_'. $message['id'] .'").style.paddingRight = document.getElementById("modified_'. $message['id'] .'").offsetWidth +"px";}
+										TitleResize();
+									</script>
 								</h5>
 								<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
 							</div>';

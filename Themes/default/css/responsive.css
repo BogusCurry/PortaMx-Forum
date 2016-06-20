@@ -141,9 +141,6 @@
 	img.icon, #forumposts .catbg img {
 		display: none;
 	}
-	.keyinfo h5 .modified {
-		float: none !important;
-	}
 	.subject_title input {
 		width: 90%;
 	}
@@ -310,9 +307,6 @@
 	}
 	img.icon, #forumposts .catbg img {
 		display:none;
-	}
-	.keyinfo h5 .modified {
-		float: none !important;
 	}
 
 	/* Stats Center */
@@ -650,6 +644,19 @@
 @media (max-width: 480px) {
 	#mobile_user_menu>div>div.popup_heading {
 		margin-bottom: 0px;
+	}
+}
+@media (max-width: 585px) {
+	.keyinfo h5 .modified {
+		display: none;
+	}
+	.subject_title {
+		padding-right: 0;
+	}
+}
+@media (max-width: 590px) {
+	.keyinfo h5 .modified {
+		margin-top: -2px;
 	}
 }
 @media (max-width: 600px) {
