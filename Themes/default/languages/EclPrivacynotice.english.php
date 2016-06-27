@@ -43,14 +43,14 @@ $txt['ecl_headrows'] = array(
 		'@host@',
 		'Expires according to user-chosen session duration',
 		'If you log-in as a member of this site, this cookie contains your user name, an encrypted hash of
-			your password and the time you logged-in. It\'s used by the Website software to ensure that features such as indicating
+			your password and the time you logged-in. It is used by the Website software to ensure that features such as indicating
 			new Forum and Private messages are indicated to you.',
 	),
 	array(
 		'PHPSESSID',
 		'@host@',
 		'Current session only',
-		'This cookie contains a unique Session Identification value. It\'s set for both members and
+		'This cookie contains a unique Session Identification value. It is set for both members and
 			non-members (guests) and it is essential for the site software to work completely. This cookie is not persistent
 			and should be automatically removed when you close the browser window.',
 	),
@@ -69,8 +69,8 @@ $txt['ecl_footertop'] = '
 
 /* footer informations */
 $txt['ecl_footrows'] = array(
-/* remove the comment if you use Google Adsense */
-/* 
+/* remove the comment if you use Google Adsense
+
 	'We use Google AdSense, therefore cookies are set by Google, to analyze visits to our website and personalize content and ads.
 		Informations on the use of our website are anonymous distributed to our partner for social media, to adapt advertising and analysis.',
 */

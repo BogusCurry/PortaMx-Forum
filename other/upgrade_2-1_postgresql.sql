@@ -794,7 +794,9 @@ WHERE variable = 'newsfader_time';
 INSERT INTO {$db_prefix}settings
 	(variable, value)
 VALUES
-	('enableThemes', '1');
+	('enableThemes', '1'),
+	('ecl_topofs', 36),
+	('pmx_docserver', 'http://docserver.portamx.com/pmxforum/');
 ---#
 
 ---# Setting "default" as the default...
@@ -1324,10 +1326,10 @@ WHERE variable IN ('show_board_desc', 'no_new_reply_warning', 'display_quick_rep
 INSERT IGNORE INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, filetype, data)
 VALUES
-	(1, 'current-version.js', '/smf_files/', '', 'text/javascript', ''),
-	(2, 'detailed-version.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
-	(3, 'latest-news.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
-	(4, 'latest-versions.txt', '/smf_files/', '', 'text/plain', '');
+	(1, 'current-version.js', '/pmxforum/infofiles/', '', 'text/javascript', ''),
+	(2, 'detailed-version.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
+	(3, 'latest-news.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
+	(4, 'latest-versions.txt', '/pmxforum/infofiles/', '', 'text/plain', '');
 ---#
 
 /******************************************************************************/

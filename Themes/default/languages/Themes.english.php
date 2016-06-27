@@ -72,7 +72,7 @@ $txt['theme_variants_default'] = 'Default theme variant';
 $txt['theme_variants_user_disable'] = 'Disable user variant selection';
 
 $txt['site_slogan'] = 'Site slogan';
-$txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the SMF logo.';
+$txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the PortaMx Forum logo.';
 
 $txt['enable_random_news'] = 'Enable random news line in the forum header';
 $txt['show_group_key'] = 'Show group key on board index';
@@ -93,7 +93,7 @@ $txt['header_logo_url_desc'] = '(leave blank to show forum name or default logo.
 $txt['number_recent_posts'] = 'Number of recent posts to display on board index';
 
 $txt['theme_adding_title'] = 'Obtaining Themes';
-$txt['theme_adding'] = 'You can always find new themes for your forum from the SMF themes area - <strong><a href="http://custom.simplemachines.org/themes/" target="_blank">http://custom.simplemachines.org/themes/</a></strong>. You can browse them on the website, read the comments, and download them to your computer and then upload them to your forum from there.<br><br>If you run into any questions with themes, each modification published on simplemachines.org has a dedicated topic about it where support and comments should be directed to.';
+$txt['theme_adding'] = 'You can always find new themes for your forum from the PortaMx Forum themes area - <strong><a href="http://custom.simplemachines.org/themes/" target="_blank">http://custom.simplemachines.org/themes/</a></strong>. You can browse them on the website, read the comments, and download them to your computer and then upload them to your forum from there.<br><br>If you run into any questions with themes, each modification published on simplemachines.org has a dedicated topic about it where support and comments should be directed to.';
 
 $txt['theme_options_defaults'] = 'These are the default values for some member specific settings. Changing these will only affect new members and guests.';
 $txt['theme_options_title'] = 'Change or reset default options';
@@ -134,7 +134,7 @@ $txt['themeadmin_edit_style'] = 'Edit this theme\'s stylesheets.';
 $txt['themeadmin_edit_copy_template'] = 'Copy a template from the theme this is based on.';
 $txt['themeadmin_edit_exists'] = 'already exists';
 $txt['themeadmin_edit_do_copy'] = 'copy';
-$txt['themeadmin_edit_copy_warning'] = 'When SMF needs a template or language file which is not in the current theme, it looks in the theme it is based on, or the default theme.<br>Unless you need to modify a template, it\'s better not to copy it.';
+$txt['themeadmin_edit_copy_warning'] = 'When PortaMx Forum needs a template or language file which is not in the current theme, it looks in the theme it is based on, or the default theme.<br>Unless you need to modify a template, it\'s better not to copy it.';
 $txt['themeadmin_edit_copy_confirm'] = 'Are you sure you want to copy this template?';
 $txt['themeadmin_edit_overwrite_confirm'] = 'Are you sure you want to copy this template over the one that already exists?\nThis will OVERWRITE any changes you\\\'ve made';
 $txt['themeadmin_edit_no_copy'] = '<em>(can\'t copy)</em>';

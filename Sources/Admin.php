@@ -554,22 +554,6 @@ function AdminHome()
 						' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']),
 		);
 
-	// Lastly, fill in the blanks in the support resources paragraphs.
-	$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
-		'http://wiki.simplemachines.org/',
-		'http://wiki.simplemachines.org/smf/features2',
-		'http://wiki.simplemachines.org/smf/options2',
-		'http://wiki.simplemachines.org/smf/themes2',
-		'http://wiki.simplemachines.org/smf/packages2'
-	);
-	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
-		'http://www.simplemachines.org/community/',
-		'http://www.simplemachines.org/redirect/english_support',
-		'http://www.simplemachines.org/redirect/international_support_boards',
-		'http://www.simplemachines.org/redirect/smf_support',
-		'http://www.simplemachines.org/redirect/customize_support'
-	);
-
 	if ($context['admin_area'] == 'admin')
 		loadJavascriptFile('admin.js', array('defer' => false), 'smf_admin');
 }

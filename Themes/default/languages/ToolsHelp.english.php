@@ -8,7 +8,7 @@ $helptxt['dont_use_lightbox'] = 'If enabled, images and attaches in messages can
 $helptxt['disable_quick_reply'] = 'This setting disallows all users from using the Quick Reply box on the post page.';
 $helptxt['add_favicon_to_links'] = 'This settings add a favicon (if the site have one) to each link with the class "bbc_link".';
 
-$helptxt['ecl_enabled'] = 'This make your SMF Forum compatible with the <b>EU Cookie Law</b>.<br>
+$helptxt['ecl_enabled'] = 'This make your PortaMx Forum compatible with the <b>EU Cookie Law</b>.<br>
 	If enabled, any visitor (except spider) must accept the storage of cookies before he can browse the forum.<br>
 	More information you find on <a href="http://ec.europa.eu/ipg/basics/legal/cookies/index_en.htm" target="_blank">European Commission</a>';
 $helptxt['ecl_nomodal'] = 'Normaly the Forum are not accessible until ECL is accepted.<br>

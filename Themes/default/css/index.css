@@ -1201,6 +1201,7 @@ ul li.greeting {
 /* "Unread posts" and "New replies" links, accessible with header collapsed. */
 .navigate_section .unread_links {
 	float: right;
+	font-weight: bold;
 }
 .navigate_section .unread_links a {
 	padding: 0 0 4px 10px;
@@ -2681,7 +2682,7 @@ dl.addrules dt.floatleft {
 .generic_list_wrapper, .windowbg, .windowbg2, #forumposts .approvebg, #forumposts .approvebg2 {
 	background: #f0f4f7;
 	margin: 12px 0 0 0;
-	padding: 12px 16px;
+	padding: 10px 10px;
 	border: 1px solid #ddd;
 	border-radius: 6px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
@@ -2981,7 +2982,7 @@ span.postby {
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
-	min-height: 3.5em;
+	min-height: 3.4em;
 }
 .icon img, .moderation input {
 	margin-top: 15px;
@@ -3239,10 +3240,9 @@ div#pollmoderation {
 }
 .messageicon img {
 	padding: 2px 0 0 0 !important;
-	margin-left: -2px !important;
 }
 .keyinfo h5 {
-	padding: 1px 0 5px 0;
+	padding: 1px 0 5px 1px;
 	line-height: 1.5em;
 	font-size: 0.9em;
 }
@@ -3315,7 +3315,7 @@ img.smiley {
 	text-transform: capitalize;
 	padding-top: 0px;
 	position: relative;
-	top: -15px;
+	top: 4px;
 }
 /* Styles for the quick reply area. */
 #quickreplybox {

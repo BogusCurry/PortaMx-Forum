@@ -1346,8 +1346,9 @@ if ($request !== false)
 			('reserveCase', '" . (int) @$match_settings['matchcase'] . "'),
 			('reserveUser', '" . (int) @$match_settings['matchuser'] . "'),
 			('reserveName', '" . (int) @$match_settings['matchname'] . "'),
-			('reserveNames', '" . implode("\n", $words) . "')"),
-			('ecl_topofs', 36);
+			('reserveNames', '" . implode("\n", $words) . "'),
+			('ecl_topofs', 36),
+			('pmx_docserver', 'http://docserver.portamx.com/pmxforum/');
 
 	upgrade_query("
 		DROP TABLE {$db_prefix}reserved_names");

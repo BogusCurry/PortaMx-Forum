@@ -45,32 +45,6 @@ function HelpIndex()
 {
 	global $scripturl, $context, $txt;
 
-	// We need to know where our wiki is.
-	$context['wiki_url'] = 'http://wiki.simplemachines.org/smf';
-	$context['wiki_prefix'] = 'SMF2.1:';
-
-	$context['canonical_url'] = $scripturl . '?action=help';
-
-	// Sections were are going to link...
-	$context['manual_sections'] = array(
-		'registering' => 'Registering',
-		'logging_in' => 'Logging_In',
-		'profile' => 'Profile',
-		'search' => 'Search',
-		'posting' => 'Posting',
-		'bbc' => 'Bulletin_board_code',
-		'personal_messages' => 'Personal_messages',
-		'memberlist' => 'Memberlist',
-		'calendar' => 'Calendar',
-		'features' => 'Features',
-	);
-
-	// Build the link tree.
-	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=help',
-		'name' => $txt['help'],
-	);
-
 	// Lastly, some minor template stuff.
 	$context['page_title'] = $txt['manual_smf_user_help'];
 	$context['sub_template'] = 'manual';

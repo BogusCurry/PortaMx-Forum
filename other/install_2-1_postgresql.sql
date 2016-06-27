@@ -1767,10 +1767,10 @@ BEGIN;
 INSERT INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, filetype, data)
 VALUES
-	(1, 'current-version.js', '/smf_files/', '', 'text/javascript', ''),
-	(2, 'detailed-version.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
-	(3, 'latest-news.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
-	(4, 'latest-versions.txt', '/smf_files/', '', 'text/plain', '');
+	(1, 'current-version.js', '/pmxforum/infofiles/', '', 'text/javascript', ''),
+	(2, 'detailed-version.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
+	(3, 'latest-news.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
+	(4, 'latest-versions.txt', '/pmxforum/infofiles/', '', 'text/plain', '');
 # --------------------------------------------------------
 
 #
@@ -2301,6 +2301,10 @@ VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Simple Machine
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
 VALUES ('Simple Machines Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
+INSERT INTO {$db_prefix}package_servers
+	(name, url)
+VALUES ('PortaMx File Server', 'http://docserver.portamx.com');
+
 # --------------------------------------------------------
 
 #
@@ -2596,7 +2600,10 @@ VALUES ('smfVersion', '{$smf_version}'),
 	('tfa_mode', '1'),
 	('allow_expire_redirect', '1'),
 	('json_done', '1'),
-	('minimize_files', '1');
+	('minimize_files', '1'),
+	('ecl_topofs', 36),
+	('pmx_docserver', 'http://docserver.portamx.com/pmxforum/');
+
 # --------------------------------------------------------
 
 #

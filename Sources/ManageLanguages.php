@@ -142,10 +142,10 @@ function AddLanguage()
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $sourcedir, $smcFunc, $txt, $scripturl;
+	global $forum_version, $context, $sourcedir, $smcFunc, $txt, $scripturl, $modSettings;
 
 	// We're going to use this URL.
-	$url = 'http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('SMF ' => '')));
+	$url = $modSettings['pmx_docserver'] .'lang-data.xml';
 
 	// Load the class file and stick it into an array.
 	require_once($sourcedir . '/Class-Package.php');
@@ -239,7 +239,7 @@ function DownloadLanguage()
 		// Otherwise, go go go!
 		elseif (!empty($install_files))
 		{
-			$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('SMF ' => ''))) . ';fetch=' . urlencode($_GET['did']), $boarddir, false, true, $install_files);
+			$archive_content = read_tgz_file($modSettings['pmx_docserver'] .'languages/lang-'. $_GET['did'] .'.tgz', $boarddir, false, true, $install_files);
 			// Make sure the files aren't stuck in the cache.
 			package_flush_cache();
 			$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], $scripturl . '?action=admin;area=languages');
@@ -250,7 +250,7 @@ function DownloadLanguage()
 
 	// Open up the old china.
 	if (!isset($archive_content))
-		$archive_content = read_tgz_file('http://download.simplemachines.org/fetch_language.php?version=' . urlencode(strtr($forum_version, array('SMF ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
+		$archive_content = read_tgz_file($modSettings['pmx_docserver'] .'languages/lang-'. $_GET['did'] .'.tgz', null);
 
 	if (empty($archive_content))
 		fatal_error($txt['add_language_error_no_response']);
@@ -375,8 +375,11 @@ function DownloadLanguage()
 
 	// So, I'm a perfectionist - let's get the theme names.
 	$theme_indexes = array();
-	foreach ($context['files']['images'] as $k => $dummy)
-		$indexes[] = $k;
+	if(isset($context['files']['images']))
+	{
+		foreach ($context['files']['images'] as $k => $dummy)
+			$indexes[] = $k;
+	}
 
 	$context['theme_names'] = array();
 	if (!empty($indexes))

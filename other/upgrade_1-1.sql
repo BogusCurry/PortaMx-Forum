@@ -762,6 +762,7 @@ INSERT IGNORE INTO {$db_prefix}package_servers
 	(id_server, name, url)
 VALUES
 	(1, 'Simple Machines Third-party Mod Site', 'http://mods.simplemachines.org');
+	(2, 'PortaMx File Server', 'http://docserver.portamx.com');
 ---#
 
 /******************************************************************************/

@@ -373,7 +373,9 @@ if (!isset($modSettings['birthday_email']))
 		INSERT INTO {$db_prefix}settings
 			(variable, value)
 		VALUES
-			('birthday_email', 'happy_birthday')");
+			('birthday_email', 'happy_birthday'),
+			('ecl_topofs', 36),
+			('pmx_docserver', 'http://docserver.portamx.com/pmxforum/')");
 }
 ---}
 ---#
@@ -515,6 +517,13 @@ else
 UPDATE {$db_prefix}package_servers
 SET url = 'http://custom.simplemachines.org/packages/mods'
 WHERE url = 'http://mods.simplemachines.org';
+---#
+
+---# Inserting "package_servers"...
+INSERT IGNORE INTO {$db_prefix}package_servers
+	(id_server, name, url)
+VALUES
+	(2, 'PortaMx File Server', 'http://docserver.portamx.com');
 ---#
 
 /******************************************************************************/
@@ -941,10 +950,10 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
 INSERT IGNORE INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, filetype, data)
 VALUES
-	(1, 'current-version.js', '/smf_files/', '', 'text/javascript', ''),
-	(2, 'detailed-version.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
-	(3, 'latest-news.js', '/smf_files/', '%1$s/', 'text/javascript', ''),
-	(4, 'latest-versions.txt', '/smf_files/', '', 'text/plain', '');
+	(1, 'current-version.js', '/pmxforum/infofiles/', '', 'text/javascript', ''),
+	(2, 'detailed-version.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
+	(3, 'latest-news.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
+	(4, 'latest-versions.txt', '/pmxforum/infofiles/', '', 'text/plain', '');
 ---#
 
 ---# Ensure that the table has the filetype column

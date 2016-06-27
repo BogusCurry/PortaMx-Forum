@@ -1500,7 +1500,7 @@ function PackageBrowse()
 		SELECT data FROM {db_prefix}admin_info_files WHERE filename={string:versionsfile} AND path={string:smf}',
 		array(
 			'versionsfile' => 'latest-versions.txt',
-			'smf' => '/smf/',
+			'smf' => '/pmxforum/infofiles/',
 		)
 	);
 
@@ -1510,13 +1510,13 @@ function PackageBrowse()
 	// Decode the data.
 	$items = smf_json_decode($data['data'], true);
 
-	$context['emulation_versions'] = preg_replace('~^SMF ~', '', $items);
+	$context['emulation_versions'] = preg_replace('~^PortaMx-Forum ~', '', $items);
 
 	// Current SMF version, which is selected by default
-	$context['default_version'] = preg_replace('~^SMF ~', '', $forum_version);
+	$context['default_version'] = preg_replace('~^PortaMx-Forum ~', '', $forum_version);
 
 	// Version we're currently emulating, if any
-	$context['selected_version'] = preg_replace('~^SMF ~', '', $context['forum_version']);
+	$context['selected_version'] = preg_replace('~^PortaMx-Forum ~', '', $context['forum_version']);
 }
 
 /**

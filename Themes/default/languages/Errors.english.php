@@ -279,7 +279,7 @@ $txt['unable_to_create_temporary'] = 'The search function was unable to create t
 
 $txt['package_no_file'] = 'Unable to find package file!';
 $txt['packageget_unable'] = 'Unable to connect to the server. Please try using <a href="%1$s" target="_blank" class="new_win">this URL</a> instead.';
-$txt['not_on_simplemachines'] = 'Sorry, packages can only be downloaded like this from the simplemachines.org server.';
+$txt['not_on_simplemachines'] = 'Sorry, packages can only be downloaded like this from the portamx.coms server.';
 $txt['package_cant_uninstall'] = 'This package was either never installed or was already uninstalled - you can\'t uninstall it now.';
 $txt['package_cant_download'] = 'You cannot download or install new packages because the Packages directory or one of the files in it are not writable!';
 $txt['package_upload_error_nofile'] = 'You did not select a package to upload.';
@@ -291,8 +291,8 @@ $txt['package_theme_upload_error_broken'] = 'Theme upload failed due to the foll
 
 $txt['package_get_error_not_found'] = 'The package you are trying to install cannot be located. You may want to manually upload the package to your Packages directory.';
 $txt['package_get_error_missing_xml'] = 'The package you are attempting to install is missing the package-info.xml that must be in the root package directory.';
-$txt['package_get_error_is_zero'] = 'Although the package was downloaded to the server it appears to be empty. Please check the Packages directory, and the &quot;temp&quot; sub-directory are both writable. If you continue to experience this problem you should try extracting the package on your PC and uploading the extracted files into a subdirectory in your Packages directory and try again. For example, if the package was called shout.tar.gz you should:<br>1) Download the package to your local PC and extract it into files.<br>2) Using an FTP client create a new directory in your &quot;Packages&quot; folder, in this example you may call it "shout".<br>3) Upload all the files from the extracted package to this directory.<br>4) Go back to the package manager browse page and the package will be automatically found by SMF.';
-$txt['package_get_error_packageinfo_corrupt'] = 'SMF was unable to find any valid information within the package-info.xml file included within the Package. There may be an error with the modification, or the package may be corrupt.';
+$txt['package_get_error_is_zero'] = 'Although the package was downloaded to the server it appears to be empty. Please check the Packages directory, and the &quot;temp&quot; sub-directory are both writable. If you continue to experience this problem you should try extracting the package on your PC and uploading the extracted files into a subdirectory in your Packages directory and try again. For example, if the package was called shout.tar.gz you should:<br>1) Download the package to your local PC and extract it into files.<br>2) Using an FTP client create a new directory in your &quot;Packages&quot; folder, in this example you may call it "shout".<br>3) Upload all the files from the extracted package to this directory.<br>4) Go back to the package manager browse page and the package will be automatically found by PortaMx Forum.';
+$txt['package_get_error_packageinfo_corrupt'] = 'PortaMx Forum was unable to find any valid information within the package-info.xml file included within the Package. There may be an error with the modification, or the package may be corrupt.';
 $txt['package_get_error_is_theme'] = 'You can\'t install a Theme from this section, please use the <a href="{MANAGETHEMEURL}">Themes and Layout</a> management page to upload it';
 $txt['package_get_error_is_mod'] = 'You can\'t install a mod from this section, please use the <a href="{MANAGEMODURL}">Package manager</a> page to upload it';
 $txt['package_get_error_theme_not_compatible'] = 'Your theme does not show it has compatibility with %1$s. Please contact the theme author.';
