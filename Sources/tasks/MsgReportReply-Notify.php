@@ -16,7 +16,7 @@
 /**
  * Class MsgReportReply_Notify_Background
  */
-class MsgReportReply_Notify_Background extends SMF_BackgroundTask
+class MsgReportReply_Notify_Background extends PMX_BackgroundTask
 {
 	/**
      * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
@@ -24,11 +24,11 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 	 */
 	public function execute()
 	{
-		global $smcFunc, $sourcedir, $modSettings, $language, $scripturl;
+		global $pmxcFunc, $sourcedir, $modSettings, $language, $scripturl;
 
 		// Let's see. Let us, first of all, establish the list of possible people.
 		$possible_members = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}log_comments
 			WHERE id_notice = {int:report}
@@ -39,9 +39,9 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 				'last_comment' => $this->_details['comment_id'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $pmxcFunc['db_fetch_row']($request))
 			$possible_members[] = $row[0];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Presumably, there are some people?
 		if (!empty($possible_members))
@@ -58,7 +58,7 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 		$members = membersAllowedTo('moderate_board', $this->_details['board_id']);
 
 		// Second, anyone assigned to be a moderator of this board directly.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}moderators
 			WHERE id_board = {int:current_board}',
@@ -66,12 +66,12 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 				'current_board' => $this->_details['board_id'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$members[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Thirdly, anyone assigned to be a moderator of this group as a group->board moderator.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT mem.id_member
 			FROM {db_prefix}members AS mem, {db_prefix}moderator_groups AS bm
 			WHERE bm.id_board = {int:current_board}
@@ -84,9 +84,9 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$members[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// So now we have two lists: the people who replied to a report in the past,
 		// and all the possible people who could see said report.
@@ -136,7 +136,7 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 				);
 			}
 
-			$smcFunc['db_insert']('insert',
+			$pmxcFunc['db_insert']('insert',
 				'{db_prefix}user_alerts',
 				array('alert_time' => 'int', 'id_member' => 'int', 'id_member_started' => 'int',
 					'member_name' => 'string', 'content_type' => 'string', 'content_id' => 'int',
@@ -159,7 +159,7 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 
 			// First, get everyone's language and details.
 			$emails = array();
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member, lngfile, email_address
 				FROM {db_prefix}members
 				WHERE id_member IN ({array_int:members})',
@@ -167,17 +167,17 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 					'members' => $notifies['email'],
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if (empty($row['lngfile']))
 					$row['lngfile'] = $language;
 				$emails[$row['lngfile']][$row['id_member']] = $row['email_address'];
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Second, get some details that might be nice for the report email.
 			// We don't bother cluttering up the tasks data for this, when it's really no bother to fetch it.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT lr.subject, lr.membername, lr.body
 				FROM {db_prefix}log_reported AS lr
 				WHERE id_report = {int:report}',
@@ -185,8 +185,8 @@ class MsgReportReply_Notify_Background extends SMF_BackgroundTask
 					'report' => $this->_details['report_id'],
 				)
 			);
-			list ($subject, $poster_name, $comment) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($subject, $poster_name, $comment) = $pmxcFunc['db_fetch_row']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Third, iterate through each language, load the relevant templates and set up sending.
 			foreach ($emails as $this_lang => $recipients)

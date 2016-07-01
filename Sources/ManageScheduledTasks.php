@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -72,7 +72,7 @@ function ManageScheduledTasks()
  */
 function ScheduledTasks()
 {
-	global $context, $txt, $sourcedir, $smcFunc, $scripturl;
+	global $context, $txt, $sourcedir, $pmxcFunc, $scripturl;
 
 	// Mama, setup the template first - cause it's like the most important bit, like pickle in a sandwich.
 	// ... ironically I don't like pickle. </grudge>
@@ -94,7 +94,7 @@ function ScheduledTasks()
 				$enablers[] = (int) $id;
 
 		// Do the update!
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}scheduled_tasks
 			SET disabled = CASE WHEN id_task IN ({array_int:id_task_enable}) THEN 0 ELSE 1 END',
 			array(
@@ -103,7 +103,7 @@ function ScheduledTasks()
 		);
 
 		// Update the "allow_expire_redirect" setting...
-		$get_info = $smcFunc['db_query']('', '
+		$get_info = $pmxcFunc['db_query']('', '
 			SELECT disabled
 			FROM {db_prefix}scheduled_tasks
 			WHERE task = {string:remove_redirect}',
@@ -112,9 +112,9 @@ function ScheduledTasks()
 			)
 		);
 
-		$temp = $smcFunc['db_fetch_assoc']($get_info);
+		$temp = $pmxcFunc['db_fetch_assoc']($get_info);
 		$task_disabled = !empty($temp['disabled']) ? 0 : 1;
-		$smcFunc['db_free_result']($get_info);
+		$pmxcFunc['db_free_result']($get_info);
 
 		updateSettings(array('allow_expire_redirect' => $task_disabled));
 
@@ -133,7 +133,7 @@ function ScheduledTasks()
 			$tasks[] = (int) $task;
 
 		// Load up the tasks.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_task, task, callable
 			FROM {db_prefix}scheduled_tasks
 			WHERE id_task IN ({array_int:tasks})
@@ -147,7 +147,7 @@ function ScheduledTasks()
 		// Lets get it on!
 		require_once($sourcedir . '/ScheduledTasks.php');
 		ignore_user_abort(true);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			// What kind of task are we handling?
 			if (!empty($row['callable']))
@@ -185,7 +185,7 @@ function ScheduledTasks()
 			if ($completed)
 			{
 				$total_time = round(array_sum(explode(' ', microtime())) - array_sum(explode(' ', $start_time)), 3);
-				$smcFunc['db_insert']('',
+				$pmxcFunc['db_insert']('',
 					'{db_prefix}log_scheduled_tasks',
 					array('id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float'),
 					array($row['id_task'], time(), $total_time),
@@ -193,7 +193,7 @@ function ScheduledTasks()
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// If we had any errors, push them to session so we can pick them up next time to tell the user.
 		if (!empty($context['scheduled_errors']))
@@ -323,16 +323,16 @@ function ScheduledTasks()
  */
 function list_getScheduledTasks($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt;
+	global $pmxcFunc, $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
 		FROM {db_prefix}scheduled_tasks',
 		array(
 		)
 	);
 	$known_tasks = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Find the next for regularity - don't offset as it's always server time!
 		$offset = sprintf($txt['scheduled_task_reg_starting'], date('H:i', $row['time_offset']));
@@ -349,7 +349,7 @@ function list_getScheduledTasks($start, $items_per_page, $sort)
 			'regularity' => $offset . ', ' . $repeating,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $known_tasks;
 }
@@ -361,7 +361,7 @@ function list_getScheduledTasks($start, $items_per_page, $sort)
  */
 function EditTask()
 {
-	global $context, $txt, $sourcedir, $smcFunc;
+	global $context, $txt, $sourcedir, $pmxcFunc;
 
 	// Just set up some lovely context stuff.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'tasks';
@@ -407,7 +407,7 @@ function EditTask()
 		$disabled = !isset($_POST['enabled']) ? 1 : 0;
 
 		// Do the update!
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}scheduled_tasks
 			SET disabled = {int:disabled}, time_offset = {int:time_offset}, time_unit = {string:time_unit},
 				time_regularity = {int:time_regularity}
@@ -429,7 +429,7 @@ function EditTask()
 	}
 
 	// Load the task, understand? Que? Que?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE id_task = {int:id_task}',
@@ -439,10 +439,10 @@ function EditTask()
 	);
 
 	// Should never, ever, happen!
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('no_access', false);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$context['task'] = array(
 			'id' => $row['id_task'],
@@ -457,7 +457,7 @@ function EditTask()
 			'unit' => $row['time_unit'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	createToken('admin-st');
 }
@@ -469,7 +469,7 @@ function EditTask()
  */
 function TaskLog()
 {
-	global $scripturl, $context, $txt, $smcFunc, $sourcedir;
+	global $scripturl, $context, $txt, $pmxcFunc, $sourcedir;
 
 	// Lets load the language just incase we are outside the Scheduled area.
 	loadLanguage('ManageScheduledTasks');
@@ -480,7 +480,7 @@ function TaskLog()
 		checkSession();
 		validateToken('admin-tl');
 
-		$smcFunc['db_query']('truncate_table', '
+		$pmxcFunc['db_query']('truncate_table', '
 			TRUNCATE {db_prefix}log_scheduled_tasks',
 			array(
 			)
@@ -584,9 +584,9 @@ function TaskLog()
  */
 function list_getTaskLogEntries($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt;
+	global $pmxcFunc, $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT lst.id_log, lst.id_task, lst.time_run, lst.time_taken, st.task
 		FROM {db_prefix}log_scheduled_tasks AS lst
 			INNER JOIN {db_prefix}scheduled_tasks AS st ON (st.id_task = lst.id_task)
@@ -599,14 +599,14 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
 		)
 	);
 	$log_entries = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$log_entries[] = array(
 			'id' => $row['id_log'],
 			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
 			'time_run' => $row['time_run'],
 			'time_taken' => $row['time_taken'],
 		);
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $log_entries;
 }
@@ -617,16 +617,16 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumTaskLogEntries()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_scheduled_tasks',
 		array(
 		)
 	);
-	list ($num_entries) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($num_entries) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $num_entries;
 }

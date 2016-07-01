@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -22,7 +22,7 @@ if (!defined('SMF'))
  */
 function writeLog($force = false)
 {
-	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $smcFunc, $sourcedir;
+	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $pmxcFunc, $sourcedir;
 
 	// If we are showing who is viewing a topic, let's see if we are, and force an update if so - to make it accurate.
 	if (!empty($settings['display_who_viewing']) && ($topic || $board))
@@ -77,7 +77,7 @@ function writeLog($force = false)
 	{
 		if ($do_delete)
 		{
-			$smcFunc['db_query']('delete_log_online_interval', '
+			$pmxcFunc['db_query']('delete_log_online_interval', '
 				DELETE FROM {db_prefix}log_online
 				WHERE log_time < {int:log_time}
 					AND session != {string:session}',
@@ -91,7 +91,7 @@ function writeLog($force = false)
 			cache_put_data('log_online-update', time(), 30);
 		}
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}log_online
 			SET log_time = {int:log_time}, ip = {inet:ip}, url = {string:url}
 			WHERE session = {string:session}',
@@ -104,7 +104,7 @@ function writeLog($force = false)
 		);
 
 		// Guess it got deleted.
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($pmxcFunc['db_affected_rows']() == 0)
 			$_SESSION['log_time'] = 0;
 	}
 	else
@@ -114,7 +114,7 @@ function writeLog($force = false)
 	if (empty($_SESSION['log_time']))
 	{
 		if ($do_delete || !empty($user_info['id']))
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}log_online
 				WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty($user_info['id']) ? ' OR ' : '') . (empty($user_info['id']) ? '' : 'id_member = {int:current_member}'),
 				array(
@@ -123,7 +123,7 @@ function writeLog($force = false)
 				)
 			);
 
-		$smcFunc['db_insert']($do_delete ? 'ignore' : 'replace',
+		$pmxcFunc['db_insert']($do_delete ? 'ignore' : 'replace',
 			'{db_prefix}log_online',
 			array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'inet', 'url' => 'string'),
 			array($session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), $user_info['ip'], $serialized),
@@ -139,7 +139,7 @@ function writeLog($force = false)
 		$_SESSION['timeOnlineUpdated'] = time();
 
 	// Set their login time, if not already done within the last minute.
-	if (SMF != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60 && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('.xml', 'login2', 'logintfa'))))
+	if (PMX != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60 && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('.xml', 'login2', 'logintfa'))))
 	{
 		// Don't count longer than 15 minutes.
 		if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)
@@ -204,7 +204,7 @@ function logLastDatabaseError()
 function displayDebug()
 {
 	global $context, $scripturl, $boarddir, $sourcedir, $cachedir, $settings, $modSettings;
-	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $smcFunc, $txt;
+	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $pmxcFunc, $txt;
 
 	// Add to Settings.php if you want to show the debugging information.
 	if (!isset($db_show_debug) || $db_show_debug !== true || (isset($_GET['action']) && $_GET['action'] == 'viewquery'))
@@ -303,7 +303,7 @@ function displayDebug()
 				$qq['f'] = preg_replace('~^' . preg_quote($boarddir, '~') . '~', '...', $qq['f']);
 
 			echo '
-	<strong>', $is_select ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win" style="text-decoration: none;">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', $smcFunc['htmlspecialchars'](ltrim($qq['q'], "\n\r")))) . ($is_select ? '</a></strong>' : '</strong>') . '<br>
+	<strong>', $is_select ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win" style="text-decoration: none;">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', $pmxcFunc['htmlspecialchars'](ltrim($qq['q'], "\n\r")))) . ($is_select ? '</a></strong>' : '</strong>') . '<br>
 	&nbsp;&nbsp;&nbsp;';
 			if (!empty($qq['f']) && !empty($qq['l']))
 				echo sprintf($txt['debug_query_in_line'], $qq['f'], $qq['l']);
@@ -333,7 +333,7 @@ function displayDebug()
  */
 function trackStats($stats = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 	static $cache_stats = array();
 
 	if (empty($modSettings['trackStats']))
@@ -361,15 +361,15 @@ function trackStats($stats = array())
 		$insert_keys[$field] = 'int';
 	}
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}log_activity
 		SET' . substr($setStringUpdate, 0, -1) . '
 		WHERE date = {date:current_date}',
 		$update_parameters
 	);
-	if ($smcFunc['db_affected_rows']() == 0)
+	if ($pmxcFunc['db_affected_rows']() == 0)
 	{
-		$smcFunc['db_insert']('ignore',
+		$pmxcFunc['db_insert']('ignore',
 			'{db_prefix}log_activity',
 			array_merge($insert_keys, array('date' => 'date')),
 			array_merge($cache_stats, array($date)),
@@ -411,7 +411,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  */
 function logActions($logs)
 {
-	global $modSettings, $user_info, $smcFunc, $sourcedir;
+	global $modSettings, $user_info, $pmxcFunc, $sourcedir;
 
 	$inserts = array();
 	$log_types = array(
@@ -463,7 +463,7 @@ function logActions($logs)
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_report
 				FROM {db_prefix}log_reported
 				WHERE {raw:column_name} = {int:reported}
@@ -474,14 +474,14 @@ function logActions($logs)
 			));
 
 			// Alright, if we get any result back, update open reports.
-			if ($smcFunc['db_num_rows']($request) > 0)
+			if ($pmxcFunc['db_num_rows']($request) > 0)
 			{
 				require_once($sourcedir . '/ModerationCenter.php');
 				require_once($sourcedir . '/Subs-ReportedContent.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports('posts');
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 
 		if (isset($log['extra']['member']) && !is_numeric($log['extra']['member']))
@@ -519,7 +519,7 @@ function logActions($logs)
 		);
 	}
 
-	$smcFunc['db_insert']('',
+	$pmxcFunc['db_insert']('',
 		'{db_prefix}log_actions',
 		array(
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'inet', 'action' => 'string',
@@ -529,7 +529,7 @@ function logActions($logs)
 		array('id_action')
 	);
 
-	return $smcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
+	return $pmxcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
 }
 
 ?>

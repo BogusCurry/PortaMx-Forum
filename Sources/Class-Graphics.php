@@ -18,7 +18,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -660,14 +660,14 @@ class gif_file
 		// Now, we want the header...
 		$out .= "\x00\x00\x00\x0D";
 		$tmp = 'IHDR' . pack('N', (int) $this->header->m_nWidth) . pack('N', (int) $this->header->m_nHeight) . "\x08\x03\x00\x00\x00";
-		$out .= $tmp . pack('N', smf_crc32($tmp));
+		$out .= $tmp . pack('N', pmx_crc32($tmp));
 
 		// The palette, assuming we have one to speak of...
 		if ($colors > 0)
 		{
 			$out .= pack('N', (int) $colors * 3);
 			$tmp = 'PLTE' . $pal;
-			$out .= $tmp . pack('N', smf_crc32($tmp));
+			$out .= $tmp . pack('N', pmx_crc32($tmp));
 		}
 
 		// Do we have any transparency we want to make available?
@@ -680,13 +680,13 @@ class gif_file
 			for ($i = 0; $i < $colors; $i++)
 				$tmp .= $i == $this->image->m_nTrans ? "\x00" : "\xFF";
 
-			$out .= $tmp . pack('N', smf_crc32($tmp));
+			$out .= $tmp . pack('N', pmx_crc32($tmp));
 		}
 
 		// Here's the data itself!
 		$out .= pack('N', strlen($bmp));
 		$tmp = 'IDAT' . $bmp;
-		$out .= $tmp . pack('N', smf_crc32($tmp));
+		$out .= $tmp . pack('N', pmx_crc32($tmp));
 
 		// EOF marker...
 		$out .= "\x00\x00\x00\x00" . 'IEND' . "\xAE\x42\x60\x82";
@@ -696,7 +696,7 @@ class gif_file
 }
 
 // 64-bit only functions?
-if (!function_exists('smf_crc32'))
+if (!function_exists('pmx_crc32'))
 {
 	require_once $sourcedir . '/Subs-Compat.php';
 }

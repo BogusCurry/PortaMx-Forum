@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -25,7 +25,7 @@ if (!defined('SMF'))
  */
 function modifyCategory($category_id, $catOptions)
 {
-	global $sourcedir, $smcFunc;
+	global $sourcedir, $pmxcFunc;
 
 	$catUpdates = array();
 	$catParameters = array();
@@ -45,14 +45,14 @@ function modifyCategory($category_id, $catOptions)
 			$cats[] = $category_id;
 
 		// Grab the categories sorted by cat_order.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_cat, cat_order
 			FROM {db_prefix}categories
 			ORDER BY cat_order',
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['id_cat'] != $category_id)
 				$cats[] = $row['id_cat'];
@@ -60,12 +60,12 @@ function modifyCategory($category_id, $catOptions)
 				$cats[] = $category_id;
 			$cat_order[$row['id_cat']] = $row['cat_order'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Set the new order for the categories.
 		foreach ($cats as $index => $cat)
 			if ($index != $cat_order[$cat])
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}categories
 					SET cat_order = {int:new_order}
 					WHERE id_cat = {int:current_category}',
@@ -105,7 +105,7 @@ function modifyCategory($category_id, $catOptions)
 	// Do the updates (if any).
 	if (!empty($catUpdates))
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}categories
 			SET
 				' . implode(',
@@ -131,7 +131,7 @@ function modifyCategory($category_id, $catOptions)
  */
 function createCategory($catOptions)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// Check required values.
 	if (!isset($catOptions['cat_name']) || trim($catOptions['cat_name']) == '')
@@ -159,7 +159,7 @@ function createCategory($catOptions)
 	call_integration_hook('integrate_create_category', array(&$catOptions, &$cat_columns, &$cat_parameters));
 
 	// Add the category to the database.
-	$smcFunc['db_insert']('',
+	$pmxcFunc['db_insert']('',
 		'{db_prefix}categories',
 		$cat_columns,
 		$cat_parameters,
@@ -167,7 +167,7 @@ function createCategory($catOptions)
 	);
 
 	// Grab the new category ID.
-	$category_id = $smcFunc['db_insert_id']('{db_prefix}categories', 'id_cat');
+	$category_id = $pmxcFunc['db_insert_id']('{db_prefix}categories', 'id_cat');
 
 	// Set the given properties to the newly created category.
 	modifyCategory($category_id, $catOptions);
@@ -191,7 +191,7 @@ function createCategory($catOptions)
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
-	global $sourcedir, $smcFunc, $cat_tree;
+	global $sourcedir, $pmxcFunc, $cat_tree;
 
 	require_once($sourcedir . '/Subs-Boards.php');
 
@@ -202,7 +202,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 	// With no category set to move the boards to, delete them all.
 	if ($moveBoardsTo === null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_board
 			FROM {db_prefix}boards
 			WHERE id_cat IN ({array_int:category_list})',
@@ -211,9 +211,9 @@ function deleteCategories($categories, $moveBoardsTo = null)
 			)
 		);
 		$boards_inside = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$boards_inside[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (!empty($boards_inside))
 			deleteBoards($boards_inside, null);
@@ -225,7 +225,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 	// Move the boards inside the categories to a safe category.
 	else
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}boards
 			SET id_cat = {int:new_parent_cat}
 			WHERE id_cat IN ({array_int:category_list})',
@@ -236,7 +236,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 		);
 
 	// Do the deletion of the category itself
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}categories
 		WHERE id_cat IN ({array_int:category_list})',
 		array(

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -39,7 +39,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	$cookie_state = (empty($modSettings['localCookies']) ? 0 : 1) | (empty($modSettings['globalCookies']) ? 0 : 2);
 	if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,7};i:1;s:(0|128):"([a-fA-F0-9]{128})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
 	{
-		$array = smf_json_decode($_COOKIE[$cookiename], true);
+		$array = pmx_json_decode($_COOKIE[$cookiename], true);
 
 		// Legacy format
 		if (is_null($array))
@@ -49,7 +49,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		if (isset($array[3]) && $array[3] != $cookie_state)
 		{
 			$cookie_url = url_parts($array[3] & 1 > 0, $array[3] & 2 > 0);
-			smf_setcookie($cookiename, json_encode(array(0, '', 0)), time() - 3600, $cookie_url[1], $cookie_url[0]);
+			pmx_setcookie($cookiename, json_encode(array(0, '', 0)), time() - 3600, $cookie_url[1], $cookie_url[0]);
 		}
 	}
 
@@ -58,11 +58,11 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 
 	// Set the cookie, $_COOKIE, and session variable.
-	smf_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1], $cookie_url[0]);
+	pmx_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1], $cookie_url[0]);
 
 	// If subdomain-independent cookies are on, unset the subdomain-dependent cookie too.
 	if (empty($id) && !empty($modSettings['globalCookies']))
-		smf_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1], '');
+		pmx_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1], '');
 
 	// Any alias URLs?  This is mainly for use with frames, etc.
 	if (!empty($modSettings['forum_alias_urls']))
@@ -81,7 +81,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 			if ($cookie_url[0] == '')
 				$cookie_url[0] = strtok($alias, '/');
 
-			smf_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1], $cookie_url[0]);
+			pmx_setcookie($cookiename, $data, time() + $cookie_length, $cookie_url[1], $cookie_url[0]);
 		}
 
 		$boardurl = $temp;
@@ -136,11 +136,11 @@ function setTFACookie($cookie_length, $id, $secret, $preserve = false)
 	$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 
 	// Set the cookie, $_COOKIE, and session variable.
-	smf_setcookie($identifier, $data, time() + $cookie_length, $cookie_url[1], $cookie_url[0]);
+	pmx_setcookie($identifier, $data, time() + $cookie_length, $cookie_url[1], $cookie_url[0]);
 
 	// If subdomain-independent cookies are on, unset the subdomain-dependent cookie too.
 	if (empty($id) && !empty($modSettings['globalCookies']))
-		smf_setcookie($identifier, $data, time() + $cookie_length, $cookie_url[1], '');
+		pmx_setcookie($identifier, $data, time() + $cookie_length, $cookie_url[1], '');
 
 	$_COOKIE[$identifier] = $data;
 }
@@ -211,7 +211,7 @@ function KickGuest()
  */
 function InMaintenance()
 {
-	global $txt, $mtitle, $mmessage, $context, $smcFunc;
+	global $txt, $mtitle, $mmessage, $context, $pmxcFunc;
 
 	loadLanguage('Login');
 	loadTemplate('Login');
@@ -222,7 +222,7 @@ function InMaintenance()
 
 	// Basic template stuff..
 	$context['sub_template'] = 'maintenance';
-	$context['title'] = $smcFunc['htmlspecialchars']($mtitle);
+	$context['title'] = $pmxcFunc['htmlspecialchars']($mtitle);
 	$context['description'] = &$mmessage;
 	$context['page_title'] = $txt['maintain_mode'];
 }
@@ -298,11 +298,11 @@ function adminLogin($type = 'admin')
  */
 function adminLogin_outputPostVars($k, $v)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (!is_array($v))
 		return '
-<input type="hidden" name="' . $smcFunc['htmlspecialchars']($k) . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '">';
+<input type="hidden" name="' . $pmxcFunc['htmlspecialchars']($k) . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '">';
 	else
 	{
 		$ret = '';
@@ -365,7 +365,7 @@ function construct_query_string($get)
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
 {
-	global $scripturl, $user_info, $smcFunc;
+	global $scripturl, $user_info, $pmxcFunc;
 
 	// If it's not already an array, make it one.
 	if (!is_array($names))
@@ -375,7 +375,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	foreach ($names as $i => $name)
 	{
 		// Trim, and fix wildcards for each name.
-		$names[$i] = trim($smcFunc['strtolower']($name));
+		$names[$i] = trim($pmxcFunc['strtolower']($name));
 
 		$maybe_email |= strpos($name, '@') !== false;
 
@@ -400,11 +400,11 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		$email_condition = '';
 
 	// Get the case of the columns right - but only if we need to as things like MySQL will go slow needlessly otherwise.
-	$member_name = $smcFunc['db_case_sensitive'] ? 'LOWER(member_name)' : 'member_name';
-	$real_name = $smcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name';
+	$member_name = $pmxcFunc['db_case_sensitive'] ? 'LOWER(member_name)' : 'member_name';
+	$real_name = $pmxcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name';
 
 	// Search by username, display name, and email address.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, member_name, real_name, email_address
 		FROM {db_prefix}members
 		WHERE ({raw:member_name_search}
@@ -420,7 +420,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'limit' => $max,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$results[$row['id_member']] = array(
 			'id' => $row['id_member'],
@@ -431,7 +431,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Return all the results.
 	return $results;
@@ -445,7 +445,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function JSMembers()
 {
-	global $context, $scripturl, $user_info, $smcFunc;
+	global $context, $scripturl, $user_info, $pmxcFunc;
 
 	checkSession('get');
 
@@ -456,7 +456,7 @@ function JSMembers()
 	$context['sub_template'] = 'find_members';
 
 	if (isset($_REQUEST['search']))
-		$context['last_search'] = $smcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
+		$context['last_search'] = $pmxcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
 	else
 		$_REQUEST['start'] = 0;
 
@@ -477,7 +477,7 @@ function JSMembers()
 	// If the user has done a search, well - search.
 	if (isset($_REQUEST['search']))
 	{
-		$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
+		$_REQUEST['search'] = $pmxcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
 
 		$context['results'] = findMembers(array($_REQUEST['search']), true, $context['buddy_search']);
 		$total_results = count($context['results']);
@@ -510,31 +510,31 @@ function JSMembers()
  */
 function RequestMembers()
 {
-	global $user_info, $txt, $smcFunc;
+	global $user_info, $txt, $pmxcFunc;
 
 	checkSession('get');
 
-	$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search']) . '*';
-	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search']));
+	$_REQUEST['search'] = $pmxcFunc['htmlspecialchars']($_REQUEST['search']) . '*';
+	$_REQUEST['search'] = trim($pmxcFunc['strtolower']($_REQUEST['search']));
 	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 	if (function_exists('iconv'))
 		header('Content-Type: text/plain; charset=UTF-8');
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT real_name
 		FROM {db_prefix}members
 		WHERE {raw:real_name} LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN (1, 11)
-		LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
+		LIMIT ' . ($pmxcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
 		array(
-			'real_name' => $smcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name',
+			'real_name' => $pmxcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $user_info['buddies'],
 			'search' => $_REQUEST['search'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if (function_exists('iconv'))
 		{
@@ -550,7 +550,7 @@ function RequestMembers()
 
 		echo $row['real_name'], "\n";
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	obExit(false);
 }
@@ -568,14 +568,14 @@ function RequestMembers()
  */
 function resetPassword($memID, $username = null)
 {
-	global $sourcedir, $modSettings, $smcFunc, $language;
+	global $sourcedir, $modSettings, $pmxcFunc, $language;
 
 	// Language... and a required file.
 	loadLanguage('Login');
 	require_once($sourcedir . '/Subs-Post.php');
 
 	// Get some important details.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT member_name, email_address, lngfile
 		FROM {db_prefix}members
 		WHERE id_member = {int:id_member}',
@@ -583,8 +583,8 @@ function resetPassword($memID, $username = null)
 			'id_member' => $memID,
 		)
 	);
-	list ($user, $email, $lngfile) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($user, $email, $lngfile) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if ($username !== null)
 	{
@@ -631,12 +631,12 @@ function resetPassword($memID, $username = null)
  */
 function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
 {
-	global $sourcedir, $txt, $smcFunc, $user_info;
+	global $sourcedir, $txt, $pmxcFunc, $user_info;
 
 	$errors = array();
 
 	// Don't use too long a name.
-	if ($smcFunc['strlen']($username) > 25)
+	if ($pmxcFunc['strlen']($username) > 25)
 		$errors[] = array('lang', 'error_long_name');
 
 	// No name?!  How can you register with no name?
@@ -654,7 +654,7 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
 	{
 		require_once($sourcedir . '/Subs-Members.php');
 		if (isReservedName($username, $memID, false))
-			$errors[] = array('done', '(' . $smcFunc['htmlspecialchars']($username) . ') ' . $txt['name_in_use']);
+			$errors[] = array('done', '(' . $pmxcFunc['htmlspecialchars']($username) . ') ' . $txt['name_in_use']);
 	}
 
 	if ($return_error)
@@ -683,10 +683,10 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
  */
 function validatePassword($password, $username, $restrict_in = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 
 	// Perform basic requirements first.
-	if ($smcFunc['strlen']($password) < (empty($modSettings['password_strength']) ? 4 : 8))
+	if ($pmxcFunc['strlen']($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 		return 'short';
 
 	// Is this enough?
@@ -696,7 +696,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Otherwise, perform the medium strength test - checking if password appears in the restricted string.
 	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) != 0)
 		return 'restricted_words';
-	elseif ($smcFunc['strpos']($password, $username) !== false)
+	elseif ($pmxcFunc['strpos']($password, $username) !== false)
 		return 'restricted_words';
 
 	// If just medium, we're done.
@@ -705,7 +705,7 @@ function validatePassword($password, $username, $restrict_in = array())
 
 	// Otherwise, hard test next, check for numbers and letters, uppercase too.
 	$good = preg_match('~(\D\d|\d\D)~', $password) != 0;
-	$good &= $smcFunc['strtolower']($password) != $password;
+	$good &= $pmxcFunc['strtolower']($password) != $password;
 
 	return $good ? null : 'chars';
 }
@@ -717,14 +717,14 @@ function validatePassword($password, $username, $restrict_in = array())
  */
 function rebuildModCache()
 {
-	global $user_info, $smcFunc;
+	global $user_info, $pmxcFunc;
 
 	// What groups can they moderate?
 	$group_query = allowedTo('manage_membergroups') ? '1=1' : '0=1';
 
 	if ($group_query == '0=1' && !$user_info['is_guest'])
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
@@ -733,9 +733,9 @@ function rebuildModCache()
 			)
 		);
 		$groups = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$groups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (empty($groups))
 			$group_query = '0=1';
@@ -760,7 +760,7 @@ function rebuildModCache()
 	$boards_mod = array();
 	if (!$user_info['is_guest'])
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_board
 			FROM {db_prefix}moderators
 			WHERE id_member = {int:current_member}',
@@ -768,12 +768,12 @@ function rebuildModCache()
 				'current_member' => $user_info['id'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$boards_mod[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Can any of the groups they're in moderate any of the boards?
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_board
 			FROM {db_prefix}moderator_groups
 			WHERE id_group IN({array_int:groups})',
@@ -781,9 +781,9 @@ function rebuildModCache()
 				'groups' => $user_info['groups'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$boards_mod[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Just in case we've got duplicates here...
 		$boards_mod = array_unique($boards_mod);
@@ -822,7 +822,7 @@ function rebuildModCache()
  * @param bool $secure = false
  * @param bool $httponly = true
  */
-function smf_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = true)
+function pmx_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = true)
 {
 	global $modSettings;
 
@@ -849,13 +849,13 @@ function smf_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  */
 function hash_password($username, $password, $cost = null)
 {
-	global $sourcedir, $smcFunc, $modSettings;
+	global $sourcedir, $pmxcFunc, $modSettings;
 	if (!function_exists('password_hash'))
 		require_once($sourcedir . '/Subs-Password.php');
 
 	$cost = empty($cost) ? (empty($modSettings['bcrypt_hash_cost']) ? 10 : $modSettings['bcrypt_hash_cost']) : $cost;
 
-	return password_hash($smcFunc['strtolower']($username) . $password, PASSWORD_BCRYPT, array(
+	return password_hash($pmxcFunc['strtolower']($username) . $password, PASSWORD_BCRYPT, array(
 		'cost' => $cost,
 	));
 }
@@ -882,11 +882,11 @@ function hash_salt($password, $salt)
  */
 function hash_verify_password($username, $password, $hash)
 {
-	global $sourcedir, $smcFunc;
+	global $sourcedir, $pmxcFunc;
 	if (!function_exists('password_verify'))
 		require_once($sourcedir . '/Subs-Password.php');
 
-	return password_verify($smcFunc['strtolower']($username) . $password, $hash);
+	return password_verify($pmxcFunc['strtolower']($username) . $password, $hash);
 }
 
 /**

@@ -64,7 +64,7 @@ function template_main()
 	// End of the javascript, start the form and display the link tree.
 	echo '
 		</script>
-		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');" enctype="multipart/form-data">';
+		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);pmxc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');" enctype="multipart/form-data">';
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
@@ -656,7 +656,7 @@ function template_main()
 						if (checkboxFields[i] in document.forms.postmodify && document.forms.postmodify.elements[checkboxFields[i]].checked)
 							x[x.length] = checkboxFields[i] + \'=\' + document.forms.postmodify.elements[checkboxFields[i]].value;
 
-					sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=post2\' + (current_board ? \';board=\' + current_board : \'\') + (make_poll ? \';poll\' : \'\') + \';preview;xml\', x.join(\'&\'), onDocSent);
+					sendXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=post2\' + (current_board ? \';board=\' + current_board : \'\') + (make_poll ? \';poll\' : \'\') + \';preview;xml\', x.join(\'&\'), onDocSent);
 
 					document.getElementById(\'preview_section\').style.display = \'\';
 					setInnerHTML(document.getElementById(\'preview_subject\'), txt_preview_title);
@@ -761,7 +761,7 @@ function template_main()
 				{
 					for (var i = 0; i < numIgnoredReplies; i++)
 					{
-						aIgnoreToggles[ignored_replies[i]] = new smc_Toggle({
+						aIgnoreToggles[ignored_replies[i]] = new pmxc_Toggle({
 							bToggleEnabled: true,
 							bCurrentlyCollapsed: true,
 							aSwappableContainers: [
@@ -781,14 +781,14 @@ function template_main()
 
 				location.hash = \'#\' + \'preview_section\';
 
-				if (typeof(smf_codeFix) != \'undefined\')
-					smf_codeFix();
+				if (typeof(pmx_codeFix) != \'undefined\')
+					pmx_codeFix();
 			}';
 
 	// Code for showing and hiding additional options.
 	if (!empty($modSettings['additional_options_collapsable']))
 		echo '
-			var oSwapAdditionalOptions = new smc_Toggle({
+			var oSwapAdditionalOptions = new pmxc_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', $context['show_additional_options'] ? 'false' : 'true', ',
 				funcOnBeforeCollapse: function () {
@@ -819,7 +819,7 @@ function template_main()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new pmxc_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -905,7 +905,7 @@ function template_main()
 		foreach ($ignored_posts as $post_id)
 		{
 			echo '
-			aIgnoreToggles[', $post_id, '] = new smc_Toggle({
+			aIgnoreToggles[', $post_id, '] = new pmxc_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -926,9 +926,9 @@ function template_main()
 			function insertQuoteFast(messageid)
 			{
 				if (window.XMLHttpRequest)
-					getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=0\', onDocReceived);
+					getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=0\', onDocReceived);
 				else
-					reqWin(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=0\', 240, 90);
+					reqWin(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=0\', 240, 90);
 
 				return true;
 			}

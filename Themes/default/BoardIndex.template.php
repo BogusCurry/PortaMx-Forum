@@ -29,7 +29,7 @@ function template_newsfader()
 	if (!empty($settings['show_newsfader']) && !empty($context['news_lines']))
 	{
 		echo '
-		<ul id="smf_slider" class="roundframe">';
+		<ul id="pmx_slider" class="roundframe">';
 
 		foreach ($context['news_lines'] as $news)
 		{
@@ -40,7 +40,7 @@ function template_newsfader()
 		echo '
 		</ul>
 		<script>
-			jQuery("#smf_slider").slippry({
+			jQuery("#pmx_slider").slippry({
 				pause: ', $settings['newsfader_time'],',
 				adaptiveHeight: 0,
 				captions: 0,
@@ -217,7 +217,7 @@ function template_info_center()
 	// Info center collapse object.
 	echo '
 	<script>
-		var oInfoCenterToggle = new smc_Toggle({
+		var oInfoCenterToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: '. ($context['user']['is_guest'] ? (empty($_COOKIE['upshrinkIC']) ? 'false' : 'true') : (empty($options['collapse_header_ic']) ? 'false' : 'true')) .',
 			aSwappableContainers: [
@@ -240,8 +240,8 @@ function template_info_center()
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'collapse_header_ic\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: pmx_session_id,
+				sSessionVar: pmx_session_var,
 			},
 			oCookieOptions: {
 				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',

@@ -14,7 +14,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 if(!checkECL_Cookie())
@@ -29,7 +29,7 @@ function ModifyProfile($post_errors = array())
 {
 	global $txt, $scripturl, $user_info, $context, $sourcedir, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
-	global $db_show_debug, $smcFunc;
+	global $db_show_debug, $pmxcFunc;
 
 	// Don't reload this as we may have processed error strings.
 	if (empty($post_errors))
@@ -78,7 +78,7 @@ function ModifyProfile($post_errors = array())
 
 	if (!empty($modSettings['paid_enabled']))
 	{
-		$get_active_subs = $smcFunc['db_query']('', '
+		$get_active_subs = $pmxcFunc['db_query']('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}subscriptions
 			WHERE active = {int:active}', array(
@@ -86,11 +86,11 @@ function ModifyProfile($post_errors = array())
 			)
 		);
 
-		list ($num_subs) = $smcFunc['db_fetch_row']($get_active_subs);
+		list ($num_subs) = $pmxcFunc['db_fetch_row']($get_active_subs);
 
 		$context['subs_available'] = ($num_subs > 0);
 
-		$smcFunc['db_free_result']($get_active_subs);
+		$pmxcFunc['db_free_result']($get_active_subs);
 	}
 
 	/* Define all the sections within the profile area!
@@ -582,7 +582,7 @@ function ModifyProfile($post_errors = array())
 	$check_password = $context['user']['is_owner'] && in_array($profile_include_data['current_area'], $context['password_areas']);
 	$context['require_password'] = $check_password;
 
-	loadJavascriptFile('profile.js', array('defer' => false), 'smf_profile');
+	loadJavascriptFile('profile.js', array('defer' => false), 'pmx_profile');
 
 	// These will get populated soon!
 	$post_errors = array();
@@ -860,7 +860,7 @@ function alerts_popup($memID)
  */
 function loadCustomFields($memID, $area = 'summary')
 {
-	global $context, $txt, $user_profile, $smcFunc, $user_info, $settings, $scripturl;
+	global $context, $txt, $user_profile, $pmxcFunc, $user_info, $settings, $scripturl;
 
 	// Get the right restrictions in place...
 	$where = 'active = 1';
@@ -879,7 +879,7 @@ function loadCustomFields($memID, $area = 'summary')
 		$where .= ' AND show_profile = {string:area}';
 
 	// Load all the relevant fields - and data.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			col_name, field_name, field_desc, field_type, field_order, show_reg, field_length, field_options,
 			default_value, bbc, enclose, placement
@@ -892,7 +892,7 @@ function loadCustomFields($memID, $area = 'summary')
 	);
 	$context['custom_fields'] = array();
 	$context['custom_fields_required'] = false;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Shortcut.
 		$exists = $memID && isset($user_profile[$memID], $user_profile[$memID]['options'][$row['col_name']]);
@@ -901,7 +901,7 @@ function loadCustomFields($memID, $area = 'summary')
 		// If this was submitted already then make the value the posted version.
 		if (isset($_POST['customfield']) && isset($_POST['customfield'][$row['col_name']]))
 		{
-			$value = $smcFunc['htmlspecialchars']($_POST['customfield'][$row['col_name']]);
+			$value = $pmxcFunc['htmlspecialchars']($_POST['customfield'][$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 					$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}
@@ -985,7 +985,7 @@ function loadCustomFields($memID, $area = 'summary')
 		);
 		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'] == 2;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	call_integration_hook('integrate_load_custom_profile_fields', array($memID, $area));
 }

@@ -12,28 +12,28 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
- *  Add the file functions to the $smcFunc array.
+ *  Add the file functions to the $pmxcFunc array.
  */
 function db_search_init()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	if (!isset($smcFunc['db_search_query']) || $smcFunc['db_search_query'] != 'smf_db_search_query')
-		$smcFunc += array(
-			'db_search_query' => 'smf_db_search_query',
-			'db_search_support' => 'smf_db_search_support',
-			'db_create_word_search' => 'smf_db_create_word_search',
+	if (!isset($pmxcFunc['db_search_query']) || $pmxcFunc['db_search_query'] != 'pmx_db_search_query')
+		$pmxcFunc += array(
+			'db_search_query' => 'pmx_db_search_query',
+			'db_search_support' => 'pmx_db_search_support',
+			'db_create_word_search' => 'pmx_db_create_word_search',
 			'db_support_ignore' => false,
 		);
 	
 	db_extend();
 	
 	//pg 9.5 got ignore support
-	$version = $smcFunc['db_get_version']();
+	$version = $pmxcFunc['db_get_version']();
 	// if we got a Beta Version
 	if (stripos($version, 'beta') !== false)
 		$version = substr($version, 0, stripos($version, 'beta')).'.0';
@@ -42,7 +42,7 @@ function db_search_init()
 		$version = substr($version, 0, stripos($version, 'rc')).'.0';
 	
 	if (version_compare($version,'9.5.0','>='))
-		$smcFunc['db_support_ignore'] = true;
+		$pmxcFunc['db_support_ignore'] = true;
 }
 
 /**
@@ -51,7 +51,7 @@ function db_search_init()
  * @param string $search_type The search type
  * @return boolean Whether or not the specified search type is supported by this DB system.
  */
-function smf_db_search_support($search_type)
+function pmx_db_search_support($search_type)
 {
 	$supported_types = array('custom','fulltext');
 
@@ -63,13 +63,13 @@ function smf_db_search_support($search_type)
  *
  * @param string $identifier A query identifier
  * @param string $db_string The query text
- * @param array $db_values An array of values to pass to $smcFunc['db_query']
+ * @param array $db_values An array of values to pass to $pmxcFunc['db_query']
  * @param resource $connection The current DB connection resource
- * @return resource The query result resource from $smcFunc['db_query']
+ * @return resource The query result resource from $pmxcFunc['db_query']
  */
-function smf_db_search_query($identifier, $db_string, $db_values = array(), $connection = null)
+function pmx_db_search_query($identifier, $db_string, $db_values = array(), $connection = null)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	$replacements = array(
 		'create_tmp_log_search_topics' => array(
@@ -107,7 +107,7 @@ function smf_db_search_query($identifier, $db_string, $db_values = array(), $con
 	if (preg_match('~^\s*INSERT\sIGNORE~i', $db_string) != 0)
 	{
 		$db_string = preg_replace('~^\s*INSERT\sIGNORE~i', 'INSERT', $db_string);
-		if ($smcFunc['db_support_ignore']){
+		if ($pmxcFunc['db_support_ignore']){
 			//pg style "INSERT INTO.... ON CONFLICT DO NOTHING"
 			$db_string = $db_string.' ON CONFLICT DO NOTHING';
 		}
@@ -118,7 +118,7 @@ function smf_db_search_query($identifier, $db_string, $db_values = array(), $con
 		}
 	}
 
-	$return = $smcFunc['db_query']('', $db_string,
+	$return = $pmxcFunc['db_query']('', $db_string,
 		$db_values, $connection
 	);
 
@@ -130,13 +130,13 @@ function smf_db_search_query($identifier, $db_string, $db_values = array(), $con
  *
  * @param string $size The column size type (int, mediumint (8), etc.). Not used here.
  */
-function smf_db_create_word_search($size)
+function pmx_db_create_word_search($size)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	$size = 'int';
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		CREATE TABLE {db_prefix}log_search_words (
 			id_word {raw:size} NOT NULL default {string:string_zero},
 			id_msg int NOT NULL default {string:string_zero},

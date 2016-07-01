@@ -14,7 +14,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -24,7 +24,7 @@ if (!defined('SMF'))
  */
 function loadProfileFields($force_reload = false)
 {
-	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $smcFunc, $cur_profile, $language;
+	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $pmxcFunc, $cur_profile, $language;
 	global $sourcedir, $profile_vars;
 
 	// Don't load this twice!
@@ -208,9 +208,9 @@ function loadProfileFields($force_reload = false)
 			'callback_func' => 'theme_pick',
 			'permission' => 'profile_extra',
 			'enabled' => $modSettings['theme_allow'] || allowedTo('admin_forum'),
-			'preload' => function () use ($smcFunc, &$context, $cur_profile, $txt)
+			'preload' => function () use ($pmxcFunc, &$context, $cur_profile, $txt)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT value
 					FROM {db_prefix}themes
 					WHERE id_theme = {int:id_theme}
@@ -220,8 +220,8 @@ function loadProfileFields($force_reload = false)
 						'variable' => 'name',
 					)
 				);
-				list ($name) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				list ($name) = $pmxcFunc['db_fetch_row']($request);
+				$pmxcFunc['db_free_result']($request);
 
 				$context['member']['theme'] = array(
 					'id' => $cur_profile['id_theme'],
@@ -308,7 +308,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_password',
 			'save_key' => 'passwd',
 			// Note this will only work if passwrd2 also exists!
-			'input_validate' => function (&$value) use ($sourcedir, $user_info, $smcFunc, $cur_profile)
+			'input_validate' => function (&$value) use ($sourcedir, $user_info, $pmxcFunc, $cur_profile)
 			{
 				// If we didn't try it then ignore it!
 				if ($value == '')
@@ -347,9 +347,9 @@ function loadProfileFields($force_reload = false)
 			'input_attr' => array('maxlength="50"'),
 			'size' => 50,
 			'permission' => 'profile_blurb',
-			'input_validate' => function (&$value) use ($smcFunc)
+			'input_validate' => function (&$value) use ($pmxcFunc)
 			{
-				if ($smcFunc['strlen']($value) > 50)
+				if ($pmxcFunc['strlen']($value) > 50)
 					return 'personal_text_too_long';
 
 				return true;
@@ -400,13 +400,13 @@ function loadProfileFields($force_reload = false)
 			'input_attr' => array('maxlength="60"'),
 			'permission' => 'profile_displayed_name',
 			'enabled' => allowedTo('profile_displayed_name_own') || allowedTo('profile_displayed_name_any') || allowedTo('moderate_forum'),
-			'input_validate' => function (&$value) use ($context, $smcFunc, $sourcedir, $cur_profile)
+			'input_validate' => function (&$value) use ($context, $pmxcFunc, $sourcedir, $cur_profile)
 			{
 				$value = trim(preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $value));
 
 				if (trim($value) == '')
 					return 'no_name';
-				elseif ($smcFunc['strlen']($value) > 60)
+				elseif ($pmxcFunc['strlen']($value) > 60)
 					return 'name_too_long';
 				elseif ($cur_profile['real_name'] != $value)
 				{
@@ -457,7 +457,7 @@ function loadProfileFields($force_reload = false)
 			'callback_func' => 'smiley_pick',
 			'enabled' => !empty($modSettings['smiley_sets_enable']),
 			'permission' => 'profile_extra',
-			'preload' => function () use ($modSettings, &$context, $txt, $cur_profile, $smcFunc)
+			'preload' => function () use ($modSettings, &$context, $txt, $cur_profile, $pmxcFunc)
 			{
 				$context['member']['smiley_set']['id'] = empty($cur_profile['smiley_set']) ? '' : $cur_profile['smiley_set'];
 				$context['smiley_sets'] = explode(',', 'none,,' . $modSettings['smiley_sets_known']);
@@ -465,8 +465,8 @@ function loadProfileFields($force_reload = false)
 				foreach ($context['smiley_sets'] as $i => $set)
 				{
 					$context['smiley_sets'][$i] = array(
-						'id' => $smcFunc['htmlspecialchars']($set),
-						'name' => $smcFunc['htmlspecialchars']($set_names[$i]),
+						'id' => $pmxcFunc['htmlspecialchars']($set),
+						'name' => $pmxcFunc['htmlspecialchars']($set_names[$i]),
 						'selected' => $set == $context['member']['smiley_set']['id']
 					);
 
@@ -538,12 +538,12 @@ function loadProfileFields($force_reload = false)
 		),
 		'timezone' => array(
 			'type' => 'select',
-			'options' => smf_list_timezones(),
+			'options' => pmx_list_timezones(),
 			'permission' => 'profile_extra',
 			'label' => $txt['timezone'],
 			'input_validate' => function ($value)
 			{
-				$tz = smf_list_timezones();
+				$tz = pmx_list_timezones();
 				if (!isset($tz[$value]))
 					return 'bad_timezone';
 
@@ -558,9 +558,9 @@ function loadProfileFields($force_reload = false)
 			'size' => 50,
 			'permission' => 'profile_other',
 			'enabled' => !empty($modSettings['titlesEnable']),
-			'input_validate' => function (&$value) use ($smcFunc)
+			'input_validate' => function (&$value) use ($pmxcFunc)
 			{
-				if ($smcFunc['strlen']($value) > 50)
+				if ($pmxcFunc['strlen']($value) > 50)
 					return 'user_title_too_long';
 
 				return true;
@@ -952,7 +952,7 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
  */
 function makeThemeChanges($memID, $id_theme)
 {
-	global $modSettings, $smcFunc, $context, $user_info;
+	global $modSettings, $pmxcFunc, $context, $user_info;
 
 	$reservedVars = array(
 		'actual_theme_url',
@@ -978,7 +978,7 @@ function makeThemeChanges($memID, $id_theme)
 		fatal_lang_error('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT col_name
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:is_active}',
@@ -987,9 +987,9 @@ function makeThemeChanges($memID, $id_theme)
 		)
 	);
 	$custom_fields = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$custom_fields[] = $row['col_name'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// These are the theme changes...
 	$themeSetArray = array();
@@ -1034,7 +1034,7 @@ function makeThemeChanges($memID, $id_theme)
 	{
 		if (!empty($themeSetArray))
 		{
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}themes',
 				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				$themeSetArray,
@@ -1044,7 +1044,7 @@ function makeThemeChanges($memID, $id_theme)
 
 		if (!empty($erase_options))
 		{
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}themes
 				WHERE id_theme != {int:id_theme}
 					AND variable IN ({array_string:erase_variables})
@@ -1071,7 +1071,7 @@ function makeThemeChanges($memID, $id_theme)
  */
 function makeNotificationChanges($memID)
 {
-	global $smcFunc, $sourcedir;
+	global $pmxcFunc, $sourcedir;
 
 	require_once($sourcedir . '/Subs-Notify.php');
 
@@ -1085,7 +1085,7 @@ function makeNotificationChanges($memID)
 		// id_board = 0 is reserved for topic notifications.
 		$_POST['notify_boards'] = array_diff($_POST['notify_boards'], array(0));
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_board IN ({array_int:board_list})
 				AND id_member = {int:selected_member}',
@@ -1105,7 +1105,7 @@ function makeNotificationChanges($memID)
 		// Make sure there are no zeros left.
 		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member = {int:selected_member}',
@@ -1148,7 +1148,7 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true, $returnErrors = false)
 {
-	global $context, $smcFunc, $user_profile, $user_info, $modSettings;
+	global $context, $pmxcFunc, $user_profile, $user_info, $modSettings;
 	global $sourcedir;
 
 	$errors = array();
@@ -1159,7 +1159,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true, $returnErrors =
 	$where = $area == 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
 
 	// Load the fields we are saving too - make sure we save valid data (etc).
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
@@ -1171,7 +1171,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true, $returnErrors =
 	);
 	$changes = array();
 	$log_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		/* This means don't save if:
 			- The user is NOT an admin.
@@ -1197,7 +1197,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true, $returnErrors =
 		{
 			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : '';
 			if ($row['field_length'])
-				$value = $smcFunc['substr']($value, 0, $row['field_length']);
+				$value = $pmxcFunc['substr']($value, 0, $row['field_length']);
 
 			// Any masks?
 			if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
@@ -1242,7 +1242,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true, $returnErrors =
 			$user_profile[$memID]['options'][$row['col_name']] = $value;
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$hook_errors = array();
 	$hook_errors = call_integration_hook('integrate_save_custom_profile_fields', array(&$changes, &$log_changes, &$errors, $returnErrors, $memID, $area, $sanitize));
@@ -1253,7 +1253,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true, $returnErrors =
 	// Make those changes!
 	if (!empty($changes) && empty($context['password_auth_failed']) && empty($errors))
 	{
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}themes',
 			array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
 			$changes,
@@ -1305,7 +1305,7 @@ function editBuddyIgnoreLists($memID)
 		),
 	);
 
-	loadJavascriptFile('suggest.js', array('defer' => false), 'smf_suggest');
+	loadJavascriptFile('suggest.js', array('defer' => false), 'pmx_suggest');
 
 	// Pass on to the actual function.
 	$context['sub_template'] = $subActions[$context['list_area']][0];
@@ -1323,7 +1323,7 @@ function editBuddyIgnoreLists($memID)
 function editBuddies($memID)
 {
 	global $txt, $scripturl, $settings;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext, $pmxcFunc;
 
 	// For making changes!
 	$buddiesArray = explode(',', $user_profile[$memID]['buddy_list']);
@@ -1360,7 +1360,7 @@ function editBuddies($memID)
 		checkSession();
 
 		// Prepare the string for extraction...
-		$_POST['new_buddy'] = strtr($smcFunc['htmlspecialchars']($_POST['new_buddy'], ENT_QUOTES), array('&quot;' => '"'));
+		$_POST['new_buddy'] = strtr($pmxcFunc['htmlspecialchars']($_POST['new_buddy'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_POST['new_buddy'], $matches);
 		$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_buddy']))));
 
@@ -1378,7 +1378,7 @@ function editBuddies($memID)
 		if (!empty($new_buddies))
 		{
 			// Now find out the id_member of the buddy.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE member_name IN ({array_string:new_buddies}) OR real_name IN ({array_string:new_buddies})
@@ -1389,18 +1389,18 @@ function editBuddies($memID)
 				)
 			);
 
-			if ($smcFunc['db_num_rows']($request) != 0)
+			if ($pmxcFunc['db_num_rows']($request) != 0)
 				$_SESSION['prf-save'] = true;
 
 			// Add the new member to the buddies array.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if (in_array($row['id_member'], $buddiesArray))
 					continue;
 				else
 					$buddiesArray[] = (int) $row['id_member'];
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Now update the current users buddy list.
 			$user_profile[$memID]['buddy_list'] = implode(',', $buddiesArray);
@@ -1415,7 +1415,7 @@ function editBuddies($memID)
 	$buddies = array();
 
 	// Gotta load the custom profile fields names.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT col_name, field_name, field_desc, field_type, bbc, enclose
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
@@ -1428,7 +1428,7 @@ function editBuddies($memID)
 
 	$context['custom_pf'] = array();
 	$disabled_fields = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		if (!isset($disabled_fields[$row['col_name']]))
 			$context['custom_pf'][$row['col_name']] = array(
 				'label' => $row['field_name'],
@@ -1441,11 +1441,11 @@ function editBuddies($memID)
 	if (isset($context['custom_pf']['cust_gender']) && $context['custom_pf']['cust_gender'] == 'Disabled')
 		unset($context['custom_pf']['cust_gender']);
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($buddiesArray))
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE id_member IN ({array_int:buddy_list})
@@ -1456,9 +1456,9 @@ function editBuddies($memID)
 				'buddy_list_count' => substr_count($user_profile[$memID]['buddy_list'], ',') + 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 			$buddies[] = $row['id_member'];
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 	}
 
 	$context['buddy_count'] = count($buddies);
@@ -1524,7 +1524,7 @@ function editBuddies($memID)
 function editIgnoreList($memID)
 {
 	global $txt;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext, $pmxcFunc;
 
 	// For making changes!
 	$ignoreArray = explode(',', $user_profile[$memID]['pm_ignore_list']);
@@ -1558,7 +1558,7 @@ function editIgnoreList($memID)
 	{
 		checkSession();
 		// Prepare the string for extraction...
-		$_POST['new_ignore'] = strtr($smcFunc['htmlspecialchars']($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
+		$_POST['new_ignore'] = strtr($pmxcFunc['htmlspecialchars']($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_POST['new_ignore'], $matches);
 		$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_ignore']))));
 
@@ -1574,7 +1574,7 @@ function editIgnoreList($memID)
 		if (!empty($new_entries))
 		{
 			// Now find out the id_member for the members in question.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE member_name IN ({array_string:new_entries}) OR real_name IN ({array_string:new_entries})
@@ -1585,18 +1585,18 @@ function editIgnoreList($memID)
 				)
 			);
 
-			if ($smcFunc['db_num_rows']($request) != 0)
+			if ($pmxcFunc['db_num_rows']($request) != 0)
 				$_SESSION['prf-save'] = true;
 
 			// Add the new member to the buddies array.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if (in_array($row['id_member'], $ignoreArray))
 					continue;
 				else
 					$ignoreArray[] = (int) $row['id_member'];
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Now update the current users buddy list.
 			$user_profile[$memID]['pm_ignore_list'] = implode(',', $ignoreArray);
@@ -1612,7 +1612,7 @@ function editIgnoreList($memID)
 
 	if (!empty($ignoreArray))
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE id_member IN ({array_int:ignore_list})
@@ -1623,9 +1623,9 @@ function editIgnoreList($memID)
 				'ignore_list_count' => substr_count($user_profile[$memID]['pm_ignore_list'], ',') + 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 			$ignored[] = $row['id_member'];
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 	}
 
 	$context['ignore_count'] = count($ignored);
@@ -1715,7 +1715,7 @@ function forumProfile($memID)
  */
 function getAvatars($directory, $level)
 {
-	global $context, $txt, $modSettings, $smcFunc;
+	global $context, $txt, $modSettings, $pmxcFunc;
 
 	$result = array();
 
@@ -1758,9 +1758,9 @@ function getAvatars($directory, $level)
 		$tmp = getAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
 		if (!empty($tmp))
 			$result[] = array(
-				'filename' => $smcFunc['htmlspecialchars']($line),
+				'filename' => $pmxcFunc['htmlspecialchars']($line),
 				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
-				'name' => '[' . $smcFunc['htmlspecialchars'](str_replace('_', ' ', $line)) . ']',
+				'name' => '[' . $pmxcFunc['htmlspecialchars'](str_replace('_', ' ', $line)) . ']',
 				'is_dir' => true,
 				'files' => $tmp
 		);
@@ -1777,9 +1777,9 @@ function getAvatars($directory, $level)
 			continue;
 
 		$result[] = array(
-			'filename' => $smcFunc['htmlspecialchars']($line),
+			'filename' => $pmxcFunc['htmlspecialchars']($line),
 			'checked' => $line == $context['member']['avatar']['server_pic'],
-			'name' => $smcFunc['htmlspecialchars'](str_replace('_', ' ', $filename)),
+			'name' => $pmxcFunc['htmlspecialchars'](str_replace('_', ' ', $filename)),
 			'is_dir' => false
 		);
 		if ($level == 1)
@@ -1824,7 +1824,7 @@ function notification($memID)
 	global $txt, $context;
 
 	// Going to want this for consistency.
-	loadCSSFile('admin.css', array(), 'smf_admin');
+	loadCSSFile('admin.css', array(), 'pmx_admin');
 
 	// This is just a bootstrap for everything else.
 	$sa = array(
@@ -1852,7 +1852,7 @@ function notification($memID)
  */
 function alert_configuration($memID)
 {
-	global $txt, $user_profile, $context, $modSettings, $smcFunc, $sourcedir;
+	global $txt, $user_profile, $context, $modSettings, $pmxcFunc, $sourcedir;
 
 	if (!isset($context['token_check']))
 		$context['token_check'] = 'profile-nt' . $memID;
@@ -1867,7 +1867,7 @@ function alert_configuration($memID)
 
 	// What options are set
 	loadThemeOptions($memID);
-	loadJavascriptFile('alertSettings.js', array(), 'smf_alertSettings');
+	loadJavascriptFile('alertSettings.js', array(), 'pmx_alertSettings');
 
 	// Now load all the values for this user.
 	require_once($sourcedir . '/Subs-Notify.php');
@@ -1982,7 +1982,7 @@ function alert_configuration($memID)
 	{
 		require_once($sourcedir . '/Subs-Members.php');
 		$perms_cache = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:memID}',
@@ -1991,7 +1991,7 @@ function alert_configuration($memID)
 			)
 		);
 
-		list ($can_mod) = $smcFunc['db_fetch_row']($request);
+		list ($can_mod) = $pmxcFunc['db_fetch_row']($request);
 
 		if (!isset($perms_cache['manage_membergroups']))
 		{
@@ -2107,7 +2107,7 @@ function alert_configuration($memID)
  */
 function alert_markread($memID)
 {
-	global $context, $db_show_debug, $smcFunc;
+	global $context, $db_show_debug, $pmxcFunc;
 
 	// We do not want to output debug information here.
 	$db_show_debug = false;
@@ -2127,7 +2127,7 @@ function alert_markread($memID)
 
 	// Assuming we're here, mark everything as read and head back.
 	// We only spit back the little layer because this should be called AJAXively.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}user_alerts
 		SET is_read = {int:now}
 		WHERE id_member = {int:current_member}
@@ -2151,7 +2151,7 @@ function alert_markread($memID)
  */
 function alert_mark($memID, $toMark, $read = 0)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (empty($toMark) || empty($memID))
 		return false;
@@ -2159,7 +2159,7 @@ function alert_mark($memID, $toMark, $read = 0)
 	$toMark = (array) $toMark;
 	$count = 0;
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}user_alerts
 		SET is_read = {int:read}
 		WHERE id_alert IN({array_int:toMark})',
@@ -2187,14 +2187,14 @@ function alert_mark($memID, $toMark, $read = 0)
  */
 function alert_delete($toDelete, $memID = false)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (empty($toDelete))
 		return false;
 
 	$toDelete = (array) $toDelete;
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}user_alerts
 		WHERE id_alert IN({array_int:toDelete})',
 		array(
@@ -2223,14 +2223,14 @@ function alert_delete($toDelete, $memID = false)
  */
 function alert_count($memID, $unread = false)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (empty($memID))
 		return false;
 
 	$count = 0;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_alert
 		FROM {db_prefix}user_alerts
 		WHERE id_member = {int:id_member}
@@ -2241,8 +2241,8 @@ function alert_count($memID, $unread = false)
 		)
 	);
 
-	$count =  $smcFunc['db_num_rows']($request);
-	$smcFunc['db_free_result']($request);
+	$count =  $pmxcFunc['db_num_rows']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $count;
 }
@@ -2532,9 +2532,9 @@ function alert_notifications_boards($memID)
  */
 function list_getTopicNotificationCount($memID)
 {
-	global $smcFunc, $user_info, $modSettings;
+	global $pmxcFunc, $user_info, $modSettings;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && $user_info['query_see_board'] === '1=1' ? '' : '
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . ($user_info['query_see_board'] === '1=1' ? '' : '
@@ -2547,8 +2547,8 @@ function list_getTopicNotificationCount($memID)
 			'is_approved' => 1,
 		)
 	);
-	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalNotifications) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return (int) $totalNotifications;
 }
@@ -2564,14 +2564,14 @@ function list_getTopicNotificationCount($memID)
  */
 function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $scripturl, $user_info, $modSettings, $sourcedir;
+	global $pmxcFunc, $scripturl, $user_info, $modSettings, $sourcedir;
 
 	require_once($sourcedir . '/Subs-Notify.php');
 	$prefs = getNotifyPrefs($memID);
 	$prefs = isset($prefs[$memID]) ? $prefs[$memID] : array();
 
 	// All the topics with notification on...
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			COALESCE(lt.id_msg, COALESCE(lmr.id_msg, -1)) + 1 AS new_from, b.id_board, b.name,
 			t.id_topic, ms.subject, ms.id_member, COALESCE(mem.real_name, ms.poster_name) AS real_name_col,
@@ -2600,7 +2600,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$notification_topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		censorText($row['subject']);
 
@@ -2621,7 +2621,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 			'unwatched' => $row['unwatched'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $notification_topics;
 }
@@ -2637,13 +2637,13 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
  */
 function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $scripturl, $user_info, $sourcedir;
+	global $pmxcFunc, $scripturl, $user_info, $sourcedir;
 
 	require_once($sourcedir . '/Subs-Notify.php');
 	$prefs = getNotifyPrefs($memID);
 	$prefs = isset($prefs[$memID]) ? $prefs[$memID] : array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
@@ -2658,7 +2658,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$notification_boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' => $row['name'],
@@ -2667,7 +2667,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 			'new' => $row['board_read'] < $row['id_msg_updated'],
 			'notify_pref' => isset($prefs['board_notify_' . $row['id_board']]) ? $prefs['board_notify_' . $row['id_board']] : (!empty($prefs['board_notify']) ? $prefs['board_notify'] : 0),
 		);
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $notification_boards;
 }
@@ -2679,7 +2679,7 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
  */
 function loadThemeOptions($memID)
 {
-	global $context, $options, $cur_profile, $smcFunc;
+	global $context, $options, $cur_profile, $pmxcFunc;
 
 	if (isset($_POST['default_options']))
 		$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
@@ -2693,7 +2693,7 @@ function loadThemeOptions($memID)
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member, variable, value
 			FROM {db_prefix}themes
 			WHERE id_theme IN (1, {int:member_theme})
@@ -2704,7 +2704,7 @@ function loadThemeOptions($memID)
 			)
 		);
 		$temp = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['id_member'] == -1)
 			{
@@ -2716,7 +2716,7 @@ function loadThemeOptions($memID)
 				$row['value'] = $_POST['options'][$row['variable']];
 			$context['member']['options'][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Load up the default theme options for any missing.
 		foreach ($temp as $k => $v)
@@ -2734,14 +2734,14 @@ function loadThemeOptions($memID)
  */
 function ignoreboards($memID)
 {
-	global $context, $modSettings, $smcFunc, $cur_profile, $sourcedir;
+	global $context, $modSettings, $pmxcFunc, $cur_profile, $sourcedir;
 
 	// Have the admins enabled this option?
 	if (empty($modSettings['allow_ignore_boards']))
 		fatal_lang_error('ignoreboards_disallowed', 'user');
 
 	// Find all the boards this user is allowed to see.
-	$request = $smcFunc['db_query']('order_by_board_order', '
+	$request = $pmxcFunc['db_query']('order_by_board_order', '
 		SELECT b.id_cat, c.name AS cat_name, b.id_board, b.name, b.child_level,
 			'. (!empty($cur_profile['ignore_boards']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored
 		FROM {db_prefix}boards AS b
@@ -2753,9 +2753,9 @@ function ignoreboards($memID)
 			'empty_string' => '',
 		)
 	);
-	$context['num_boards'] = $smcFunc['db_num_rows']($request);
+	$context['num_boards'] = $pmxcFunc['db_num_rows']($request);
 	$context['categories'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// This category hasn't been set up yet..
 		if (!isset($context['categories'][$row['id_cat']]))
@@ -2773,7 +2773,7 @@ function ignoreboards($memID)
 			'selected' => $row['is_ignored'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	require_once($sourcedir . '/Subs-Boards.php');
 	sortCategories($context['categories']);
@@ -2842,7 +2842,7 @@ function profileLoadLanguages()
  */
 function profileLoadGroups()
 {
-	global $cur_profile, $txt, $context, $smcFunc, $user_settings;
+	global $cur_profile, $txt, $context, $pmxcFunc, $user_settings;
 
 	$context['member_groups'] = array(
 		0 => array(
@@ -2856,7 +2856,7 @@ function profileLoadGroups()
 	$curGroups = explode(',', $cur_profile['additional_groups']);
 
 	// Load membergroups, but only those groups the user can assign.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT group_name, id_group, hidden
 		FROM {db_prefix}membergroups
 		WHERE id_group != {int:moderator_group}
@@ -2870,7 +2870,7 @@ function profileLoadGroups()
 			'newbie_group' => 4,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// We should skip the administrator group if they don't have the admin_forum permission!
 		if ($row['id_group'] == 1 && !allowedTo('admin_forum'))
@@ -2885,7 +2885,7 @@ function profileLoadGroups()
 			'can_be_primary' => $row['hidden'] != 2,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$context['member']['group_id'] = $user_settings['id_group'];
 
@@ -2951,7 +2951,7 @@ function profileLoadSignatureData()
 
 	// Load the spell checker?
 	if ($context['show_spellchecking'])
-		loadJavascriptFile('spellcheck.js', array('defer' => false), 'smf_spellcheck');
+		loadJavascriptFile('spellcheck.js', array('defer' => false), 'pmx_spellcheck');
 
 	return true;
 }
@@ -3037,12 +3037,12 @@ function profileLoadAvatarData()
  */
 function profileSaveGroups(&$value)
 {
-	global $profile_vars, $old_profile, $context, $smcFunc, $cur_profile;
+	global $profile_vars, $old_profile, $context, $pmxcFunc, $cur_profile;
 
 	// Do we need to protect some groups?
 	if (!allowedTo('admin_forum'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_group
 			FROM {db_prefix}membergroups
 			WHERE group_type = {int:is_protected}',
@@ -3051,9 +3051,9 @@ function profileSaveGroups(&$value)
 			)
 		);
 		$protected_groups = array(1);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$protected_groups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		$protected_groups = array_unique($protected_groups);
 	}
@@ -3099,7 +3099,7 @@ function profileSaveGroups(&$value)
 		// If they would no longer be an admin, look for any other...
 		if (!$stillAdmin)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -3110,8 +3110,8 @@ function profileSaveGroups(&$value)
 					'selected_member' => $context['id_member'],
 				)
 			);
-			list ($another) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($another) = $pmxcFunc['db_fetch_row']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			if (empty($another))
 				fatal_lang_error('at_least_one_admin', 'critical');
@@ -3142,7 +3142,7 @@ function profileSaveGroups(&$value)
  */
 function profileSaveAvatarData(&$value)
 {
-	global $modSettings, $sourcedir, $smcFunc, $profile_vars, $cur_profile, $context;
+	global $modSettings, $sourcedir, $pmxcFunc, $profile_vars, $cur_profile, $context;
 
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
@@ -3290,7 +3290,7 @@ function profileSaveAvatarData(&$value)
 				if (!empty($modSettings['avatar_resize_upload']))
 				{
 					// Attempt to chmod it.
-					smf_chmod($_FILES['attachment']['tmp_name'], 0644);
+					pmx_chmod($_FILES['attachment']['tmp_name'], 0644);
 
 					// @todo remove this require when appropriate
 					require_once($sourcedir . '/Subs-Graphics.php');
@@ -3353,7 +3353,7 @@ function profileSaveAvatarData(&$value)
 				// Remove previous attachments this member might have had.
 				removeAttachments(array('id_member' => $memID));
 
-				$smcFunc['db_insert']('',
+				$pmxcFunc['db_insert']('',
 					'{db_prefix}attachments',
 					array(
 						'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'fileext' => 'string', 'size' => 'int',
@@ -3366,7 +3366,7 @@ function profileSaveAvatarData(&$value)
 					array('id_attach')
 				);
 
-				$cur_profile['id_attach'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+				$cur_profile['id_attach'] = $pmxcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
 				$cur_profile['filename'] = $destName;
 				$cur_profile['attachment_type'] = 1;
 
@@ -3379,7 +3379,7 @@ function profileSaveAvatarData(&$value)
 				}
 
 				// Attempt to chmod it.
-				smf_chmod($uploadDir . '/' . $destinationPath, 0644);
+				pmx_chmod($uploadDir . '/' . $destinationPath, 0644);
 			}
 			$profile_vars['avatar'] = '';
 
@@ -3410,7 +3410,7 @@ function profileSaveAvatarData(&$value)
  */
 function profileValidateSignature(&$value)
 {
-	global $sourcedir, $modSettings, $smcFunc, $txt;
+	global $sourcedir, $modSettings, $pmxcFunc, $txt;
 
 	require_once($sourcedir . '/Subs-Post.php');
 
@@ -3575,9 +3575,9 @@ function profileValidateSignature(&$value)
 	preparsecode($value);
 
 	// Too long?
-	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && $smcFunc['strlen'](str_replace('<br>', "\n", $value)) > $sig_limits[1])
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && $pmxcFunc['strlen'](str_replace('<br>', "\n", $value)) > $sig_limits[1])
 	{
-		$_POST['signature'] = trim($smcFunc['htmlspecialchars'](str_replace('<br>', "\n", $value), ENT_QUOTES));
+		$_POST['signature'] = trim($pmxcFunc['htmlspecialchars'](str_replace('<br>', "\n", $value), ENT_QUOTES));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
 		return 'signature_max_length';
 	}
@@ -3594,7 +3594,7 @@ function profileValidateSignature(&$value)
  */
 function profileValidateEmail($email, $memID = 0)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	$email = strtr($email, array('&#039;' => '\''));
 
@@ -3605,7 +3605,7 @@ function profileValidateEmail($email, $memID = 0)
 		return 'bad_email';
 
 	// Email addresses should be and stay unique.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . ($memID != 0 ? 'id_member != {int:selected_member} AND ' : '') . '
@@ -3617,9 +3617,9 @@ function profileValidateEmail($email, $memID = 0)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($pmxcFunc['db_num_rows']($request) > 0)
 		return 'email_taken';
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return true;
 }
@@ -3643,7 +3643,7 @@ function profileReloadUser()
  */
 function profileSendActivation()
 {
-	global $sourcedir, $profile_vars, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
+	global $sourcedir, $profile_vars, $context, $scripturl, $pmxcFunc, $cookiename, $cur_profile, $language, $modSettings;
 
 	require_once($sourcedir . '/Subs-Post.php');
 
@@ -3662,7 +3662,7 @@ function profileSendActivation()
 	sendmail($profile_vars['email_address'], $emaildata['subject'], $emaildata['body'], null, 'reactivate', $emaildata['is_html'], 0);
 
 	// Log the user out.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE id_member = {int:selected_member}',
 		array(
@@ -3690,7 +3690,7 @@ function profileSendActivation()
  */
 function groupMembership($memID)
 {
-	global $txt, $user_profile, $context, $smcFunc;
+	global $txt, $user_profile, $context, $pmxcFunc;
 
 	$curMember = $user_profile[$memID];
 	$context['primary_group'] = $curMember['id_group'];
@@ -3713,7 +3713,7 @@ function groupMembership($memID)
 		$groups[$k] = (int) $v;
 
 	// Get all the membergroups they can join.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT mg.id_group, mg.group_name, mg.description, mg.group_type, mg.online_color, mg.hidden,
 			COALESCE(lgr.id_member, 0) AS pending
 		FROM {db_prefix}membergroups AS mg
@@ -3737,7 +3737,7 @@ function groupMembership($memID)
 		'member' => array(),
 		'available' => array()
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Can they edit their primary group?
 		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1) || ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $groups)))
@@ -3760,7 +3760,7 @@ function groupMembership($memID)
 			'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Add registered members on the end.
 	$context['groups']['member'][0] = array(
@@ -3792,7 +3792,7 @@ function groupMembership($memID)
  */
 function groupMembership2($profile_vars, $post_errors, $memID)
 {
-	global $user_info, $context, $user_profile, $modSettings, $smcFunc;
+	global $user_info, $context, $user_profile, $modSettings, $pmxcFunc;
 
 	// Let's be extra cautious...
 	if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
@@ -3822,7 +3822,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 	// Protected groups too!
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT group_type
 			FROM {db_prefix}membergroups
 			WHERE id_group = {int:current_group}
@@ -3832,15 +3832,15 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 				'limit' => 1,
 			)
 		);
-		list ($is_protected) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($is_protected) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if ($is_protected == 1)
 			isAllowedTo('admin_forum');
 	}
 
 	// What ever we are doing, we need to determine if changing primary is possible!
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_group, group_type, hidden, group_name
 		FROM {db_prefix}membergroups
 		WHERE id_group IN ({int:group_list}, {int:current_group})',
@@ -3849,7 +3849,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 			'current_group' => $old_profile['id_group'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Is this the new group?
 		if ($row['id_group'] == $group_id)
@@ -3883,7 +3883,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 		if ((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0))
 			$canChangePrimary = false;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Didn't find the target?
 	if (!$foundTarget)
@@ -3892,7 +3892,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 	// Final security check, don't allow users to promote themselves to admin.
 	if ($context['can_manage_membergroups'] && !allowedTo('admin_forum'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT COUNT(permission)
 			FROM {db_prefix}permissions
 			WHERE id_group = {int:selected_group}
@@ -3904,8 +3904,8 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 				'admin_forum' => 'admin_forum',
 			)
 		);
-		list ($disallow) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($disallow) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if ($disallow)
 			isAllowedTo('admin_forum');
@@ -3914,7 +3914,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 	// If we're requesting, add the note then return.
 	if ($changeType == 'request')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}log_group_requests
 			WHERE id_member = {int:selected_member}
@@ -3926,12 +3926,12 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 				'status_open' => 0,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) != 0)
+		if ($pmxcFunc['db_num_rows']($request) != 0)
 			fatal_lang_error('profile_error_already_requested_group');
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Log the request.
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}log_group_requests',
 			array(
 				'id_member' => 'int', 'id_group' => 'int', 'time_applied' => 'int', 'reason' => 'string-65534',
@@ -3948,7 +3948,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 		$data = json_encode(array('id_member' => $memID, 'member_name' => $user_info['name'], 'id_group' => $group_id, 'group_name' => $group_name, 'reason' => $_POST['reason'], 'time' => time()));
 
 		// Add a background task to handle notifying people of this request
-		$smcFunc['db_insert']('insert', '{db_prefix}background_tasks',
+		$pmxcFunc['db_insert']('insert', '{db_prefix}background_tasks',
 			array('task_file' => 'string-255', 'task_class' => 'string-255', 'task_data' => 'string', 'claimed_time' => 'int'),
 			array('$sourcedir/tasks/GroupReq-Notify.php', 'GroupReq_Notify_Background', $data, 0), array()
 		);

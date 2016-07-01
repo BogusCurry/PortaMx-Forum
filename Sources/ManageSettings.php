@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -562,7 +562,7 @@ function ModifyWarningSettings($return_config = false)
  */
 function ModifyAntispamSettings($return_config = false)
 {
-	global $txt, $scripturl, $context, $modSettings, $smcFunc, $language, $sourcedir;
+	global $txt, $scripturl, $context, $modSettings, $pmxcFunc, $language, $sourcedir;
 
 	loadLanguage('Help');
 	loadLanguage('ManageSettings');
@@ -613,17 +613,17 @@ function ModifyAntispamSettings($return_config = false)
 
 	// Secondly, load any questions we currently have.
 	$context['question_answers'] = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_question, lngfile, question, answers
 		FROM {db_prefix}qanda'
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$lang = strtr($row['lngfile'], array('-utf8' => ''));
 		$context['question_answers'][$row['id_question']] = array(
 			'lngfile' => $lang,
 			'question' => $row['question'],
-			'answers' => smf_json_decode($row['answers'], true),
+			'answers' => pmx_json_decode($row['answers'], true),
 		);
 		$context['qa_by_lang'][$lang][] = $row['id_question'];
 	}
@@ -718,7 +718,7 @@ function ModifyAntispamSettings($return_config = false)
 							$changes['delete'][] = $q_id;
 						continue;
 					}
-					$question = $smcFunc['htmlspecialchars'](trim($question));
+					$question = $pmxcFunc['htmlspecialchars'](trim($question));
 
 					// Get the answers. Firstly check there actually might be some.
 					if (!isset($_POST['answer'][$lang_id][$q_id]) || !is_array($_POST['answer'][$lang_id][$q_id]))
@@ -731,7 +731,7 @@ function ModifyAntispamSettings($return_config = false)
 					$answers = array();
 					foreach ($_POST['answer'][$lang_id][$q_id] as $answer)
 						if (!empty($answer) && trim($answer) !== '')
-							$answers[] = $smcFunc['htmlspecialchars'](trim($answer));
+							$answers[] = $pmxcFunc['htmlspecialchars'](trim($answer));
 					if (empty($answers))
 					{
 						if (isset($context['question_answers'][$q_id]))
@@ -763,7 +763,7 @@ function ModifyAntispamSettings($return_config = false)
 		// OK, so changes?
 		if (!empty($changes['delete']))
 		{
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}qanda
 				WHERE id_question IN ({array_int:questions})',
 				array(
@@ -776,7 +776,7 @@ function ModifyAntispamSettings($return_config = false)
 		{
 			foreach ($changes['replace'] as $q_id => $question)
 			{
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}qanda
 					SET lngfile = {string:lngfile},
 						question = {string:question},
@@ -794,7 +794,7 @@ function ModifyAntispamSettings($return_config = false)
 
 		if (!empty($changes['insert']))
 		{
-			$smcFunc['db_insert']('insert',
+			$pmxcFunc['db_insert']('insert',
 				'{db_prefix}qanda',
 				array('lngfile' => 'string-50', 'question' => 'string-255', 'answers' => 'string-65534'),
 				$changes['insert'],
@@ -873,7 +873,7 @@ function ModifyAntispamSettings($return_config = false)
  */
 function ModifySignatureSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $sig_start, $smcFunc, $scripturl;
+	global $context, $txt, $modSettings, $sig_start, $pmxcFunc, $scripturl;
 
 	$config_vars = array(
 			// Are signatures even enabled?
@@ -922,20 +922,20 @@ function ModifySignatureSettings($return_config = false)
 		$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 		$done = false;
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT MAX(id_member)
 			FROM {db_prefix}members',
 			array(
 			)
 		);
-		list ($context['max_member']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($context['max_member']) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		while (!$done)
 		{
 			$changes = array();
 
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member, signature
 				FROM {db_prefix}members
 				WHERE id_member BETWEEN {int:step} AND {int:step} + 49
@@ -946,14 +946,14 @@ function ModifySignatureSettings($return_config = false)
 					'step' => $_GET['step'],
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				// Apply all the rules we can realistically do.
 				$sig = strtr($row['signature'], array('<br>' => "\n"));
 
 				// Max characters...
 				if (!empty($sig_limits[1]))
-					$sig = $smcFunc['substr']($sig, 0, $sig_limits[1]);
+					$sig = $pmxcFunc['substr']($sig, 0, $sig_limits[1]);
 				// Max lines...
 				if (!empty($sig_limits[2]))
 				{
@@ -1118,15 +1118,15 @@ function ModifySignatureSettings($return_config = false)
 				if ($sig != $row['signature'])
 					$changes[$row['id_member']] = $sig;
 			}
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($pmxcFunc['db_num_rows']($request) == 0)
 				$done = true;
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Do we need to delete what we have?
 			if (!empty($changes))
 			{
 				foreach ($changes as $id => $sig)
-					$smcFunc['db_query']('', '
+					$pmxcFunc['db_query']('', '
 						UPDATE {db_prefix}members
 						SET signature = {string:signature}
 						WHERE id_member = {int:id_member}',
@@ -1524,7 +1524,7 @@ function ShowCustomProfiles()
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
-	global $txt, $modSettings, $smcFunc;
+	global $txt, $modSettings, $pmxcFunc;
 
 	$list = array();
 
@@ -1547,7 +1547,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 	else
 	{
 		// Load all the fields.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_field, col_name, field_name, field_desc, field_type, field_order, active, placement
 			FROM {db_prefix}custom_fields
 			ORDER BY {raw:sort}
@@ -1558,9 +1558,9 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 				'items_per_page' => $items_per_page,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$list[] = $row;
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	return $list;
@@ -1572,17 +1572,17 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
  */
 function list_getProfileFieldSize()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}custom_fields',
 		array(
 		)
 	);
 
-	list ($numProfileFields) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($numProfileFields) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $numProfileFields;
 }
@@ -1592,7 +1592,7 @@ function list_getProfileFieldSize()
  */
 function EditCustomProfiles()
 {
-	global $txt, $scripturl, $context, $smcFunc;
+	global $txt, $scripturl, $context, $pmxcFunc;
 
 	// Sort out the context!
 	$context['fid'] = isset($_GET['fid']) ? (int) $_GET['fid'] : 0;
@@ -1611,7 +1611,7 @@ function EditCustomProfiles()
 
 	if ($context['fid'])
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT
 				id_field, col_name, field_name, field_desc, field_type, field_order, field_length, field_options,
 				show_reg, show_display, show_mlist, show_profile, private, active, default_value, can_search,
@@ -1623,7 +1623,7 @@ function EditCustomProfiles()
 			)
 		);
 		$context['field'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['field_type'] == 'textarea')
 				@list ($rows, $cols) = @explode(',', $row['default_value']);
@@ -1659,7 +1659,7 @@ function EditCustomProfiles()
 				'placement' => $row['placement'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Setup the default values as needed.
@@ -1691,7 +1691,7 @@ function EditCustomProfiles()
 		);
 
 	// Are we moving it?
-	if (isset($_GET['move']) && in_array($smcFunc['htmlspecialchars']($_GET['move']), $move_to))
+	if (isset($_GET['move']) && in_array($pmxcFunc['htmlspecialchars']($_GET['move']), $move_to))
 	{
 		// Down is the new up.
 		$new_order = ($_GET['move'] == 'up' ? ($context['field']['order'] - 1) : ($context['field']['order'] + 1));
@@ -1701,7 +1701,7 @@ function EditCustomProfiles()
 			redirectexit('action=admin;area=featuresettings;sa=profile'); // @todo implement an error handler
 
 		// All good, proceed.
-		$smcFunc['db_query']('','
+		$pmxcFunc['db_query']('','
 			UPDATE {db_prefix}custom_fields
 			SET field_order = {int:old_order}
 			WHERE field_order = {int:new_order}',
@@ -1710,7 +1710,7 @@ function EditCustomProfiles()
 				'old_order' => $context['field']['order'],
 			)
 		);
-		$smcFunc['db_query']('','
+		$pmxcFunc['db_query']('','
 			UPDATE {db_prefix}custom_fields
 			SET field_order = {int:new_order}
 			WHERE id_field = {int:id_field}',
@@ -1736,8 +1736,8 @@ function EditCustomProfiles()
 		if (!empty($_POST['regex']) && @preg_match($_POST['regex'], 'dummy') === false)
 			redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=regex_error');
 
-		$_POST['field_name'] = $smcFunc['htmlspecialchars']($_POST['field_name']);
-		$_POST['field_desc'] = $smcFunc['htmlspecialchars']($_POST['field_desc']);
+		$_POST['field_name'] = $pmxcFunc['htmlspecialchars']($_POST['field_name']);
+		$_POST['field_desc'] = $pmxcFunc['htmlspecialchars']($_POST['field_desc']);
 
 		// Checkboxes...
 		$show_reg = isset($_POST['reg']) ? (int) $_POST['reg'] : 0;
@@ -1767,7 +1767,7 @@ function EditCustomProfiles()
 			foreach ($_POST['select_option'] as $k => $v)
 			{
 				// Clean, clean, clean...
-				$v = $smcFunc['htmlspecialchars']($v);
+				$v = $pmxcFunc['htmlspecialchars']($v);
 				$v = strtr($v, array(',' => ''));
 
 				// Nada, zip, etc...
@@ -1793,7 +1793,7 @@ function EditCustomProfiles()
 		// Come up with the unique name?
 		if (empty($context['fid']))
 		{
-			$col_name = $smcFunc['substr'](strtr($_POST['field_name'], array(' ' => '')), 0, 6);
+			$col_name = $pmxcFunc['substr'](strtr($_POST['field_name'], array(' ' => '')), 0, 6);
 			preg_match('~([\w\d_-]+)~', $col_name, $matches);
 
 			// If there is nothing to the name, then let's start out own - for foreign languages etc.
@@ -1804,12 +1804,12 @@ function EditCustomProfiles()
 
 			// Make sure this is unique.
 			$current_fields = array();
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_field, col_name
 				FROM {db_prefix}custom_fields');
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				$current_fields[$row['id_field']] = $row['col_name'];
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			$unique = false;
 			for ($i = 0; !$unique && $i < 9; $i ++)
@@ -1832,7 +1832,7 @@ function EditCustomProfiles()
 				|| (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
 				|| ($context['field']['type'] == 'check' && $_POST['field_type'] != 'check'))
 			{
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}themes
 					WHERE variable = {string:current_column}
 						AND id_member > {int:no_member}',
@@ -1866,7 +1866,7 @@ function EditCustomProfiles()
 				{
 					// Just been renamed?
 					if (!in_array($k, $takenKeys) && !empty($newOptions[$k]))
-						$smcFunc['db_query']('', '
+						$pmxcFunc['db_query']('', '
 							UPDATE {db_prefix}themes
 							SET value = {string:new_value}
 							WHERE variable = {string:current_column}
@@ -1887,7 +1887,7 @@ function EditCustomProfiles()
 		// Do the insertion/updates.
 		if ($context['fid'])
 		{
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}custom_fields
 				SET
 					field_name = {string:field_name}, field_desc = {string:field_desc},
@@ -1922,7 +1922,7 @@ function EditCustomProfiles()
 
 			// Just clean up any old selects - these are a pain!
 			if (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && !empty($newOptions))
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}themes
 					WHERE variable = {string:current_column}
 						AND value NOT IN ({array_string:new_option_values})
@@ -1939,7 +1939,7 @@ function EditCustomProfiles()
 			// Gotta figure it out the order.
 			$new_order = $order_count > 1 ? ($order_count + 1) : 1;
 
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}custom_fields',
 				array(
 					'col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string',
@@ -1966,7 +1966,7 @@ function EditCustomProfiles()
 		validateToken('admin-ecp');
 
 		// Delete the user data first.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}themes
 			WHERE variable = {string:current_column}
 				AND id_member > {int:no_member}',
@@ -1976,7 +1976,7 @@ function EditCustomProfiles()
 			)
 		);
 		// Finally - the field itself is gone!
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}custom_fields
 			WHERE id_field = {int:current_field}',
 			array(
@@ -1985,7 +1985,7 @@ function EditCustomProfiles()
 		);
 
 		// Re-arrange the order.
-		$smcFunc['db_query']('','
+		$pmxcFunc['db_query']('','
 			UPDATE {db_prefix}custom_fields
 			SET field_order = field_order - 1
 			WHERE field_order > {int:current_order}',
@@ -2000,7 +2000,7 @@ function EditCustomProfiles()
 	{
 		checkSession();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT col_name, field_name, field_type, field_order, bbc, enclose, placement, show_mlist
 			FROM {db_prefix}custom_fields
 			WHERE show_display = {int:is_displayed}
@@ -2017,7 +2017,7 @@ function EditCustomProfiles()
 		);
 
 		$fields = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			$fields[] = array(
 				'col_name' => strtr($row['col_name'], array('|' => '', ';' => '')),
@@ -2030,7 +2030,7 @@ function EditCustomProfiles()
 				'mlist' => $row['show_mlist'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		updateSettings(array('displayFields' => json_encode($fields)));
 		$_SESSION['adm-save'] = true;
@@ -2046,17 +2046,17 @@ function EditCustomProfiles()
  */
 function custFieldsMaxOrder()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// Gotta know the order limit
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 			SELECT MAX(field_order)
 			FROM {db_prefix}custom_fields',
 			array()
 		);
 
-	list ($order_count) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($order_count) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	return (int) $order_count;
 }

@@ -11,7 +11,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -20,7 +20,7 @@ if (!defined('SMF'))
  */
 function createList($listOptions)
 {
-	global $context, $smcFunc;
+	global $context, $pmxcFunc;
 
 	assert(isset($listOptions['id']));
 	assert(isset($listOptions['columns']));
@@ -127,14 +127,14 @@ function createList($listOptions)
 
 			// Take the value from the database and make it HTML safe.
 			elseif (isset($column['data']['db_htmlsafe']))
-				$cur_data['value'] = $smcFunc['htmlspecialchars']($list_item[$column['data']['db_htmlsafe']]);
+				$cur_data['value'] = $pmxcFunc['htmlspecialchars']($list_item[$column['data']['db_htmlsafe']]);
 
 			// Using sprintf is probably the most readable way of injecting data.
 			elseif (isset($column['data']['sprintf']))
 			{
 				$params = array();
 				foreach ($column['data']['sprintf']['params'] as $sprintf_param => $htmlsafe)
-					$params[] = $htmlsafe ? $smcFunc['htmlspecialchars']($list_item[$sprintf_param]) : $list_item[$sprintf_param];
+					$params[] = $htmlsafe ? $pmxcFunc['htmlspecialchars']($list_item[$sprintf_param]) : $list_item[$sprintf_param];
 				$cur_data['value'] = vsprintf($column['data']['sprintf']['format'], $params);
 			}
 

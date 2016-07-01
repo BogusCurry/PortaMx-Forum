@@ -10,7 +10,7 @@
  * @version 2.1 Beta 4
  */
 
-$GLOBALS['current_smf_version'] = '2.1 Beta 4';
+$GLOBALS['current_pmx_version'] = 'PortaMx Forum 2.1 Beta 4';
 $GLOBALS['db_script_version'] = '2-1';
 
 $GLOBALS['required_php_version'] = '5.3.8';
@@ -95,7 +95,7 @@ load_lang_file();
 // This is what we are.
 $installurl = $_SERVER['PHP_SELF'];
 // This is where SMF is.
-$smfsite = 'http://www.simplemachines.org/smf';
+$pmxsite = 'http://portamx.com';
 
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
@@ -110,7 +110,7 @@ $incontext['steps'] = array(
 );
 
 // Default title...
-$incontext['page_title'] = $txt['smf_installer'];
+$incontext['page_title'] = $txt['pmx_installer'];
 
 // What step are we on?
 $incontext['current_step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
@@ -195,7 +195,7 @@ function initialize_inputs()
 	if (!isset($_GET['xml']))
 	{
 		$incontext['remote_files_available'] = false;
-		$test = @fsockopen('www.simplemachines.org', 80, $errno, $errstr, 1);
+		$test = @fsockopen('portamx.com', 80, $errno, $errstr, 1);
 		if ($test)
 			$incontext['remote_files_available'] = true;
 		@fclose($test);
@@ -285,7 +285,7 @@ function load_lang_file()
 		echo '<!DOCTYPE html>
 <html>
 	<head>
-		<title>SMF Installer: Error!</title>
+		<title>PortaMx Forum Installer: Error!</title>
 	</head>
 	<body style="font-family: sans-serif;"><div style="width: 600px;">
 		<h1 style="font-size: 14pt;">A critical error has occurred.</h1>
@@ -328,17 +328,17 @@ function load_lang_file()
 function load_database()
 {
 	global $db_prefix, $db_connection, $sourcedir;
-	global $smcFunc, $modSettings, $db_type, $db_name, $db_user, $db_persist;
+	global $pmxcFunc, $modSettings, $db_type, $db_name, $db_user, $db_persist;
 
 	if (empty($sourcedir))
 		$sourcedir = dirname(__FILE__) . '/Sources';
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
-	if (!defined('SMF'))
-		define('SMF', 1);
-	if (empty($smcFunc))
-		$smcFunc = array();
+	if (!defined('PMX'))
+		define('PMX', 1);
+	if (empty($pmxcFunc))
+		$pmxcFunc = array();
 
 	$modSettings['disableQueryCheck'] = true;
 
@@ -370,7 +370,7 @@ function load_database()
 			$db_options['port'] = $port;
 
 		if (!$db_connection)
-			$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
+			$db_connection = pmx_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 	}
 }
 
@@ -684,7 +684,7 @@ function CheckFilesWritable()
 
 function DatabaseSettings()
 {
-	global $txt, $databases, $incontext, $smcFunc, $sourcedir;
+	global $txt, $databases, $incontext, $pmxcFunc, $sourcedir;
 
 	$incontext['sub_template'] = 'database_settings';
 	$incontext['page_title'] = $txt['db_settings'];
@@ -740,7 +740,7 @@ function DatabaseSettings()
 	}
 	else
 	{
-		$incontext['db']['prefix'] = 'smf_';
+		$incontext['db']['prefix'] = 'pmx_';
 	}
 
 	// Are we submitting?
@@ -767,7 +767,7 @@ function DatabaseSettings()
 			'db_server' => $_POST['db_server'],
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
-			'cookiename' => 'SMFCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
+			'cookiename' => 'PMXCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
 		);
 
 		// Only set the port if we're not using the default
@@ -801,10 +801,10 @@ function DatabaseSettings()
 		}
 
 		// Now include it for database functions!
-		define('SMF', 1);
+		define('PMX', 1);
 		$modSettings['disableQueryCheck'] = true;
-		if (empty($smcFunc))
-			$smcFunc = array();
+		if (empty($pmxcFunc))
+			$pmxcFunc = array();
 
 			require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
 
@@ -814,14 +814,14 @@ function DatabaseSettings()
 
 		// Attempt a connection.
 		$needsDB = !empty($databases[$db_type]['always_has_db']);
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB));
+		$db_connection = pmx_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB));
 
 		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
 		if ($db_connection == null)
 		{
-			$db_error = @$smcFunc['db_error']();
+			$db_error = @$pmxcFunc['db_error']();
 
-			$db_connection = smf_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB));
+			$db_connection = pmx_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB));
 			if ($db_connection != null)
 			{
 				$db_user = $_POST['db_prefix'] . $db_user;
@@ -847,7 +847,7 @@ function DatabaseSettings()
 		// Let's try that database on for size... assuming we haven't already lost the opportunity.
 		if ($db_name != '' && !$needsDB)
 		{
-			$smcFunc['db_query']('', "
+			$pmxcFunc['db_query']('', "
 				CREATE DATABASE IF NOT EXISTS `$db_name`",
 				array(
 					'security_override' => true,
@@ -857,9 +857,9 @@ function DatabaseSettings()
 			);
 
 			// Okay, let's try the prefix if it didn't work...
-			if (!$smcFunc['db_select_db']($db_name, $db_connection) && $db_name != '')
+			if (!$pmxcFunc['db_select_db']($db_name, $db_connection) && $db_name != '')
 			{
-				$smcFunc['db_query']('', "
+				$pmxcFunc['db_query']('', "
 					CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
 					array(
 						'security_override' => true,
@@ -868,7 +868,7 @@ function DatabaseSettings()
 					$db_connection
 				);
 
-				if ($smcFunc['db_select_db']($_POST['db_prefix'] . $db_name, $db_connection))
+				if ($pmxcFunc['db_select_db']($_POST['db_prefix'] . $db_name, $db_connection))
 				{
 					$db_name = $_POST['db_prefix'] . $db_name;
 					updateSettingsFile(array('db_name' => $db_name));
@@ -876,7 +876,7 @@ function DatabaseSettings()
 			}
 
 			// Okay, now let's try to connect...
-			if (!$smcFunc['db_select_db']($db_name, $db_connection))
+			if (!$pmxcFunc['db_select_db']($db_name, $db_connection))
 			{
 				$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
 				return false;
@@ -975,7 +975,7 @@ function ForumSettings()
 // Step one: Do the SQL thang.
 function DatabasePopulation()
 {
-	global $db_character_set, $txt, $db_connection, $smcFunc, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
+	global $db_character_set, $txt, $db_connection, $pmxcFunc, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 	$incontext['sub_template'] = 'populate_database';
 	$incontext['page_title'] = $txt['db_populate'];
@@ -990,7 +990,7 @@ function DatabasePopulation()
 	load_database();
 
 	// Before running any of the queries, let's make sure another version isn't already installed.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT variable, value
 		FROM {db_prefix}settings',
 		array(
@@ -1001,12 +1001,12 @@ function DatabasePopulation()
 	$modSettings = array();
 	if ($result !== false)
 	{
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 			$modSettings[$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 
 		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] != $GLOBALS['current_smf_version'])
+		if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] != $GLOBALS['current_pmx_version'])
 		{
 			$incontext['error'] = $txt['error_versions_do_not_match'];
 			return false;
@@ -1016,7 +1016,7 @@ function DatabasePopulation()
 
 	// If doing UTF8, select it. PostgreSQL requires passing it as a string...
 	if (!empty($db_character_set) && $db_character_set == 'utf8' && !empty($databases[$db_type]['utf8_support']))
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			SET NAMES {'. ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
 			array(
 				'db_error_skip' => true,
@@ -1032,12 +1032,12 @@ function DatabasePopulation()
 
 	$replaces = array(
 		'{$db_prefix}' => $db_prefix,
-		'{$attachdir}' => json_encode(array(1 => $smcFunc['db_escape_string']($attachdir))),
-		'{$boarddir}' => $smcFunc['db_escape_string'](dirname(__FILE__)),
+		'{$attachdir}' => json_encode(array(1 => $pmxcFunc['db_escape_string']($attachdir))),
+		'{$boarddir}' => $pmxcFunc['db_escape_string'](dirname(__FILE__)),
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
-		'{$smf_version}' => $GLOBALS['current_smf_version'],
+		'{$pmx_version}' => $GLOBALS['current_pmx_version'],
 		'{$current_time}' => time(),
 		'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
 		'{$registration_method}' => isset($_POST['reg_mode']) ? $_POST['reg_mode'] : 0,
@@ -1046,7 +1046,7 @@ function DatabasePopulation()
 	foreach ($txt as $key => $value)
 	{
 		if (substr($key, 0, 8) == 'default_')
-			$replaces['{$' . $key . '}'] = $smcFunc['db_escape_string']($value);
+			$replaces['{$' . $key . '}'] = $pmxcFunc['db_escape_string']($value);
 	}
 	$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
@@ -1057,16 +1057,16 @@ function DatabasePopulation()
 		$engines = array();
 
 		// Figure out storage engines - what do we have, etc.
-		$get_engines = $smcFunc['db_query']('', 'SHOW ENGINES', array());
+		$get_engines = $pmxcFunc['db_query']('', 'SHOW ENGINES', array());
 
-		while ($row = $smcFunc['db_fetch_assoc']($get_engines))
+		while ($row = $pmxcFunc['db_fetch_assoc']($get_engines))
 		{
 			if ($row['Support'] == 'YES' || $row['Support'] == 'DEFAULT')
 				$engines[] = $row['Engine'];
 		}
 
 		// Done with this now
-		$smcFunc['db_free_result']($get_engines);
+		$pmxcFunc['db_free_result']($get_engines);
 
 		// InnoDB is better, so use it if possible...
 		$has_innodb = in_array('InnoDB', $engines);
@@ -1095,14 +1095,14 @@ function DatabasePopulation()
 	// PostgreSQL-specific stuff - unlogged table
 	if ($db_type == 'postgresql')
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SHOW server_version_num'
 		);
 		if ($result !== false)
 		{
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $pmxcFunc['db_fetch_assoc']($result))
 				$pg_version = $row['server_version_num'];
-			$smcFunc['db_free_result']($result);
+			$pmxcFunc['db_free_result']($result);
 		}
 		
 		if(isset($pg_version) && $pg_version >= 90100)
@@ -1148,7 +1148,7 @@ function DatabasePopulation()
 			continue;
 		}
 
-		if ($smcFunc['db_query']('', $current_statement, array('security_override' => true, 'db_error_skip' => true), $db_connection) === false)
+		if ($pmxcFunc['db_query']('', $current_statement, array('security_override' => true, 'db_error_skip' => true), $db_connection) === false)
 		{
 			// Use the appropriate function based on the DB type
 			if ($db_type == 'mysql' || $db_type =='mysqli')
@@ -1165,7 +1165,7 @@ function DatabasePopulation()
 			elseif (!preg_match('~^\s*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~', $current_statement, $match) && !($db_type == 'postgresql' && preg_match('~^\s*CREATE OPERATOR (^\n\r]+?)~', $current_statement, $match)))
 			{
 				// MySQLi requires a connection object. It's optional with MySQL and Postgres
-				$incontext['failures'][$count] = $smcFunc['db_error']($db_connection);
+				$incontext['failures'][$count] = $pmxcFunc['db_error']($db_connection);
 			}
 		}
 		else
@@ -1237,7 +1237,7 @@ function DatabasePopulation()
 
 	if (!empty($newSettings))
 	{
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string-255', 'value' => 'string-65534'),
 			$newSettings,
@@ -1249,14 +1249,14 @@ function DatabasePopulation()
 	if (!$has_innodb)
 	{
 		db_extend();
-		$tables = $smcFunc['db_list_tables']($db_name, $db_prefix . '%');
+		$tables = $pmxcFunc['db_list_tables']($db_name, $db_prefix . '%');
 		foreach ($tables as $table)
 		{
-			$smcFunc['db_optimize_table']($table) != -1 or $db_messed = true;
+			$pmxcFunc['db_optimize_table']($table) != -1 or $db_messed = true;
 
 			if (!empty($db_messed))
 			{
-				$incontext['failures'][-1] = $smcFunc['db_error']();
+				$incontext['failures'][-1] = $pmxcFunc['db_error']();
 				break;
 			}
 		}
@@ -1268,13 +1268,13 @@ function DatabasePopulation()
 	
 	// Find database user privileges.
 	$privs = array();
-	$get_privs = $smcFunc['db_query']('', 'SHOW PRIVILEGES', array());
-	while ($row = $smcFunc['db_fetch_assoc']($get_privs))
+	$get_privs = $pmxcFunc['db_query']('', 'SHOW PRIVILEGES', array());
+	while ($row = $pmxcFunc['db_fetch_assoc']($get_privs))
 	{
 		if ($row['Privilege'] == 'Alter')
 			$privs[] = $row['Privilege'];
 	}
-	$smcFunc['db_free_result']($get_privs);
+	$pmxcFunc['db_free_result']($get_privs);
 
 	// Check for the ALTER privilege.
 	if (!empty($databases[$db_type]['alter_support']) && !in_array('Alter', $privs))
@@ -1295,7 +1295,7 @@ function DatabasePopulation()
 // Ask for the administrator login information.
 function AdminAccount()
 {
-	global $txt, $db_type, $db_connection, $smcFunc, $incontext, $db_prefix, $db_passwd, $sourcedir, $db_character_set;
+	global $txt, $db_type, $db_connection, $pmxcFunc, $incontext, $db_prefix, $db_passwd, $sourcedir, $db_character_set;
 
 	$incontext['sub_template'] = 'admin_account';
 	$incontext['page_title'] = $txt['user_settings'];
@@ -1314,7 +1314,7 @@ function AdminAccount()
 	require_once($sourcedir . '/Subs.php');
 
 	// We need this to properly hash the password for Admin
-	$smcFunc['strtolower'] = $db_character_set != 'utf8' && $txt['lang_character_set'] != 'UTF-8' ? 'strtolower' :
+	$pmxcFunc['strtolower'] = $db_character_set != 'utf8' && $txt['lang_character_set'] != 'UTF-8' ? 'strtolower' :
 		create_function('$string', '
 			global $sourcedir;
 			if (function_exists(\'mb_strtolower\'))
@@ -1337,7 +1337,7 @@ function AdminAccount()
 	$incontext['require_db_confirm'] = empty($db_type);
 
 	// Only allow skipping if we think they already have an account setup.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
@@ -1347,9 +1347,9 @@ function AdminAccount()
 			'admin_group' => 1,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($pmxcFunc['db_num_rows']($request) != 0)
 		$incontext['skip'] = 1;
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Trying to create an account?
 	if (isset($_POST['password1']) && !empty($_POST['contbutt']))
@@ -1386,7 +1386,7 @@ function AdminAccount()
 		$invalid_characters = preg_match('~[<>&"\'=\\\]~', $_POST['username']) != 0;
 		$_POST['username'] = preg_replace('~[<>&"\'=\\\]~', '', $_POST['username']);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT id_member, password_salt
 			FROM {db_prefix}members
 			WHERE member_name = {string:username} OR email_address = {string:email}
@@ -1397,10 +1397,10 @@ function AdminAccount()
 				'db_error_skip' => true,
 			)
 		);
-		if ($smcFunc['db_num_rows']($result) != 0)
+		if ($pmxcFunc['db_num_rows']($result) != 0)
 		{
-			list ($incontext['member_id'], $incontext['member_salt']) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list ($incontext['member_id'], $incontext['member_salt']) = $pmxcFunc['db_fetch_row']($result);
+			$pmxcFunc['db_free_result']($result);
 
 			$incontext['account_existed'] = $txt['error_user_settings_taken'];
 		}
@@ -1438,7 +1438,7 @@ function AdminAccount()
 
 			$_POST['password1'] = hash_password(stripslashes($_POST['username']), stripslashes($_POST['password1']));
 
-			$request = $smcFunc['db_insert']('',
+			$request = $pmxcFunc['db_insert']('',
 				$db_prefix . 'members',
 				array(
 					'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
@@ -1465,11 +1465,11 @@ function AdminAccount()
 			if ($request === false)
 			{
 				$incontext['error'] = $txt['error_user_settings_query'] . '<br>
-				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($smcFunc['db_error']($db_connection))) . '</div>';
+				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($pmxcFunc['db_error']($db_connection))) . '</div>';
 				return false;
 			}
 
-			$incontext['member_id'] = $smcFunc['db_insert_id']("{$db_prefix}members", 'id_member');
+			$incontext['member_id'] = $pmxcFunc['db_insert_id']("{$db_prefix}members", 'id_member');
 		}
 
 		// If we're here we're good.
@@ -1483,8 +1483,8 @@ function AdminAccount()
 function DeleteInstall()
 {
 	global $txt, $incontext;
-	global $smcFunc, $db_character_set, $context, $cookiename;
-	global $current_smf_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $db_type, $boardurl;
+	global $pmxcFunc, $db_character_set, $context, $cookiename;
+	global $current_pmx_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $db_type, $boardurl;
 
 	$incontext['page_title'] = $txt['congratulations'];
 	$incontext['sub_template'] = 'delete_install';
@@ -1507,7 +1507,7 @@ function DeleteInstall()
 		$incontext['warning'] = $incontext['account_existed'];
 
 	if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			SET NAMES {raw:db_character_set}',
 			array(
 				'db_character_set' => $db_character_set,
@@ -1516,7 +1516,7 @@ function DeleteInstall()
 		);
 
 	// As track stats is by default enabled let's add some activity.
-	$smcFunc['db_insert']('ignore',
+	$pmxcFunc['db_insert']('ignore',
 		'{db_prefix}log_activity',
 		array('date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'),
 		array(strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
@@ -1524,7 +1524,7 @@ function DeleteInstall()
 	);
 
 	// We're going to want our lovely $modSettings now.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT variable, value
 		FROM {db_prefix}settings',
 		array(
@@ -1534,16 +1534,16 @@ function DeleteInstall()
 	// Only proceed if we can load the data.
 	if ($request)
 	{
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $pmxcFunc['db_fetch_row']($request))
 			$modSettings[$row[0]] = $row[1];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Automatically log them in ;)
 	if (isset($incontext['member_id']) && isset($incontext['member_salt']))
 		setLoginCookie(3153600 * 60, $incontext['member_id'], hash_salt($_POST['password1'], $incontext['member_salt']));
 
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT value
 		FROM {db_prefix}settings
 		WHERE variable = {string:db_sessions}',
@@ -1552,9 +1552,9 @@ function DeleteInstall()
 			'db_error_skip' => true,
 		)
 	);
-	if ($smcFunc['db_num_rows']($result) != 0)
-		list ($db_sessions) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	if ($pmxcFunc['db_num_rows']($result) != 0)
+		list ($db_sessions) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	if (empty($db_sessions))
 		$_SESSION['admin_time'] = time();
@@ -1562,7 +1562,7 @@ function DeleteInstall()
 	{
 		$_SERVER['HTTP_USER_AGENT'] = substr($_SERVER['HTTP_USER_AGENT'], 0, 211);
 
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}sessions',
 			array(
 				'session_id' => 'string', 'last_update' => 'int', 'data' => 'string',
@@ -1579,7 +1579,7 @@ function DeleteInstall()
 	updateStats('topic');
 
 	// This function is needed to do the updateStats('subject') call.
-	$smcFunc['strtolower'] = $db_character_set != 'utf8' && $txt['lang_character_set'] != 'UTF-8' ? 'strtolower' :
+	$pmxcFunc['strtolower'] = $db_character_set != 'utf8' && $txt['lang_character_set'] != 'UTF-8' ? 'strtolower' :
 		create_function('$string', '
 			global $sourcedir;
 			if (function_exists(\'mb_strtolower\'))
@@ -1588,7 +1588,7 @@ function DeleteInstall()
 			return utf8_strtolower($string);
 		');
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE id_msg = 1
@@ -1599,16 +1599,16 @@ function DeleteInstall()
 		)
 	);
 	$context['utf8'] = $db_character_set === 'utf8' || $txt['lang_character_set'] === 'UTF-8';
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($pmxcFunc['db_num_rows']($request) > 0)
 		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Now is the perfect time to fetch the SM files.
 	require_once($sourcedir . '/ScheduledTasks.php');
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))
 	{
-		$forum_version = $current_smf_version;  // The variable is usually defined in index.php so lets just use our variable to do it for us.
+		$forum_version = $current_pmx_version;  // The variable is usually defined in index.php so lets just use our variable to do it for us.
 		scheduled_fetchSMfiles(); // Now go get those files!
 
 		// We've just installed!
@@ -1618,7 +1618,7 @@ function DeleteInstall()
 	}
 
 	// Check if we need some stupid MySQL fix.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $pmxcFunc['db_server_info']();
 	if (($db_type == 'mysql' || $db_type == 'mysqli') && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 
@@ -2119,7 +2119,7 @@ function template_install_above()
 	<head>
 		<meta charset="', isset($txt['lang_character_set']) ? $txt['lang_character_set'] : 'UTF-8', '">
 		<meta name="robots" content="noindex">
-		<title>', $txt['smf_installer'], '</title>
+		<title>', $txt['pmx_installer'], '</title>
 		<link rel="stylesheet" href="Themes/default/css/index.css?alp21">
 		<link rel="stylesheet" href="Themes/default/css/install.css?alp21">
 		', $txt['lang_rtl'] == true ? '<link rel="stylesheet" href="Themes/default/css/rtl.css?alp21">' : '' , '
@@ -2129,7 +2129,7 @@ function template_install_above()
 	</head>
 	<body><div id="footerfix">
 		<div id="header">
-			<h1 class="forumtitle">', $txt['smf_installer'], '</h1>
+			<h1 class="forumtitle">', $txt['pmx_installer'], '</h1>
 			<img id="smflogo" src="Themes/default/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
 		</div>
 		<div id="wrapper">
@@ -2217,7 +2217,7 @@ function template_install_below()
 		</div></div>
 		<div id="footer">
 			<ul>
-				<li class="copyright"><a href="http://www.simplemachines.org/" title="Simple Machines Forum" target="_blank" class="new_win">SMF &copy; 2016, Simple Machines</a></li>
+				<li class="copyright"><a href="http://portamx.com/" title="PortaMx Forum" target="_blank" class="new_win">PortaMx Forum &copy; 2016, PortaMx</a></li>
 			</ul>
 		</div>
 	</body>
@@ -2230,14 +2230,14 @@ function template_welcome_message()
 	global $incontext, $txt;
 
 	echo '
-	<script src="http://www.simplemachines.org/smf/current-version.js?version=' . $GLOBALS['current_smf_version'] . '"></script>
+	<script src="http://docserver.portamx.com/pmxforum/infofiles/current-version.js"></script>
 	<form action="', $incontext['form_url'], '" method="post">
-		<p>', sprintf($txt['install_welcome_desc'], $GLOBALS['current_smf_version']), '</p>
+		<p>', sprintf($txt['install_welcome_desc'], $GLOBALS['current_pmx_version']), '</p>
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
 			<strong style="text-decoration: underline;">', $txt['error_warning_notice'], '</strong><br />
 			<div style="padding-left: 6ex;">
-				', sprintf($txt['error_script_outdated'], '<em id="smfVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . $GLOBALS['current_smf_version'] . '</em>'), '
+				', sprintf($txt['error_script_outdated'], '<em id="pmxVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . $GLOBALS['current_pmx_version'] . '</em>'), '
 			</div>
 		</div>';
 
@@ -2258,21 +2258,21 @@ function template_welcome_message()
 			{
 				var smfVer, yourVer;
 
-				if (!(\'smfVersion\' in window))
+				if (!(\'pmxVersion\' in window))
 					return;
 
-				window.smfVersion = window.smfVersion.replace(/SMF\s?/g, \'\');
+				window.pmxVersion = window.pmxVersion;
 
-				smfVer = document.getElementById("smfVersion");
+				pmxVer = document.getElementById("pmxVersion");
 				yourVer = document.getElementById("yourVersion");
 
-				setInnerHTML(smfVer, window.smfVersion);
+				setInnerHTML(pmxVer, window.pmxVersion);
 
 				var currentVersion = getInnerHTML(yourVer);
-				if (currentVersion < window.smfVersion)
+				if (currentVersion < window.pmxVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
-			addLoadEvent(smfCurrentVersion);
+			addLoadEvent(pmxCurrentVersion);
 		</script>';
 }
 
@@ -2447,14 +2447,14 @@ function template_database_settings()
 			</tr><tr id="db_name_contain">
 				<td valign="top" class="textbox"><label for="db_name_input">', $txt['db_settings_database'], ':</label></td>
 				<td>
-					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'smf' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
+					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'pmx' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
 					<div class="smalltext block">', $txt['db_settings_database_info'], '
 					<span id="db_name_info_warning">', $txt['db_settings_database_info_note'], '</span></div>
 				</td>
 			</tr><tr id="db_filename_contain" style="display: none;">
 				<td valign="top" class="textbox"><label for="db_filename_input">', $txt['db_settings_database_file'], ':</label></td>
 				<td>
-					<input type="text" name="db_filename" id="db_filename_input" value="', empty($incontext['db']['name']) ? dirname(__FILE__) . '/smf_' . substr(md5(microtime()), 0, 10) : stripslashes($incontext['db']['name']), '" size="30" class="input_text" /><br />
+					<input type="text" name="db_filename" id="db_filename_input" value="', empty($incontext['db']['name']) ? dirname(__FILE__) . '/pmx_' . substr(md5(microtime()), 0, 10) : stripslashes($incontext['db']['name']), '" size="30" class="input_text" /><br />
 					<div class="smalltext block">', $txt['db_settings_database_file_info'], '</div>
 				</td>
 			</tr><tr>

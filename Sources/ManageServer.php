@@ -58,7 +58,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -261,7 +261,7 @@ function ModifyDatabaseSettings($return_config = false)
  */
 function ModifyCookieSettings($return_config = false)
 {
-	global $context, $scripturl, $txt, $sourcedir, $modSettings, $cookiename, $user_settings, $boardurl, $smcFunc;
+	global $context, $scripturl, $txt, $sourcedir, $modSettings, $cookiename, $user_settings, $boardurl, $pmxcFunc;
 
 	// Define the variables we want to edit.
 	$config_vars = array(
@@ -351,14 +351,14 @@ function ModifyCookieSettings($return_config = false)
 		//If we disabled 2FA, reset all members and membergroups settings.
 		if (isset($_POST['tfa_mode']) && empty($_POST['tfa_mode']))
 		{
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}membergroups
 				SET tfa_required = {int:zero}',
 				array(
 					'zero' => 0,
 				)
 			);
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}members
 				SET tfa_secret = {string:empty}, tfa_backup = {string:empty}',
 				array(
@@ -655,7 +655,7 @@ function ModifyLoadBalancingSettings($return_config = false)
  */
 function prepareServerSettingsContext(&$config_vars)
 {
-	global $context, $modSettings, $smcFunc;
+	global $context, $modSettings, $pmxcFunc;
 
 	if (isset($_SESSION['adm-save']))
 	{
@@ -694,7 +694,7 @@ function prepareServerSettingsContext(&$config_vars)
 				'size' => empty($config_var[4]) ? 0 : $config_var[4],
 				'data' => isset($config_var[4]) && is_array($config_var[4]) && $config_var[3] != 'select' ? $config_var[4] : array(),
 				'name' => $config_var[0],
-				'value' => $config_var[2] == 'file' ? $smcFunc['htmlspecialchars']($$varname) : (isset($modSettings[$config_var[0]]) ? $smcFunc['htmlspecialchars']($modSettings[$config_var[0]]) : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
+				'value' => $config_var[2] == 'file' ? $pmxcFunc['htmlspecialchars']($$varname) : (isset($modSettings[$config_var[0]]) ? $pmxcFunc['htmlspecialchars']($modSettings[$config_var[0]]) : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
 				'disabled' => !empty($context['settings_not_writable']) || !empty($config_var['disabled']),
 				'invalid' => false,
 				'subtext' => !empty($config_var['subtext']) ? $config_var['subtext'] : $subtext,
@@ -748,7 +748,7 @@ function prepareServerSettingsContext(&$config_vars)
  */
 function prepareDBSettingContext(&$config_vars)
 {
-	global $txt, $helptxt, $context, $modSettings, $sourcedir, $smcFunc;
+	global $txt, $helptxt, $context, $modSettings, $sourcedir, $pmxcFunc;
 
 	loadLanguage('Help');
 
@@ -802,7 +802,7 @@ function prepareDBSettingContext(&$config_vars)
 						$value = explode(',', $modSettings[$config_var[1]]);
 						break;
 					default:
-						$value = $smcFunc['htmlspecialchars']($modSettings[$config_var[1]]);
+						$value = $pmxcFunc['htmlspecialchars']($modSettings[$config_var[1]]);
 				}
 			}
 			else
@@ -864,7 +864,7 @@ function prepareDBSettingContext(&$config_vars)
 				if ($config_var[0] == 'select' && !empty($config_var['multiple']))
 				{
 					$context['config_vars'][$config_var[1]]['name'] .= '[]';
-					$context['config_vars'][$config_var[1]]['value'] = !empty($context['config_vars'][$config_var[1]]['value']) ? smf_json_decode($context['config_vars'][$config_var[1]]['value'], true) : array();
+					$context['config_vars'][$config_var[1]]['value'] = !empty($context['config_vars'][$config_var[1]]['value']) ? pmx_json_decode($context['config_vars'][$config_var[1]]['value'], true) : array();
 				}
 
 				// If it's associative
@@ -1113,7 +1113,7 @@ function saveSettings(&$config_vars)
  */
 function saveDBSettings(&$config_vars)
 {
-	global $sourcedir, $smcFunc;
+	global $sourcedir, $pmxcFunc;
 	static $board_list = null;
 
 	validateToken('admin-dbsc');
@@ -1147,13 +1147,13 @@ function saveDBSettings(&$config_vars)
 			if ($board_list === null)
 			{
 				$board_list = array();
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT id_board
 					FROM {db_prefix}boards');
-				while ($row = $smcFunc['db_fetch_row']($request))
+				while ($row = $pmxcFunc['db_fetch_row']($request))
 					$board_list[$row[0]] = true;
 
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 			}
 
 			$lOptions = array();

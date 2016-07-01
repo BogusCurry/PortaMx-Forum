@@ -566,10 +566,10 @@ function template_modify_board()
 	</div>
 
 <script>
-	var oModeratorSuggest = new smc_AutoSuggest({
+	var oModeratorSuggest = new pmxc_AutoSuggest({
 		sSelf: \'oModeratorSuggest\',
-		sSessionId: smf_session_id,
-		sSessionVar: smf_session_var,
+		sSessionId: pmx_session_id,
+		sSessionVar: pmx_session_var,
 		sSuggestId: \'moderators\',
 		sControlId: \'moderators\',
 		sSearchType: \'member\',
@@ -591,10 +591,10 @@ function template_modify_board()
 		]
 	});
 
-	var oModeratorGroupSuggest = new smc_AutoSuggest({
+	var oModeratorGroupSuggest = new pmxc_AutoSuggest({
 		sSelf: \'oModeratorGroupSuggest\',
-		sSessionId: smf_session_id,
-		sSessionVar: smf_session_var,
+		sSessionId: pmx_session_id,
+		sSessionVar: pmx_session_var,
 		sSuggestId: \'moderator_groups\',
 		sControlId: \'moderator_groups\',
 		sSearchType: \'membergroups\',

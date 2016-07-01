@@ -15,7 +15,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 
@@ -24,7 +24,7 @@ if (!defined('SMF'))
  * @param string $str The string
  * @return string The sha1 hashed version of $str
  */
-function sha1_smf($str)
+function sha1_pmx($str)
 {
 	// If we have mhash loaded in, use it instead!
 	if (function_exists('mhash') && defined('MHASH_SHA1'))
@@ -158,9 +158,9 @@ function sha1_raw($text)
  * @param string $number
  * @return string The crc32 polynomial of $number
  */
-if (!function_exists('smf_crc32'))
+if (!function_exists('pmx_crc32'))
 {
-	function smf_crc32($number)
+	function pmx_crc32($number)
 	{
 		$crc = crc32($number);
 

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -28,6 +28,7 @@ function jsCookieHandling()
 		$result = '';
 		if($_REQUEST['mode'] == 'get')
 		{
+			// get formatted time string?
 			if($_REQUEST['name'] == 'time' && $_REQUEST['type'] = 'format')
 				$result = timeformat($_REQUEST['value']);
 
@@ -69,8 +70,6 @@ function jsCookieHandling()
 		echo $result;
 		obExit(false);
 		die;
-//		ob_end_flush();
-//		exit;
 	}
 }
 
@@ -223,7 +222,7 @@ function eclCookieparts()
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 
 	switch ($type)
 	{
@@ -245,7 +244,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			else
 			{
 				// Update the latest activated member (highest id_member) and count.
-				$result = $smcFunc['db_query']('', '
+				$result = $pmxcFunc['db_query']('', '
 				SELECT COUNT(*), MAX(id_member)
 				FROM {db_prefix}members
 				WHERE is_activated = {int:is_activated}',
@@ -253,11 +252,11 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 						'is_activated' => 1,
 					)
 				);
-				list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
+				list ($changes['totalMembers'], $changes['latestMember']) = $pmxcFunc['db_fetch_row']($result);
+				$pmxcFunc['db_free_result']($result);
 
 				// Get the latest activated member's display name.
-				$result = $smcFunc['db_query']('', '
+				$result = $pmxcFunc['db_query']('', '
 				SELECT real_name
 				FROM {db_prefix}members
 				WHERE id_member = {int:id_member}
@@ -266,8 +265,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 						'id_member' => (int) $changes['latestMember'],
 					)
 				);
-				list ($changes['latestRealName']) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
+				list ($changes['latestRealName']) = $pmxcFunc['db_fetch_row']($result);
+				$pmxcFunc['db_free_result']($result);
 
 				if (!empty($modSettings['registration_method']))
 				{
@@ -275,7 +274,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					if ($modSettings['registration_method'] == 2 || !empty($modSettings['approveAccountDeletion']))
 					{
 						// Update the amount of members awaiting approval
-						$result = $smcFunc['db_query']('', '
+						$result = $pmxcFunc['db_query']('', '
 						SELECT COUNT(*)
 						FROM {db_prefix}members
 						WHERE is_activated IN ({array_int:activation_status})',
@@ -283,14 +282,14 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 								'activation_status' => array(3, 4),
 							)
 						);
-						list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
-						$smcFunc['db_free_result']($result);
+						list ($changes['unapprovedMembers']) = $pmxcFunc['db_fetch_row']($result);
+						$pmxcFunc['db_free_result']($result);
 					}
 
 					// What about unapproved COPPA registrations?
 					if (!empty($modSettings['coppaType']) && $modSettings['coppaType'] != 1)
 					{
-						$result = $smcFunc['db_query']('', '
+						$result = $pmxcFunc['db_query']('', '
 						SELECT COUNT(*)
 						FROM {db_prefix}members
 						WHERE is_activated = {int:coppa_approval}',
@@ -298,8 +297,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 								'coppa_approval' => 5,
 							)
 						);
-						list ($coppa_approvals) = $smcFunc['db_fetch_row']($result);
-						$smcFunc['db_free_result']($result);
+						list ($coppa_approvals) = $pmxcFunc['db_fetch_row']($result);
+						$pmxcFunc['db_free_result']($result);
 
 						// Add this to the number of unapproved members
 						if (!empty($changes['unapprovedMembers']))
@@ -318,7 +317,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			else
 			{
 				// SUM and MAX on a smaller table is better for InnoDB tables.
-				$result = $smcFunc['db_query']('', '
+				$result = $pmxcFunc['db_query']('', '
 				SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
 				FROM {db_prefix}boards
 				WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -328,8 +327,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 						'blank_redirect' => '',
 					)
 				);
-				$row = $smcFunc['db_fetch_assoc']($result);
-				$smcFunc['db_free_result']($result);
+				$row = $pmxcFunc['db_fetch_assoc']($result);
+				$pmxcFunc['db_free_result']($result);
 
 				updateSettings(array(
 					'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
@@ -340,7 +339,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 		case 'subject':
 			// Remove the previous subject (if any).
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_search_subjects
 			WHERE id_topic = {int:id_topic}',
 				array(
@@ -359,7 +358,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					$inserts[] = array($word, $parameter1);
 
 				if (!empty($inserts))
-					$smcFunc['db_insert']('ignore',
+					$pmxcFunc['db_insert']('ignore',
 						'{db_prefix}log_search_subjects',
 						array('word' => 'string', 'id_topic' => 'int'),
 						$inserts,
@@ -375,7 +374,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			{
 				// Get the number of topics - a SUM is better for InnoDB tables.
 				// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
-				$result = $smcFunc['db_query']('', '
+				$result = $pmxcFunc['db_query']('', '
 				SELECT SUM(num_topics + unapproved_topics) AS total_topics
 				FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				WHERE id_board != {int:recycle_board}' : ''),
@@ -383,8 +382,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 						'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
 					)
 				);
-				$row = $smcFunc['db_fetch_assoc']($result);
-				$smcFunc['db_free_result']($result);
+				$row = $pmxcFunc['db_fetch_assoc']($result);
+				$pmxcFunc['db_free_result']($result);
 
 				updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
 			}
@@ -399,7 +398,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			if ($postgroups == null || $parameter1 == null)
 			{
 				// Fetch the postgroups!
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 				SELECT id_group, min_posts
 				FROM {db_prefix}membergroups
 				WHERE min_posts != {int:min_posts}',
@@ -408,9 +407,9 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					)
 				);
 				$postgroups = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
 					$postgroups[$row['id_group']] = $row['min_posts'];
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 
 				// Sort them this way because if it's done with MySQL it causes a filesort :(.
 				arsort($postgroups);
@@ -433,7 +432,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			}
 
 			// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}members
 			SET id_post_group = CASE ' . $conditions . '
 					ELSE 0
@@ -471,7 +470,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  */
 function updateMemberData($members, $data)
 {
-	global $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info, $pmxcFunc;
 
 	$parameters = array();
 	if (is_array($members))
@@ -526,15 +525,15 @@ function updateMemberData($members, $data)
 			else
 			{
 				$member_names = array();
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT member_name
 					FROM {db_prefix}members
 					WHERE ' . $condition,
 					$parameters
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
 					$member_names[] = $row['member_name'];
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 			}
 
 			if (!empty($member_names))
@@ -580,7 +579,7 @@ function updateMemberData($members, $data)
 		$parameters['p_' . $var] = $val;
 	}
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}members
 		SET' . substr($setString, 0, -1) . '
 		WHERE ' . $condition,
@@ -624,7 +623,7 @@ function updateMemberData($members, $data)
  */
 function updateSettings($changeArray, $update = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -642,7 +641,7 @@ function updateSettings($changeArray, $update = false)
 
 	// Proceed with the deletion.
 	if (!empty($toRemove))
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}settings
 			WHERE variable IN ({array_string:remove})',
 			array(
@@ -655,7 +654,7 @@ function updateSettings($changeArray, $update = false)
 	{
 		foreach ($changeArray as $variable => $value)
 		{
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}settings
 				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
 				WHERE variable = {string:variable}',
@@ -691,7 +690,7 @@ function updateSettings($changeArray, $update = false)
 	if (empty($replaceArray))
 		return;
 
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-65534'),
 		$replaceArray,
@@ -728,7 +727,7 @@ function updateSettings($changeArray, $update = false)
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show_prevnext = true)
 {
-	global $modSettings, $context, $smcFunc, $settings, $txt;
+	global $modSettings, $context, $pmxcFunc, $settings, $txt;
 
 	// Save whether $start was less than 0 or not.
 	$start = (int) $start;
@@ -798,7 +797,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// Show the ... after the first page.  (prev page 1 >...< 6 7 [8] 9 10 ... 15 next page)
 		if ($start > $num_per_page * ($PageContiguous + 1))
 			$pageindex .= strtr($settings['page_index']['expand_pages'], array(
-				'{LINK}' => JavaScriptEscape($smcFunc['htmlspecialchars']($base_link)),
+				'{LINK}' => JavaScriptEscape($pmxcFunc['htmlspecialchars']($base_link)),
 				'{FIRST_PAGE}' => $num_per_page,
 				'{LAST_PAGE}' => $start - $num_per_page * $PageContiguous,
 				'{PER_PAGE}' => $num_per_page,
@@ -830,7 +829,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
 		if ($start + $num_per_page * ($PageContiguous + 1) < $tmpMaxPages)
 			$pageindex .= strtr($settings['page_index']['expand_pages'], array(
-				'{LINK}' => JavaScriptEscape($smcFunc['htmlspecialchars']($base_link)),
+				'{LINK}' => JavaScriptEscape($pmxcFunc['htmlspecialchars']($base_link)),
 				'{FIRST_PAGE}' => $start + $num_per_page * ($PageContiguous + 1),
 				'{LAST_PAGE}' => $tmpMaxPages,
 				'{PER_PAGE}' => $num_per_page,
@@ -1017,14 +1016,14 @@ function un_htmlspecialchars($string)
  */
 function shorten_subject($subject, $len)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// It was already short enough!
-	if ($smcFunc['strlen']($subject) <= $len)
+	if ($pmxcFunc['strlen']($subject) <= $len)
 		return $subject;
 
 	// Shorten it by the length it was too long, and strip off junk from the end.
-	return $smcFunc['substr']($subject, 0, $len) . '...';
+	return $pmxcFunc['substr']($subject, 0, $len) . '...';
 }
 
 /**
@@ -1361,7 +1360,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_content',
-				'content' => '<div class="codeheader"><span class="code floatleft">' . $txt['code'] . '</span> <a class="codeoperation smf_select_text">' . $txt['code_select'] . '</a></div><code class="bbc_code">$1</code>',
+				'content' => '<div class="codeheader"><span class="code floatleft">' . $txt['code'] . '</span> <a class="codeoperation pmx_select_text">' . $txt['code_select'] . '</a></div><code class="bbc_code">$1</code>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : function (&$tag, &$data, $disabled) use ($context)
 				{
@@ -1398,7 +1397,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_equals_content',
-				'content' => '<div class="codeheader"><span class="code floatleft">' . $txt['code'] . '</span> ($2) <a class="codeoperation smf_select_text">' . $txt['code_select'] . '</a></div><code class="bbc_code">$1</code>',
+				'content' => '<div class="codeheader"><span class="code floatleft">' . $txt['code'] . '</span> ($2) <a class="codeoperation pmx_select_text">' . $txt['code_select'] . '</a></div><code class="bbc_code">$1</code>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : function (&$tag, &$data, $disabled) use ($context)
 				{
@@ -2748,7 +2747,7 @@ function sort_bbc_tags($a, $b)
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info, $context, $smcFunc;
+	global $modSettings, $txt, $user_info, $context, $pmxcFunc;
 	static $smileyPregSearch = null, $smileyPregReplacements = array();
 
 	// No smiley set at all?!
@@ -2761,7 +2760,7 @@ function parsesmileys(&$message)
 		// Use the default smileys if it is disabled. (better for "portability" of smileys.)
 		if (empty($modSettings['smiley_enable']))
 		{
-			$smileysfrom = array('>:D', ':D', '::)', '>:(', ':))', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', '0:)');
+			$smileysfrom = array(':>D', ':D', '::)', ':>(', ':))', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', '0:)');
 			$smileysto = array('evil.gif', 'cheesy.gif', 'rolleyes.gif', 'angry.gif', 'laugh.gif', 'smiley.gif', 'wink.gif', 'grin.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'tongue.gif', 'huh.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'kiss.gif', 'cry.gif', 'undecided.gif', 'azn.gif', 'afro.gif', 'police.gif', 'angel.gif');
 			$smileysdescs = array('', $txt['icon_cheesy'], $txt['icon_rolleyes'], $txt['icon_angry'], '', $txt['icon_smiley'], $txt['icon_wink'], $txt['icon_grin'], $txt['icon_sad'], $txt['icon_shocked'], $txt['icon_cool'], $txt['icon_tongue'], $txt['icon_huh'], $txt['icon_embarrassed'], $txt['icon_lips'], $txt['icon_kiss'], $txt['icon_cry'], $txt['icon_undecided'], '', '', '', '');
 		}
@@ -2770,7 +2769,7 @@ function parsesmileys(&$message)
 			// Load the smileys in reverse order by length so they don't get parsed wrong.
 			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $pmxcFunc['db_query']('', '
 					SELECT code, filename, description
 					FROM {db_prefix}smileys
 					ORDER BY LENGTH(code) DESC',
@@ -2780,13 +2779,13 @@ function parsesmileys(&$message)
 				$smileysfrom = array();
 				$smileysto = array();
 				$smileysdescs = array();
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $pmxcFunc['db_fetch_assoc']($result))
 				{
 					$smileysfrom[] = $row['code'];
-					$smileysto[] = $smcFunc['htmlspecialchars']($row['filename']);
+					$smileysto[] = $pmxcFunc['htmlspecialchars']($row['filename']);
 					$smileysdescs[] = $row['description'];
 				}
-				$smcFunc['db_free_result']($result);
+				$pmxcFunc['db_free_result']($result);
 
 				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
 			}
@@ -2800,12 +2799,12 @@ function parsesmileys(&$message)
 		// This smiley regex makes sure it doesn't parse smileys within code tags (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
 		$smileyPregReplacements = array();
 		$searchParts = array();
-		$smileys_path = $smcFunc['htmlspecialchars']($modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/');
+		$smileys_path = $pmxcFunc['htmlspecialchars']($modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/');
 
 		for ($i = 0, $n = count($smileysfrom); $i < $n; $i++)
 		{
-			$specialChars = $smcFunc['htmlspecialchars']($smileysfrom[$i], ENT_QUOTES);
-			$smileyCode = '<img src="' . $smileys_path . $smileysto[$i] . '" alt="' . strtr($specialChars, array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')). '" title="' . strtr($smcFunc['htmlspecialchars']($smileysdescs[$i]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" class="smiley">';
+			$specialChars = $pmxcFunc['htmlspecialchars']($smileysfrom[$i], ENT_QUOTES);
+			$smileyCode = '<img src="' . $smileys_path . $smileysto[$i] . '" alt="' . strtr($specialChars, array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')). '" title="' . strtr($pmxcFunc['htmlspecialchars']($smileysdescs[$i]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" class="smiley">';
 
 			$smileyPregReplacements[$smileysfrom[$i]] = $smileyCode;
 
@@ -2841,7 +2840,7 @@ function parsesmileys(&$message)
 function highlight_php_code($code)
 {
 	// Remove special characters.
-	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", '<br>' => "\n", "\t" => 'SMF_TAB();', '&#91;' => '[')));
+	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", '<br>' => "\n", "\t" => 'PMX_TAB();', '&#91;' => '[')));
 
 	$oldlevel = error_reporting(0);
 
@@ -2850,7 +2849,7 @@ function highlight_php_code($code)
 	error_reporting($oldlevel);
 
 	// Yes, I know this is kludging it, but this is the best way to preserve tabs from PHP :P.
-	$buffer = preg_replace('~SMF_TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
+	$buffer = preg_replace('~PMX_TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
 
 	return strtr($buffer, array('\'' => '&#039;', '<code>' => '', '</code>' => ''));
 }
@@ -2922,7 +2921,7 @@ function redirectexit($setLocation = '', $refresh = false, $permanent = false)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt, $smcFunc;
+	global $context, $settings, $modSettings, $txt, $pmxcFunc;
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
 	// Attempt to prevent a recursive loop.
@@ -2949,7 +2948,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = $pmxcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -2999,7 +2998,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewsmfile') === false)
+	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewpmxfile') === false)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...
@@ -3056,7 +3055,7 @@ function url_image_size($url)
 		if ($fp != false)
 		{
 			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
-			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/SMF' . "\r\n" . 'Connection: close' . "\r\n\r\n");
+			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/PMX' . "\r\n" . 'Connection: close' . "\r\n\r\n");
 
 			// Read in the HTTP/1.1 or whatever.
 			$test = substr(fgets($fp, 11), -1);
@@ -3103,7 +3102,7 @@ function url_image_size($url)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
-	global $smcFunc;
+	global $pmxcFunc;
 	static $loaded = false;
 
 	// Under SSI this function can be called more then once.  That can cause some problems.
@@ -3115,7 +3114,7 @@ function setupThemeContext($forceload = false)
 
 	$context['in_maintenance'] = !empty($maintenance);
 	$context['current_time'] = timeformat(time(), false);
-	$context['current_action'] = isset($_GET['action']) ? $smcFunc['htmlspecialchars']($_GET['action']) : '';
+	$context['current_action'] = isset($_GET['action']) ? $pmxcFunc['htmlspecialchars']($_GET['action']) : '';
 
 	// Get some news...
 	$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
@@ -3152,7 +3151,7 @@ function setupThemeContext($forceload = false)
 		if (($modSettings['gravatarEnabled'] && substr($user_info['avatar']['url'], 0, 11) == 'gravatar://') || !empty($modSettings['gravatarOverride']))
 		{
 			if (!empty($modSettings['gravatarAllowExtraEmail']) && stristr($user_info['avatar']['url'], 'gravatar://') && strlen($user_info['avatar']['url']) > 11)
-				$context['user']['avatar']['href'] = get_gravatar_url($smcFunc['substr']($user_info['avatar']['url'], 11));
+				$context['user']['avatar']['href'] = get_gravatar_url($pmxcFunc['substr']($user_info['avatar']['url'], 11));
 			else
 				$context['user']['avatar']['href'] = get_gravatar_url($user_info['email']);
 		}
@@ -3164,7 +3163,7 @@ function setupThemeContext($forceload = false)
 			$context['user']['avatar']['href'] = $user_info['avatar']['url'];
 		// Otherwise we assume it's server stored.
 		elseif ($user_info['avatar']['url'] != '')
-			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . $smcFunc['htmlspecialchars']($user_info['avatar']['url']);
+			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . $pmxcFunc['htmlspecialchars']($user_info['avatar']['url']);
 		// No avatar at all? Fine, we have a big fat default avatar ;)
 		else
 			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/default.png';
@@ -3208,7 +3207,7 @@ function setupThemeContext($forceload = false)
 	if ($context['show_pm_popup'])
 		addInlineJavascript('
 		jQuery(document).ready(function($) {
-			new smc_Popup({
+			new pmxc_Popup({
 				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
 				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
 				icon_class: \'generic_icons mail_new\'
@@ -3217,7 +3216,7 @@ function setupThemeContext($forceload = false)
 
 	// Add a generic "Are you sure?" confirmation message.
 	addInlineJavascript('
-	var smf_you_sure =' . JavaScriptEscape($txt['quickmod_confirm']) .';');
+	var pmx_you_sure =' . JavaScriptEscape($txt['quickmod_confirm']) .';');
 
 	// Now add the capping code for avatars.
 	if (!empty($modSettings['avatar_max_width_external']) && !empty($modSettings['avatar_max_height_external']) && !empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] == 'option_css_resize')
@@ -3240,14 +3239,14 @@ img.avatar { max-width: ' . $modSettings['avatar_max_width_external'] . 'px; max
 	$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
 	if (empty($settings['theme_version']))
-		addJavascriptVar('smf_scripturl', $scripturl);
+		addJavascriptVar('pmx_scripturl', $scripturl);
 
 	if (!isset($context['page_title']))
 		$context['page_title'] = '';
 
 	// Set some specific vars.
-	$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
-	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? $smcFunc['htmlspecialchars']($modSettings['meta_keywords']) : '';
+	$context['page_title_html_safe'] = $pmxcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? $pmxcFunc['htmlspecialchars']($modSettings['meta_keywords']) : '';
 	call_integration_hook('integrate_theme_context');
 }
 
@@ -3378,7 +3377,7 @@ function template_header()
 			if (!empty($modSettings['currentAttachmentUploadDir']))
 			{
 				if (!is_array($modSettings['attachmentUploadDir']))
-					$modSettings['attachmentUploadDir'] = smf_json_decode($modSettings['attachmentUploadDir'], true);
+					$modSettings['attachmentUploadDir'] = pmx_json_decode($modSettings['attachmentUploadDir'], true);
 				$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 			}
 			else
@@ -3679,7 +3678,7 @@ function template_css()
  */
 function custMinify($data, $type, $do_deferred = false)
 {
-	global $sourcedir, $smcFunc, $settings, $txt, $context;
+	global $sourcedir, $pmxcFunc, $settings, $txt, $context;
 
 	$types = array('css', 'js');
 	$type = !empty($type) && in_array($type, $types) ? $type : false;
@@ -3712,7 +3711,7 @@ function custMinify($data, $type, $do_deferred = false)
 	$toCreate = $cTempPath .'minified'. ($do_deferred ? '_deferred' : '') .'.'. $type;
 
 	// File has to exists, if it isn't try to create it.
-	if ((!file_exists($toCreate) && @fopen($toCreate, 'w') === false) || !smf_chmod($toCreate))
+	if ((!file_exists($toCreate) && @fopen($toCreate, 'w') === false) || !pmx_chmod($toCreate))
 	{
 		loadLanguage('Errors');
 		log_error(sprintf($txt['file_not_created'], $toCreate), 'general');
@@ -3779,7 +3778,7 @@ function custMinify($data, $type, $do_deferred = false)
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 
 	// Just make up a nice hash...
 	if ($new)
@@ -3789,7 +3788,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	// Left this for legacy.
 	if ($file_hash === '')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT file_hash
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
@@ -3797,11 +3796,11 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 				'id_attach' => $attachment_id,
 			));
 
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($pmxcFunc['db_num_rows']($request) === 0)
 			return false;
 
-		list ($file_hash) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($file_hash) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Still no hash? mmm...
@@ -3812,7 +3811,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = smf_json_decode($modSettings['attachmentUploadDir'], true);
+			$modSettings['attachmentUploadDir'] = pmx_json_decode($modSettings['attachmentUploadDir'], true);
 		$path = $modSettings['attachmentUploadDir'][$dir];
 	}
 	else
@@ -3967,13 +3966,13 @@ function host_from_ip($ip)
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
-	global $smcFunc, $context;
+	global $pmxcFunc, $context;
 
 	// Step 1: Remove entities/things we don't consider words:
 	$words = preg_replace('~(?:[\x0B\0' . ($context['utf8'] ? '\x{A0}' : '\xA0') . '\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~' . ($context['utf8'] ? 'u' : ''), ' ', strtr($text, array('<br>' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
-	$words = un_htmlspecialchars($smcFunc['strtolower']($words));
+	$words = un_htmlspecialchars($pmxcFunc['strtolower']($words));
 
 	// Step 3: Ready to split apart and index!
 	$words = explode(' ', $words);
@@ -4083,7 +4082,7 @@ function clean_cache($type = '')
 			break;
 		case 'zend':
 			if (function_exists('zend_shm_cache_clear'))
-				zend_shm_cache_clear('SMF');
+				zend_shm_cache_clear('PMX');
 			break;
 		case 'xcache':
 			if (function_exists('xcache_clear_cache'))
@@ -4163,7 +4162,7 @@ function setupMenuContext()
 	if (!$context['user']['is_guest'])
 	{
 		addInlineJavascript('
-	var user_menus = new smc_PopupMenu();
+	var user_menus = new pmxc_PopupMenu();
 	user_menus.add("profile", "' . $scripturl . '?action=profile;area=popup");
 	user_menus.add("alerts", "' . $scripturl . '?action=profile;area=alerts_popup;u='. $context['user']['id'] .'");', true);
 		if ($context['allow_pm'])
@@ -4180,7 +4179,7 @@ function setupMenuContext()
 			addInlineJavascript('
 	var new_alert_title = "' . $context['forum_name'] . '";
 	var alert_timeout = ' . $timeout . ';');
-			loadJavascriptFile('alerts.js', array(), 'smf_alerts');
+			loadJavascriptFile('alerts.js', array(), 'pmx_alerts');
 		}
 	}
 
@@ -4462,7 +4461,7 @@ function setupMenuContext()
 /**
  * Generate a random seed and ensure it's stored in settings.
  */
-function smf_seed_generator()
+function pmx_seed_generator()
 {
 	updateSettings(array('rand_seed' => microtime() * 1000000));
 }
@@ -4543,7 +4542,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function add_integration_function($hook, $function, $permanent = true, $file = '', $object = false)
 {
-	global $smcFunc, $modSettings;
+	global $pmxcFunc, $modSettings;
 
 	// Any objects?
 	if ($object)
@@ -4559,7 +4558,7 @@ function add_integration_function($hook, $function, $permanent = true, $file = '
 	// Is it going to be permanent?
 	if ($permanent)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
@@ -4567,8 +4566,8 @@ function add_integration_function($hook, $function, $permanent = true, $file = '
 				'variable' => $hook,
 			)
 		);
-		list ($current_functions) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($current_functions) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (!empty($current_functions))
 		{
@@ -4610,7 +4609,7 @@ add_integration_function
  */
 function remove_integration_function($hook, $function, $permanent = true, $file = '', $object = false)
 {
-	global $smcFunc, $modSettings;
+	global $pmxcFunc, $modSettings;
 
 	// Any objects?
 	if ($object)
@@ -4624,7 +4623,7 @@ function remove_integration_function($hook, $function, $permanent = true, $file 
 	$integration_call = $function;
 
 	// Get the permanent functions.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT value
 		FROM {db_prefix}settings
 		WHERE variable = {string:variable}',
@@ -4632,8 +4631,8 @@ function remove_integration_function($hook, $function, $permanent = true, $file 
 			'variable' => $hook,
 		)
 	);
-	list ($current_functions) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($current_functions) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($current_functions))
 	{
@@ -4666,7 +4665,7 @@ function remove_integration_function($hook, $function, $permanent = true, $file 
  */
 function call_helper($string, $return = false)
 {
-	global $context, $smcFunc, $txt, $db_show_debug;
+	global $context, $pmxcFunc, $txt, $db_show_debug;
 
 	// Really?
 	if (empty($string))
@@ -4682,7 +4681,7 @@ function call_helper($string, $return = false)
 		return false;
 
 	// Stay vitaminized my friends...
-	$string = $smcFunc['htmlspecialchars']($smcFunc['htmltrim']($string));
+	$string = $pmxcFunc['htmlspecialchars']($pmxcFunc['htmltrim']($string));
 
 	// The soon to be populated var.
 	$func = false;
@@ -4821,7 +4820,7 @@ function load_file($string)
  */
 function prepareLikesContext($topic)
 {
-	global $user_info, $smcFunc;
+	global $user_info, $pmxcFunc;
 
 	// Make sure we have something to work with.
 	if (empty($topic))
@@ -4836,7 +4835,7 @@ function prepareLikesContext($topic)
 	if (($temp = cache_get_data($cache_key, $ttl)) === null)
 	{
 		$temp = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT content_id
 			FROM {db_prefix}user_likes AS l
 				INNER JOIN {db_prefix}messages AS m ON (l.content_id = m.id_msg)
@@ -4848,7 +4847,7 @@ function prepareLikesContext($topic)
 				'topic' => $topic,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$temp[] = (int) $row['content_id'];
 
 		cache_put_data($cache_key, $temp, $ttl);
@@ -5018,7 +5017,7 @@ function fixchar__callback($matches)
 /**
  * Strips out invalid html entities, replaces others with html style &#123; codes
  *
- * Callback function used of preg_replace_callback in smcFunc $ent_checks, for example
+ * Callback function used of preg_replace_callback in pmxcFunc $ent_checks, for example
  * strpos, strlen, substr etc
  *
  * @param array $matches An array of matches (relevant info should be the 3rd item in the array)
@@ -5052,7 +5051,7 @@ function entity_fix__callback($matches)
  */
 function get_gravatar_url($email_address)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 	static $url_params = null;
 
 	if ($url_params === null)
@@ -5075,7 +5074,7 @@ function get_gravatar_url($email_address)
 	}
 	$http_method = !empty($modSettings['force_ssl']) && $modSettings['force_ssl'] == 2 ? 'https://secure' : 'http://www';
 
-	return $http_method . '.gravatar.com/avatar/' . md5($smcFunc['strtolower']($email_address)) . '?' . implode('&', $url_params);
+	return $http_method . '.gravatar.com/avatar/' . md5($pmxcFunc['strtolower']($email_address)) . '?' . implode('&', $url_params);
 }
 
 /**
@@ -5083,7 +5082,7 @@ function get_gravatar_url($email_address)
  *
  * @return array An array of timezone info.
  */
-function smf_list_timezones()
+function pmx_list_timezones()
 {
 	return array(
 		'' => '(Forum Default)',
@@ -5198,10 +5197,9 @@ function inet_dtop($bin)
 	if(empty($bin))
 		return '';
 
-	if(strpos($bin,'.')!==false || strpos($bin,':')!==false)
-		return $bin;
-
-	$ip_address = inet_ntop($bin);
+	$ip_address = @inet_ntop($bin);
+	if($ip_address === false)
+		return '';
 
 	return $ip_address;
 }
@@ -5482,7 +5480,7 @@ function safe_unserialize($str)
  * @param int $value Not needed, added for legacy reasons.
  * @return boolean  true if the file/dir is already writable or the function was able to make it writable, false if the function couldn't make the file/dir writable.
  */
-function smf_chmod($file, $value = 0)
+function pmx_chmod($file, $value = 0)
 {
 	// No file? no checks!
 	if (empty($file))
@@ -5516,13 +5514,13 @@ function smf_chmod($file, $value = 0)
 }
 
 /**
- * Wrapper function for smf_json_decode() with error handling.
+ * Wrapper function for pmx_json_decode() with error handling.
  * @param string $json The string to decode.
  * @param bool $returnAsArray To return the decoded string as an array or an object, SMF only uses Arrays but to keep on compatibility with json_decode its set to false as default.
  * @param bool $logIt To specify if the error will be logged if h}theres an error.
  * @return array Either an empty array or the decoded data as an array.
  */
-function smf_json_decode($json, $returnAsArray = false, $logIt = true)
+function pmx_json_decode($json, $returnAsArray = false, $logIt = true)
 {
 	global $txt;
 
@@ -5563,7 +5561,7 @@ function smf_json_decode($json, $returnAsArray = false, $logIt = true)
 	// Something went wrong!
 	if (!empty($jsonError) && $logIt)
 	{
-		// Being a wrapper means we lost our smf_error_handler() privileges :(
+		// Being a wrapper means we lost our pmx_error_handler() privileges :(
 		$jsonDebug = debug_backtrace();
 		$jsonDebug = $jsonDebug[0];
 		loadLanguage('Errors');

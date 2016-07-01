@@ -339,10 +339,10 @@ function template_modify_user_subscription()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 		</form>
 		<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var,
 			sSuggestId: \'name_subscriber\',
 			sControlId: \'name_control\',
 			sSearchType: \'member\',

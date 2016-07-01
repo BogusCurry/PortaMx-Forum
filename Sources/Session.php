@@ -16,7 +16,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -61,7 +61,7 @@ function loadSession()
 		// This is here to stop people from using bad junky PHPSESSIDs.
 		if (isset($_REQUEST[session_name()]) && preg_match('~^[A-Za-z0-9,-]{16,64}$~', $_REQUEST[session_name()]) == 0 && !isset($_COOKIE[session_name()]))
 		{
-			$session_id = md5(md5('smf_sess_' . time()) . mt_rand());
+			$session_id = md5(md5('pmx_sess_' . time()) . mt_rand());
 			$_REQUEST[session_name()] = $session_id;
 			$_GET[session_name()] = $session_id;
 			$_POST[session_name()] = $session_id;
@@ -129,13 +129,13 @@ function sessionClose()
  */
 function sessionRead($session_id)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return '';
 
 	// Look for it in the database.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT data
 		FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}
@@ -144,8 +144,8 @@ function sessionRead($session_id)
 			'session_id' => $session_id,
 		)
 	);
-	list ($sess_data) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($sess_data) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	return $sess_data != null ? $sess_data : '';
 }
@@ -159,13 +159,13 @@ function sessionRead($session_id)
  */
 function sessionWrite($session_id, $data)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
 
 	// First try to update an existing row...
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}sessions
 		SET data = {string:data}, last_update = {int:last_update}
 		WHERE session_id = {string:session_id}',
@@ -177,15 +177,15 @@ function sessionWrite($session_id, $data)
 	);
 
 	// If that didn't work, try inserting a new one.
-	if ($smcFunc['db_affected_rows']() == 0)
-		$result = $smcFunc['db_insert']('ignore',
+	if ($pmxcFunc['db_affected_rows']() == 0)
+		$result = $pmxcFunc['db_insert']('ignore',
 			'{db_prefix}sessions',
 			array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
 			array($session_id, $data, time()),
 			array('session_id')
 		);
 
-	return ($smcFunc['db_affected_rows']() == 0 ? false : true);
+	return ($pmxcFunc['db_affected_rows']() == 0 ? false : true);
 }
 
 /**
@@ -196,13 +196,13 @@ function sessionWrite($session_id, $data)
  */
 function sessionDestroy($session_id)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
 		return false;
 
 	// Just delete the row...
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}',
 		array(
@@ -222,14 +222,14 @@ function sessionDestroy($session_id)
  */
 function sessionGC($max_lifetime)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 
 	// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
 	if (!empty($modSettings['databaseSession_lifetime']) && ($max_lifetime <= 1440 || $modSettings['databaseSession_lifetime'] > $max_lifetime))
 		$max_lifetime = max($modSettings['databaseSession_lifetime'], 60);
 
 	// Clean up after yerself ;).
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE last_update < {int:last_update}',
 		array(
@@ -237,7 +237,7 @@ function sessionGC($max_lifetime)
 		)
 	);
 
-	return ($smcFunc['db_affected_rows']() == 0 ? false : true);
+	return ($pmxcFunc['db_affected_rows']() == 0 ? false : true);
 }
 
 ?>

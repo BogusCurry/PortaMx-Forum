@@ -40,7 +40,7 @@ if (!isset($modSettings['allow_no_censored']))
 	");
 
 	// Is it set for either "default" or the one they've set as default?
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if ($row['value'] == 1)
 		{
@@ -62,17 +62,17 @@ if (!isset($modSettings['allow_no_censored']))
 // We cannot do this twice
 if (@$modSettings['smfVersion'] < '2.1')
 {
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, id_cat
 		FROM {db_prefix}collapsed_categories');
 
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$inserts[] = array($row['id_member'], 1, 'collapse_category_' . $row['id_cat'], $row['id_cat']);
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($inserts))
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}themes',
 			array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
 			$inserts,
@@ -92,7 +92,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('topic_move_any', '1'
 
 ---# Adding new "browser_cache" setting
 ---{
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		array('browser_cache', '?beta21'),
@@ -120,7 +120,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxListItems'
 ---# Adding new "loginHistoryDays" setting
 ---{
 	if (!isset($modSettings['loginHistoryDays']))
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array('loginHistoryDays', '30'),
@@ -133,7 +133,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxListItems'
 ---{
 	$ripped_settings = array('show_modify', 'show_user_images', 'show_blurb', 'show_profile_buttons', 'subject_toggle', 'hide_post_group');
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
 		WHERE variable IN({array_string:ripped_settings})
@@ -144,11 +144,11 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxListItems'
 	));
 
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$inserts[] = array($row['variable'], $row['value']);
 
-	$smcFunc['db_free_result']($request);
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_free_result']($request);
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		$inserts,
@@ -160,7 +160,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxListItems'
 ---# Adding new "httponlyCookies" setting
 ---{
 	if (!isset($modSettings['httponlyCookies']))
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array('httponlyCookies', '1'),
@@ -171,7 +171,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxListItems'
 
 ---# Calculate appropriate hash cost
 ---{
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		array('bcrypt_hash_cost', hash_benchmark()),
@@ -226,8 +226,8 @@ if ($custom_av_dir != $GLOBALS['boarddir'] .'/custom_avatar')
 $request = upgrade_query("
 	SELECT MAX(id_attach)
 	FROM {$db_prefix}attachments");
-list ($step_progress['total']) = $smcFunc['db_fetch_row']($request);
-$smcFunc['db_free_result']($request);
+list ($step_progress['total']) = $pmxcFunc['db_fetch_row']($request);
+$pmxcFunc['db_free_result']($request);
 
 $_GET['a'] = isset($_GET['a']) ? (int) $_GET['a'] : 0;
 $step_progress['name'] = 'Converting legacy attachments';
@@ -254,10 +254,10 @@ while (!$is_done)
 		LIMIT $_GET[a], 100");
 
 	// Finished?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		$is_done = true;
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// The current folder.
 		$currentFolder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$row['id_folder']] : $modSettings['attachmentUploadDir'];
@@ -340,7 +340,7 @@ while (!$is_done)
 		{
 			$size = @getimagesize($newFile);
 			if (!empty($size['mime']))
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}attachments
 					SET mime_type = {string:mime_type}
 					WHERE id_attach = {int:id_attach}',
@@ -351,7 +351,7 @@ while (!$is_done)
 				);
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$_GET['a'] += 100;
 	$step_progress['current'] = $_GET['a'];
@@ -367,20 +367,20 @@ $attachs = array();
 // If id_member = 0, then it's not an avatar
 // If attachment_type = 0, then it's also not a thumbnail
 // Theory says there shouldn't be *that* many of these
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SELECT id_attach, mime_type, width, height
 	FROM {db_prefix}attachments
 	WHERE id_member = 0
 		AND attachment_type = 0');
-while ($row = $smcFunc['db_fetch_assoc']($request))
+while ($row = $pmxcFunc['db_fetch_assoc']($request))
 {
 	if (($row['width'] > 0 || $row['height'] > 0) && strpos($row['mime_type'], 'image') !== 0)
 		$attachs[] = $row['id_attach'];
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if (!empty($attachs))
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}attachments
 		SET width = 0,
 			height = 0
@@ -396,7 +396,7 @@ if (!empty($attachs))
 ---{
 if (!is_array($modSettings['attachmentUploadDir']) && is_dir($modSettings['attachmentUploadDir']))
 {
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}settings
 		SET value = {string:attach_dir}
 		WHERE variable = {string:uploadDir}',
@@ -405,7 +405,7 @@ if (!is_array($modSettings['attachmentUploadDir']) && is_dir($modSettings['attac
 			'uploadDir' => 'attachmentUploadDir'
 		)
 	);
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		array('currentAttachmentUploadDir', '1'),
@@ -418,7 +418,7 @@ elseif (empty($modSettings['json_done']))
 	$array = is_array($modSettings['attachmentUploadDir']) ? $modSettings['attachmentUploadDir'] : @unserialize($modSettings['attachmentUploadDir']);
 	if ($array !== false)
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}settings
 			SET value = {string:attach_dir}
 			WHERE variable = {string:uploadDir}',
@@ -511,7 +511,7 @@ VALUES
 ---{
 	if (!isset($modSettings['allow_expire_redirect']))
 	{
-		$get_info = $smcFunc['db_query']('', '
+		$get_info = $pmxcFunc['db_query']('', '
 			SELECT disabled
 			FROM {db_prefix}scheduled_tasks
 			WHERE task = {string:remove_redirect}',
@@ -520,10 +520,10 @@ VALUES
 			)
 		);
 
-		list($task_disabled) = $smcFunc['db_fetch_assoc']($get_info);
-		$smcFunc['db_free_result']($get_info);
+		list($task_disabled) = $pmxcFunc['db_fetch_assoc']($get_info);
+		$pmxcFunc['db_free_result']($get_info);
 
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array('allow_expire_redirect', !$task_disabled),
@@ -565,7 +565,7 @@ $member_groups = array(
 	'denied' => array(),
 );
 
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SELECT id_group, add_deny
 	FROM {db_prefix}permissions
 	WHERE permission = {string:permission}',
@@ -573,9 +573,9 @@ $request = $smcFunc['db_query']('', '
 		'permission' => 'manage_boards',
 	)
 );
-while ($row = $smcFunc['db_fetch_assoc']($request))
+while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 $member_groups = array_diff($member_groups['allowed'], $member_groups['denied']);
 
@@ -584,10 +584,10 @@ if (!empty($member_groups))
 	$count = count($member_groups);
 	$changes = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_board, member_groups
 		FROM {db_prefix}boards');
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$current_groups = explode(',', $row['member_groups']);
 		if (count(array_intersect($current_groups, $member_groups)) != $count)
@@ -596,12 +596,12 @@ if (!empty($member_groups))
 			$changes[$row['id_board']] = implode(',', $new_groups);
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($changes))
 	{
 		foreach ($changes as $id_board => $member_groups)
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}boards
 				SET member_groups = {string:member_groups}
 					WHERE id_board = {int:id_board}',
@@ -692,8 +692,8 @@ $step_progress['current'] = $_GET['a'];
 $limit = 100000;
 $is_done = false;
 
-$request = $smcFunc['db_query']('', 'SELECT COUNT(*) FROM {db_prefix}members');
-list($maxMembers) = $smcFunc['db_fetch_row']($request);
+$request = $pmxcFunc['db_query']('', 'SELECT COUNT(*) FROM {db_prefix}members');
+list($maxMembers) = $pmxcFunc['db_fetch_row']($request);
 
 while (!$is_done)
 {
@@ -701,7 +701,7 @@ while (!$is_done)
 	$inserts = array();
 
 	// Skip errors here so we don't croak if the columns don't exist...
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, notify_regularity, notify_send_body, notify_types
 		FROM {db_prefix}members
 		LIMIT {int:start}, {int:limit}',
@@ -711,18 +711,18 @@ while (!$is_done)
 			'limit' => $limit,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($pmxcFunc['db_num_rows']($request) != 0)
 	{
-		while ($row = $smcFunc['db_fetch_assoc']($existing_notify))
+		while ($row = $pmxcFunc['db_fetch_assoc']($existing_notify))
 		{
 			$inserts[] = array($row['id_member'], 'msg_receive_body', !empty($row['notify_send_body']) ? 1 : 0);
 			$inserts[] = array($row['id_member'], 'msg_notify_pref', $row['notify_regularity']);
 			$inserts[] = array($row['id_member'], 'msg_notify_type', $row['notify_types']);
 		}
-		$smcFunc['db_free_result']($existing_notify);
+		$pmxcFunc['db_free_result']($existing_notify);
 	}
 
-	$smcFunc['db_insert']('ignore',
+	$pmxcFunc['db_insert']('ignore',
 		'{db_prefix}user_alerts_prefs',
 		array('id_member' => 'int', 'alert_pref' => 'string', 'alert_value' => 'string'),
 		$inserts,
@@ -781,7 +781,7 @@ CHANGE `stars` `icons` VARCHAR(255) NOT NULL DEFAULT '';
 
 ---# Renaming default theme...
 UPDATE {$db_prefix}themes
-SET value = 'SMF Default Theme - Curve2'
+SET value = 'PortaMx Forum Default Theme'
 WHERE value LIKE 'SMF Default Theme%';
 ---#
 
@@ -815,7 +815,7 @@ SET id_theme = 0;
 /******************************************************************************/
 ---# Check the current saved names for icons and change them to the new name.
 ---{
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SELECT icons
 	FROM {db_prefix}membergroups
 	WHERE icons != {string:blank}',
@@ -825,7 +825,7 @@ $request = $smcFunc['db_query']('', '
 );
 $toMove = array();
 $toChange = array();
-while ($row = $smcFunc['db_fetch_assoc']($request))
+while ($row = $pmxcFunc['db_fetch_assoc']($request))
 {
 	if (strpos($row['icons'], 'star.gif') !== false)
 		$toChange[] = array(
@@ -854,10 +854,10 @@ while ($row = $smcFunc['db_fetch_assoc']($request))
 	else
 		$toMove[] = $row['icons'];
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 foreach ($toChange as $change)
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}membergroups
 		SET icons = {string:new}
 		WHERE icons = {string:old}',
@@ -896,12 +896,12 @@ if (file_exists($GLOBALS['boarddir'] . '/Themes/core'))
 			AND value ='$core_dir'");
 
 	// Don't do anything if this theme is already uninstalled
-	if ($smcFunc['db_num_rows']($theme_request) == 1)
+	if ($pmxcFunc['db_num_rows']($theme_request) == 1)
 	{
 		// Only one row, so no loop needed
-		$row = $smcFunc['db_fetch_row']($theme_request);
+		$row = $pmxcFunc['db_fetch_row']($theme_request);
 		$id_theme = $row[0];
-		$smcFunc['db_free_result']($theme_request);
+		$pmxcFunc['db_free_result']($theme_request);
 
 		$known_themes = explode(', ', $modSettings['knownThemes']);
 
@@ -950,7 +950,7 @@ INSERT INTO `{$db_prefix}custom_fields` (`col_name`, `field_name`, `field_desc`,
 
 ---# Add an order value to each existing cust profile field.
 ---{
-	$ocf = $smcFunc['db_query']('', '
+	$ocf = $pmxcFunc['db_query']('', '
 		SELECT id_field
 		FROM {db_prefix}custom_fields
 		WHERE field_order = 0');
@@ -958,11 +958,11 @@ INSERT INTO `{$db_prefix}custom_fields` (`col_name`, `field_name`, `field_desc`,
 		// We start counting from 6 because we already have the first 6 fields.
 		$fields_count = 6;
 
-		while ($row = $smcFunc['db_fetch_assoc']($ocf))
+		while ($row = $pmxcFunc['db_fetch_assoc']($ocf))
 		{
 			++$fields_count;
 
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}custom_fields
 				SET field_order = {int:field_count}
 				WHERE id_field = {int:id_field}',
@@ -972,7 +972,7 @@ INSERT INTO `{$db_prefix}custom_fields` (`col_name`, `field_name`, `field_desc`,
 				)
 			);
 		}
-		$smcFunc['db_free_result']($ocf);
+		$pmxcFunc['db_free_result']($ocf);
 ---}
 ---#
 
@@ -980,7 +980,7 @@ INSERT INTO `{$db_prefix}custom_fields` (`col_name`, `field_name`, `field_desc`,
 ---{
 // We cannot do this twice
 // See which columns we have
-$results = $smcFunc['db_list_columns']('{db_prefix}members');
+$results = $pmxcFunc['db_list_columns']('{db_prefix}members');
 $possible_columns = array('aim', 'icq', 'msn', 'yim', 'location', 'gender');
 
 // Find values that are in both arrays
@@ -992,8 +992,8 @@ if (!empty($select_columns))
 	$step_progress['name'] = 'Converting member values';
 	$step_progress['current'] = $_GET['a'];
 
-	$request = $smcFunc['db_query']('', 'SELECT COUNT(*) FROM {db_prefix}members');
-	list($maxMembers) = $smcFunc['db_fetch_row']($request);
+	$request = $pmxcFunc['db_query']('', 'SELECT COUNT(*) FROM {db_prefix}members');
+	list($maxMembers) = $pmxcFunc['db_fetch_row']($request);
 
 	$limit = 10000;
 	$is_done = false;
@@ -1003,7 +1003,7 @@ if (!empty($select_columns))
 		nextSubStep($substep);
 		$inserts = array();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member, '. implode(',', $select_columns) .'
 			FROM {db_prefix}members
 			LIMIT {int:start}, {int:limit}',
@@ -1013,7 +1013,7 @@ if (!empty($select_columns))
 		));
 
 		$genderTypes = array(1 => 'Male', 2 => 'Female');
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (!empty($row['aim']))
 				$inserts[] = array($row['id_member'], -1, 'cust_aolins', $row['aim']);
@@ -1033,10 +1033,10 @@ if (!empty($select_columns))
 			if (!empty($row['gender']) && isset($genderTypes[INTval($row['gender'])]))
 				$inserts[] = array($row['id_member'], -1, 'cust_gender', $genderTypes[INTval($row['gender'])]);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (!empty($inserts))
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}themes',
 				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
 				$inserts,
@@ -1068,14 +1068,14 @@ ALTER TABLE `{$db_prefix}members`
 ---{
 	if (empty($modSettings['displayFields']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT col_name, field_name, field_type, field_order, bbc, enclose, placement, show_mlist
 			FROM {db_prefix}custom_fields',
 			array()
 		);
 
 		$fields = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			$fields[] = array(
 				'col_name' => strtr($row['col_name'], array('|' => '', ';' => '')),
@@ -1089,9 +1089,9 @@ ALTER TABLE `{$db_prefix}members`
 			);
 		}
 
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array('displayFields', serialize($fields)),
@@ -1136,11 +1136,11 @@ if (@$modSettings['smfVersion'] < '2.1')
 		FROM {$db_prefix}board_permissions
 		WHERE permission = 'post_unapproved_topics'");
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$inserts[] = "($row[id_group], $row[id_board], 'post_draft', $row[add_deny])";
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -1155,11 +1155,11 @@ if (@$modSettings['smfVersion'] < '2.1')
 		FROM {$db_prefix}permissions
 		WHERE permission = 'pm_send'");
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$inserts[] = "($row[id_group], 'pm_draft', $row[add_deny])";
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -1175,13 +1175,20 @@ VALUES
 	('drafts_autosave_enabled', '1'),
 	('drafts_show_saved_enabled', '1'),
 	('drafts_keep_days', '7'),
-	('ecl_topofs', 36),
+	('ecl_topofs', 39),
 	('pmx_docserver', 'http://docserver.portamx.com/pmxforum/');
 
 INSERT INTO {$db_prefix}themes
 	(id_theme, variable, value)
 VALUES
 	('1', 'drafts_show_saved_enabled', '1');
+---#
+
+---# Inserting "package_servers"...
+INSERT IGNORE INTO {$db_prefix}package_servers
+	(id_server, name, url)
+VALUES
+	(2, 'PortaMx File Server', 'http://docserver.portamx.com');
 ---#
 
 /******************************************************************************/
@@ -1252,11 +1259,11 @@ WHERE variable = 'avatar_action_too_large'
 ---# Cleaning up the old Core Features page.
 ---{
 	// First get the original value
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT value
 		FROM {db_prefix}settings
 		WHERE variable = {literal:admin_features}');
-	if ($smcFunc['db_num_rows']($request) > 0 && $row = $smcFunc['db_fetch_assoc']($request))
+	if ($pmxcFunc['db_num_rows']($request) > 0 && $row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Some of these *should* already be set but you never know.
 		$new_settings = array();
@@ -1286,7 +1293,7 @@ WHERE variable = 'avatar_action_too_large'
 		// And now actually apply it.
 		if (!empty($new_settings))
 		{
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}settings',
 				array('variable' => 'string', 'value' => 'string'),
 				$new_settings,
@@ -1294,7 +1301,7 @@ WHERE variable = 'avatar_action_too_large'
 			);
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 ---}
 ---#
 
@@ -1321,11 +1328,10 @@ WHERE variable IN ('show_board_desc', 'no_new_reply_warning', 'display_quick_rep
 INSERT IGNORE INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, filetype, data)
 VALUES
-	(1, 'current-version.js', '/pmxforum/infofiles/', '', 'text/javascript', ''),
-	(2, 'detailed-version.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
-	(3, 'latest-news.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
-	(4, 'latest-versions.txt', '/pmxforum/infofiles/', '', 'text/plain', '');
-	(4, 'latest-versions.txt', '/pmxforum/infofiles/', '', 'text/plain', '');
+	(1, 'current-version.js', 'infofiles/', '', 'text/javascript', ''),
+	(2, 'detailed-version.js', 'infofiles/', '%1$s/', 'text/javascript', ''),
+	(3, 'latest-news.js', 'infofiles/', '%1$s/', 'text/javascript', ''),
+	(4, 'latest-versions.txt', 'infofiles/', '', 'text/plain', '');
 ---#
 
 /******************************************************************************/
@@ -1350,14 +1356,14 @@ $get_questions = upgrade_query("
 	FROM {$db_prefix}log_comments
 	WHERE comment_type = 'ver_test'");
 
-	while ($row = $smcFunc['db_fetch_assoc']($get_questions))
+	while ($row = $pmxcFunc['db_fetch_assoc']($get_questions))
 		$questions[] = array($language, $row['question'], serialize(array($row['answer'])));
 
-	$smcFunc['db_free_result']($get_questions);
+	$pmxcFunc['db_free_result']($get_questions);
 
 	if (!empty($questions))
 	{
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}qanda',
 			array('lngfile' => 'string', 'question' => 'string', 'answers' => 'string'),
 			$questions,
@@ -1422,12 +1428,12 @@ $request = upgrade_query("
 	FROM {$db_prefix}permissions
 	WHERE permission = 'profile_identity_own'");
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$inserts[] = "($row[id_group], 'profile_password_own', $row[add_deny])";
 	}
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($inserts))
 	{
@@ -1450,7 +1456,7 @@ $request = upgrade_query("
 	FROM {$db_prefix}permissions
 	WHERE permission = 'profile_extra_own'");
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$inserts[] = "($row[id_group], 'profile_blurb_own', $row[add_deny])";
 		$inserts[] = "($row[id_group], 'profile_displayed_name_own', $row[add_deny])";
@@ -1459,7 +1465,7 @@ $request = upgrade_query("
 		$inserts[] = "($row[id_group], 'profile_signature_own', $row[add_deny])";
 	}
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($inserts))
 	{
@@ -1501,11 +1507,11 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 ---# Moving label info to new tables and updating rules (May be slow!!!)
 ---{
 	// First see if we still have a message_labels column
-	$results = $smcFunc['db_list_columns']('{db_prefix}members');
+	$results = $pmxcFunc['db_list_columns']('{db_prefix}members');
 	if (in_array('message_labels', $results))
 	{
 		// They've still got it, so pull the label info
-		$get_labels = $smcFunc['db_query']('', '
+		$get_labels = $pmxcFunc['db_query']('', '
 			SELECT id_member, message_labels
 			FROM {db_prefix}members
 			WHERE message_labels != {string:blank}',
@@ -1516,7 +1522,7 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 
 		$inserts = array();
 		$label_info = array();
-		while ($row = $smcFunc['db_fetch_assoc']($get_labels))
+		while ($row = $pmxcFunc['db_fetch_assoc']($get_labels))
 		{
 			// Stick this in an array
 			$labels = explode(',', $row['message_labels']);
@@ -1529,7 +1535,7 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 			}
 		}
 
-		$smcFunc['db_free_result']($get_labels);
+		$pmxcFunc['db_free_result']($get_labels);
 
 		foreach ($label_info AS $id_member => $labels)
 		{
@@ -1541,14 +1547,14 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 
 		if (!empty($inserts))
 		{
-			$smcFunc['db_insert']('', '{db_prefix}pm_labels', array('id_member' => 'int', 'name' => 'string-30'), $inserts, array());
+			$pmxcFunc['db_insert']('', '{db_prefix}pm_labels', array('id_member' => 'int', 'name' => 'string-30'), $inserts, array());
 
 			// Clear this out for our next query below
 			$inserts = array();
 		}
 
 		// This is the easy part - update the inbox stuff
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}pm_recipients
 			SET in_inbox = {int:in_inbox}
 			WHERE FIND_IN_SET({int:minusone}, labels)',
@@ -1559,7 +1565,7 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 		);
 
 		// Now we go pull the new IDs for each label
-		$get_new_label_ids = $smcFunc['db_query']('', '
+		$get_new_label_ids = $pmxcFunc['db_query']('', '
 			SELECT *
 			FROM {db_prefix}pm_labels',
 			array(
@@ -1567,18 +1573,18 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 		);
 
 		$label_info_2 = array();
-		while ($label_row = $smcFunc['db_fetch_assoc']($get_new_label_ids))
+		while ($label_row = $pmxcFunc['db_fetch_assoc']($get_new_label_ids))
 		{
 			// Map the old index values to the new ID values...
 			$old_index = $label_info[$label_row['id_member']][$label_row['name']];
 			$label_info_2[$label_row['id_member']][$old_index] = $label_row['id_label'];
 		}
 
-		$smcFunc['db_free_result']($get_new_label_ids);
+		$pmxcFunc['db_free_result']($get_new_label_ids);
 
 		// Pull label info from pm_recipients
 		// Ignore any that are only in the inbox
-		$get_pm_labels = $smcFunc['db_query']('', '
+		$get_pm_labels = $pmxcFunc['db_query']('', '
 			SELECT id_pm, id_member, labels
 			FROM {db_prefix}pm_recipients
 			WHERE deleted = {int:not_deleted}
@@ -1589,7 +1595,7 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($get_pm_labels))
+		while ($row = $pmxcFunc['db_fetch_assoc']($get_pm_labels))
 		{
 			$labels = explode(',', $row['labels']);
 
@@ -1603,16 +1609,16 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 			}
 		}
 
-		$smcFunc['db_free_result']($get_pm_labels);
+		$pmxcFunc['db_free_result']($get_pm_labels);
 
 		// Insert the new data
 		if (!empty($inserts))
 		{
-			$smcFunc['db_insert']('', '{db_prefix}pm_labeled_messages', array('id_pm' => 'int', 'id_label' => 'int'), $inserts, array());
+			$pmxcFunc['db_insert']('', '{db_prefix}pm_labeled_messages', array('id_pm' => 'int', 'id_label' => 'int'), $inserts, array());
 		}
 
 		// Final step of this ridiculously massive process
-		$get_pm_rules = $smcFunc['db_query']('', '
+		$get_pm_rules = $pmxcFunc['db_query']('', '
 			SELECT id_member, id_rule, actions
 			FROM {db_prefix}pm_rules',
 			array(
@@ -1620,7 +1626,7 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 		);
 
 		// Go through the rules, unserialize the actions, then figure out if there's anything we can use
-		while ($row = $smcFunc['db_fetch_assoc']($get_pm_rules))
+		while ($row = $pmxcFunc['db_fetch_assoc']($get_pm_rules))
 		{
 			// Turn this INTo an array...
 			$actions = unserialize($row['actions']);
@@ -1638,7 +1644,7 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 			// Put this back into a string
 			$actions = serialize($actions);
 
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}pm_rules
 				SET actions = {string:actions}
 				WHERE id_rule = {int:id_rule}',
@@ -1649,11 +1655,11 @@ ADD COLUMN in_inbox TINYINT(3) NOT NULL DEFAULT '1';
 			);
 		}
 
-		$smcFunc['db_free_result']($get_pm_rules);
+		$pmxcFunc['db_free_result']($get_pm_rules);
 
 		// Lastly, we drop the old columns
-		$smcFunc['db_remove_column']('{db_prefix}members', 'message_labels');
-		$smcFunc['db_remove_column']('{db_prefix}pm_recipients', 'labels');
+		$pmxcFunc['db_remove_column']('{db_prefix}members', 'message_labels');
+		$pmxcFunc['db_remove_column']('{db_prefix}pm_recipients', 'labels');
 	}
 ---}
 ---#
@@ -1691,7 +1697,7 @@ ADD COLUMN modified_reason VARCHAR(255) NOT NULL DEFAULT '';
 
 	$illegal_permissions = array('calendar_edit_any', 'moderate_board', 'moderate_forum', 'send_email_to_members');
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}board_permissions
 		WHERE id_group = {int:guests}
 		AND permission IN ({array_string:illegal_board_perms})',
@@ -1701,7 +1707,7 @@ ADD COLUMN modified_reason VARCHAR(255) NOT NULL DEFAULT '';
 		)
 	);
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}permissions
 		WHERE id_group = {int:guests}
 		AND permission IN ({array_string:illegal_perms})',
@@ -1720,7 +1726,7 @@ ADD COLUMN modified_reason VARCHAR(255) NOT NULL DEFAULT '';
 ---{
 	if (empty($modSettings['mail_limit']))
 	{
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string-255', 'value' => 'string'),
 			array(
@@ -1740,7 +1746,7 @@ ADD COLUMN modified_reason VARCHAR(255) NOT NULL DEFAULT '';
 ---{
 	if (empty($modSettings['gravatarEnabled']))
 	{
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string-255', 'value' => 'string'),
 			array(
@@ -1767,7 +1773,7 @@ ALTER TABLE {$db_prefix}members ADD timezone VARCHAR(80) NOT NULL DEFAULT 'UTC';
 /******************************************************************************/
 ---# Removing the "send_email_to_members" permission
 ---{
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}permissions
 		WHERE permission = {literal:send_email_to_members}',
 		array()
@@ -1851,7 +1857,7 @@ ADD COLUMN tfa_required TINYINT(3) NOT NULL DEFAULT '0';
 ---# Add tfa_mode setting
 ---{
 	if (!isset($modSettings['tfa_mode']))
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array('tfa_mode', '1'),
@@ -2004,22 +2010,22 @@ DROP ip_high4;
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}log_actions
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("ALTER TABLE {$db_prefix}log_actions DROP COLUMN ip;");
@@ -2037,22 +2043,22 @@ ALTER TABLE {$db_prefix}log_actions ADD COLUMN ip VARBINARY(16);
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}log_banned
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("ALTER TABLE {$db_prefix}log_banned DROP COLUMN ip;");
@@ -2070,22 +2076,22 @@ ALTER TABLE {$db_prefix}log_banned ADD COLUMN ip VARBINARY(16);
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}log_errors
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("ALTER TABLE {$db_prefix}log_errors DROP COLUMN ip;");
@@ -2107,22 +2113,22 @@ CREATE INDEX {$db_prefix}log_errors_ip ON {$db_prefix}log_errors (ip);
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}members
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'member_ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 {
@@ -2141,19 +2147,19 @@ ADD COLUMN member_ip2 VARBINARY(16);
 ---# Create a ip index for old ips
 ---{
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}members
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'member_ip_old',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
 	upgrade_query("CREATE INDEX {$db_prefix}temp_old_ip ON {$db_prefix}members (member_ip_old);");
 	upgrade_query("CREATE INDEX {$db_prefix}temp_old_ip2 ON {$db_prefix}members (member_ip2_old);");
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 ---}
 ---#
 
@@ -2184,22 +2190,22 @@ DROP INDEX temp_old_ip2 on {$db_prefix}messages;
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}messages
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'poster_ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("ALTER TABLE {$db_prefix}messages CHANGE poster_ip poster_ip_old varchar(200);");
@@ -2214,16 +2220,16 @@ ALTER TABLE {$db_prefix}messages ADD COLUMN poster_ip VARBINARY(16);
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}members
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'member_ip_old',
 ));
-if ($smcFunc['db_num_rows']($request) == 0)
+if ($pmxcFunc['db_num_rows']($request) == 0)
 	$doChange = false;
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("CREATE INDEX {$db_prefix}temp_old_poster_ip ON {$db_prefix}messages (poster_ip_old);");
@@ -2259,22 +2265,22 @@ DROP INDEX temp_old_poster_ip on {$db_prefix}messages;
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}log_floodcontrol
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 {
@@ -2300,22 +2306,22 @@ ALTER TABLE {$db_prefix}log_floodcontrol ADD PRIMARY KEY (ip,log_type);
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}log_online
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("ALTER TABLE {$db_prefix}log_online DROP COLUMN ip;");
@@ -2333,22 +2339,22 @@ ALTER TABLE {$db_prefix}log_online ADD COLUMN ip VARBINARY(16);
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}log_reported_comments
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'member_ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("ALTER TABLE {$db_prefix}log_reported_comments DROP COLUMN member_ip;");
@@ -2366,22 +2372,22 @@ ALTER TABLE {$db_prefix}log_reported_comments ADD COLUMN member_ip VARBINARY(16)
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}member_logins
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 {
@@ -2403,22 +2409,22 @@ ALTER TABLE {$db_prefix}member_logins ADD COLUMN ip2 VARBINARY(16);
 ---{
 $doChange = true;
 // Get the details about this change.
-$request = $smcFunc['db_query']('', '
+$request = $pmxcFunc['db_query']('', '
 	SHOW FIELDS
 	FROM {db_prefix}log_online
 	WHERE Field = {string:name}',
 	array(
 		'name' => 'ip',
 ));
-if ($smcFunc['db_num_rows']($request) == 1)
+if ($pmxcFunc['db_num_rows']($request) == 1)
 {
-	list (, $columnType) = $smcFunc['db_fetch_row']($request);
+	list (, $columnType) = $pmxcFunc['db_fetch_row']($request);
 
 	// This hasn't been converted yet.
 	if (stripos($columnType, 'varbinary') !== false)
 		$doChange = false;
 }
-$smcFunc['db_free_result']($request);
+$pmxcFunc['db_free_result']($request);
 
 if ($doChange)
 	upgrade_query("ALTER TABLE {$db_prefix}log_online DROP COLUMN ip;");

@@ -1,5 +1,5 @@
 /*
-	smf_AdminIndex(oOptions)
+	pmx_AdminIndex(oOptions)
 	{
 		public init()
 		public loadAdminIndex()
@@ -8,7 +8,7 @@
 		public checkUpdateAvailable()
 	}
 
-	smf_ViewVersions(oOptions)
+	pmx_ViewVersions(oOptions)
 	{
 		public init()
 		public loadViewVersions
@@ -21,13 +21,13 @@
 
 
 // Handle the JavaScript surrounding the admin and moderation center.
-function smf_AdminIndex(oOptions)
+function pmx_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
 	this.init();
 }
 
-smf_AdminIndex.prototype.init = function ()
+pmx_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
 	var fHandlePageLoaded = function () {
@@ -36,7 +36,7 @@ smf_AdminIndex.prototype.init = function ()
 	addLoadEvent(fHandlePageLoaded);
 }
 
-smf_AdminIndex.prototype.loadAdminIndex = function ()
+pmx_AdminIndex.prototype.loadAdminIndex = function ()
 {
 	// Load the text box containing the latest news items.
 	if (this.opt.bLoadAnnouncements)
@@ -52,7 +52,7 @@ smf_AdminIndex.prototype.loadAdminIndex = function ()
 }
 
 
-smf_AdminIndex.prototype.setAnnouncements = function ()
+pmx_AdminIndex.prototype.setAnnouncements = function ()
 {
 	if (!('smfAnnouncements' in window) || !('length' in window.smfAnnouncements))
 		return;
@@ -64,7 +64,7 @@ smf_AdminIndex.prototype.setAnnouncements = function ()
 	setInnerHTML(document.getElementById(this.opt.sAnnouncementContainerId), this.opt.sAnnouncementTemplate.replace('%content%', sMessages));
 }
 
-smf_AdminIndex.prototype.showCurrentVersion = function ()
+pmx_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	if (!('smfVersion' in window))
 		return;
@@ -79,7 +79,7 @@ smf_AdminIndex.prototype.showCurrentVersion = function ()
 		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
 }
 
-smf_AdminIndex.prototype.checkUpdateAvailable = function ()
+pmx_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
 	if (!('smfUpdatePackage' in window))
 		return;
@@ -100,14 +100,14 @@ smf_AdminIndex.prototype.checkUpdateAvailable = function ()
 
 
 
-function smf_ViewVersions (oOptions)
+function pmx_ViewVersions (oOptions)
 {
 	this.opt = oOptions;
 	this.oSwaps = {};
 	this.init();
 }
 
-smf_ViewVersions.prototype.init = function ()
+pmx_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
@@ -117,12 +117,12 @@ smf_ViewVersions.prototype.init = function ()
 	addLoadEvent(fHandlePageLoaded);
 }
 
-smf_ViewVersions.prototype.loadViewVersions = function ()
+pmx_ViewVersions.prototype.loadViewVersions = function ()
 {
 	this.determineVersions();
 }
 
-smf_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
+pmx_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 {
 	// If it is undefined, or currently off, turn it on - otherwise off.
 	this.oSwaps[sName] = !(sName in this.oSwaps) || !this.oSwaps[sName];
@@ -136,7 +136,7 @@ smf_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 	return false;
 }
 
-smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
+pmx_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
 	var aVersions = aParts = new Array();
 	var aCompare = new Array(sCurrent, sTarget);
@@ -185,7 +185,7 @@ smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 	return false;
 }
 
-smf_ViewVersions.prototype.determineVersions = function ()
+pmx_ViewVersions.prototype.determineVersions = function ()
 {
 	var oHighYour = {
 		Sources: '??',
@@ -487,7 +487,7 @@ function selectMethod(element)
 function updatePreview()
 {
 	var currentImage = document.getElementById("preview");
-	currentImage.src = smf_smileys_url + "/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
+	currentImage.src = pmx_smileys_url + "/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
 }
 
 function swap_database_changes()
@@ -515,7 +515,7 @@ function testFTP()
 		sPostData = sPostData + (sPostData.length == 0 ? "" : "&") + oPostData[i] + "=" + escape(document.getElementById(oPostData[i]).value);
 
 	// Post the data out.
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + smf_session_var + '=' + smf_session_id, sPostData, testFTPResults);
+	sendXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + pmx_session_var + '=' + pmx_session_id, sPostData, testFTPResults);
 }
 
 function expandFolder(folderIdent, folderReal)
@@ -542,7 +542,7 @@ function expandFolder(folderIdent, folderReal)
 	else if (window.XMLHttpRequest)
 	{
 		ajax_indicator(true);
-		getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + smf_session_var + '=' + smf_session_id, onNewFolderReceived);
+		getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + pmx_session_var + '=' + pmx_session_id, onNewFolderReceived);
 	}
 	// Otherwise reload.
 	else

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -203,12 +203,12 @@ function EditWeights()
  */
 function EditSearchMethod()
 {
-	global $txt, $context, $modSettings, $smcFunc, $db_type, $db_prefix;
+	global $txt, $context, $modSettings, $pmxcFunc, $db_type, $db_prefix;
 
 	$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 	$context['page_title'] = $txt['search_method_title'];
 	$context['sub_template'] = 'select_search_method';
-	$context['supports_fulltext'] = $smcFunc['db_search_support']('fulltext');
+	$context['supports_fulltext'] = $pmxcFunc['db_search_support']('fulltext');
 
 	// Load any apis.
 	$context['search_apis'] = loadSearchAPIs();
@@ -223,27 +223,27 @@ function EditSearchMethod()
 		validateToken('admin-msm', 'get');
 
 		if ($db_type == 'postgresql') {
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DROP INDEX IF EXISTS {db_prefix}messages_ftx',
 				array(
 					'db_error_skip' => true,
 				)
 			);
 
-			$request = $smcFunc['db_query']('','
+			$request = $pmxcFunc['db_query']('','
 				SHOW default_text_search_config',
 				array()
 			);
 
-			if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+			if ($request !== false && $pmxcFunc['db_num_rows']($request) == 1)
 			{
-				$row = $smcFunc['db_fetch_assoc']($request);
+				$row = $pmxcFunc['db_fetch_assoc']($request);
 				$language_ftx = $row['default_text_search_config'];
 			}
 
 
-			$smcFunc['db_query']('', '
-				CREATE INDEX smf_messages_ftx ON smf_messages
+			$pmxcFunc['db_query']('', '
+				CREATE INDEX pmx_messages_ftx ON pmx_messages
 				USING gin(to_tsvector({string:language},body))',
 				array(
 					'language' => $language_ftx
@@ -253,7 +253,7 @@ function EditSearchMethod()
 		else
 		{
 			// Make sure it's gone before creating it.
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				ALTER TABLE {db_prefix}messages
 				DROP INDEX body',
 				array(
@@ -261,7 +261,7 @@ function EditSearchMethod()
 				)
 			);
 
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				ALTER TABLE {db_prefix}messages
 				ADD FULLTEXT body (body)',
 				array(
@@ -276,7 +276,7 @@ function EditSearchMethod()
 		checkSession('get');
 		validateToken('admin-msm', 'get');
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			ALTER TABLE {db_prefix}messages
 			DROP INDEX ' . implode(',
 			DROP INDEX ', $context['fulltext_index']),
@@ -299,10 +299,10 @@ function EditSearchMethod()
 		validateToken('admin-msm', 'get');
 
 		db_extend();
-		$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
+		$tables = $pmxcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
 		if (!empty($tables))
 		{
-			$smcFunc['db_search_query']('drop_words_table', '
+			$pmxcFunc['db_search_query']('drop_words_table', '
 				DROP TABLE {db_prefix}log_search_words',
 				array(
 				)
@@ -343,7 +343,7 @@ function EditSearchMethod()
 	if ($db_type == 'mysql' || $db_type == 'mysqli')
 	{
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SHOW TABLE STATUS
 				FROM {string:database_name}
 				LIKE {string:table_name}',
@@ -353,26 +353,26 @@ function EditSearchMethod()
 				)
 			);
 		else
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
 				array(
 					'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
 				)
 			);
-		if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+		if ($request !== false && $pmxcFunc['db_num_rows']($request) == 1)
 		{
 			// Only do this if the user has permission to execute this query.
-			$row = $smcFunc['db_fetch_assoc']($request);
+			$row = $pmxcFunc['db_fetch_assoc']($request);
 			$context['table_info']['data_length'] = $row['Data_length'];
 			$context['table_info']['index_length'] = $row['Index_length'];
 			$context['table_info']['fulltext_length'] = $row['Index_length'];
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 
 		// Now check the custom index table, if it exists at all.
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SHOW TABLE STATUS
 				FROM {string:database_name}
 				LIKE {string:table_name}',
@@ -382,33 +382,33 @@ function EditSearchMethod()
 				)
 			);
 		else
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
 				array(
 					'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
 				)
 			);
-		if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+		if ($request !== false && $pmxcFunc['db_num_rows']($request) == 1)
 		{
 			// Only do this if the user has permission to execute this query.
-			$row = $smcFunc['db_fetch_assoc']($request);
+			$row = $pmxcFunc['db_fetch_assoc']($request);
 			$context['table_info']['index_length'] += $row['Data_length'] + $row['Index_length'];
 			$context['table_info']['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 	}
 	elseif ($db_type == 'postgresql')
 	{
 		// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
 		//db_extend();
-		//$temp_tables = $smcFunc['db_list_tables']();
+		//$temp_tables = $pmxcFunc['db_list_tables']();
 		//foreach ($temp_tables as $table)
 		//	if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
-		//		$smcFunc['db_optimize_table']($table);
+		//		$pmxcFunc['db_optimize_table']($table);
 
 		// PostGreSql has some hidden sizes.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT
 				indexname,
 				pg_relation_size(quote_ident(t.tablename)::text) AS table_size,
@@ -431,9 +431,9 @@ function EditSearchMethod()
 			)
 		);
 
-		if ($request !== false && $smcFunc['db_num_rows']($request) > 0)
+		if ($request !== false && $pmxcFunc['db_num_rows']($request) > 0)
 		{
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if ($row['indexname'] == $db_prefix . 'messages_ftx')
 				{
@@ -447,7 +447,7 @@ function EditSearchMethod()
 					$context['table_info']['custom_index_length'] = (int) $row['index_size'];
 				}
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 		else
 			// Didn't work for some reason...
@@ -496,7 +496,7 @@ function EditSearchMethod()
  */
 function CreateMessageIndex()
 {
-	global $modSettings, $context, $smcFunc, $db_prefix, $txt;
+	global $modSettings, $context, $pmxcFunc, $db_prefix, $txt;
 
 	// Scotty, we need more time...
 	@set_time_limit(600);
@@ -527,7 +527,7 @@ function CreateMessageIndex()
 
 	if (isset($_REQUEST['resume']) && !empty($modSettings['search_custom_index_resume']))
 	{
-		$context['index_settings'] = smf_json_decode($modSettings['search_custom_index_resume'], true);
+		$context['index_settings'] = pmx_json_decode($modSettings['search_custom_index_resume'], true);
 		$context['start'] = (int) $context['index_settings']['resume_at'];
 		unset($context['index_settings']['resume_at']);
 		$context['step'] = 1;
@@ -562,17 +562,17 @@ function CreateMessageIndex()
 		if ($context['start'] === 0)
 		{
 			db_extend();
-			$tables = $smcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
+			$tables = $pmxcFunc['db_list_tables'](false, $db_prefix . 'log_search_words');
 			if (!empty($tables))
 			{
-				$smcFunc['db_search_query']('drop_words_table', '
+				$pmxcFunc['db_search_query']('drop_words_table', '
 					DROP TABLE {db_prefix}log_search_words',
 					array(
 					)
 				);
 			}
 
-			$smcFunc['db_create_word_search']($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
+			$pmxcFunc['db_create_word_search']($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
 
 			// Temporarily switch back to not using a search index.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
@@ -588,7 +588,7 @@ function CreateMessageIndex()
 			'todo' => 0,
 		);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_msg >= {int:starting_id} AS todo, COUNT(*) AS num_messages
 			FROM {db_prefix}messages
 			GROUP BY todo',
@@ -596,7 +596,7 @@ function CreateMessageIndex()
 				'starting_id' => $context['start'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
 
 		if (empty($num_messages['todo']))
@@ -612,7 +612,7 @@ function CreateMessageIndex()
 			while (time() < $stop)
 			{
 				$inserts = array();
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT id_msg, body
 					FROM {db_prefix}messages
 					WHERE id_msg BETWEEN {int:starting_id} AND {int:ending_id}
@@ -625,7 +625,7 @@ function CreateMessageIndex()
 				);
 				$forced_break = false;
 				$number_processed = 0;
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				{
 					// In theory it's possible for one of these to take friggin ages so add more timeout protection.
 					if ($stop < time())
@@ -642,12 +642,12 @@ function CreateMessageIndex()
 				}
 				$num_messages['done'] += $number_processed;
 				$num_messages['todo'] -= $number_processed;
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 
 				$context['start'] += $forced_break ? $number_processed : $messages_per_batch;
 
 				if (!empty($inserts))
-					$smcFunc['db_insert']('ignore',
+					$pmxcFunc['db_insert']('ignore',
 						'{db_prefix}log_search_words',
 						array('id_word' => 'int', 'id_msg' => 'int'),
 						$inserts,
@@ -682,7 +682,7 @@ function CreateMessageIndex()
 
 			while (time() < $stop)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT id_word, COUNT(id_word) AS num_words
 					FROM {db_prefix}log_search_words
 					WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
@@ -694,14 +694,14 @@ function CreateMessageIndex()
 						'minimum_messages' => $max_messages,
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
 					$stop_words[] = $row['id_word'];
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 
 				updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 
 				if (!empty($stop_words))
-					$smcFunc['db_query']('', '
+					$pmxcFunc['db_query']('', '
 						DELETE FROM {db_prefix}log_search_words
 						WHERE id_word in ({array_int:stop_words})',
 						array(
@@ -726,7 +726,7 @@ function CreateMessageIndex()
 		$context['sub_template'] = 'create_index_done';
 
 		updateSettings(array('search_index' => 'custom', 'search_custom_index_config' => json_encode($context['index_settings'])));
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}settings
 			WHERE variable = {string:search_custom_index_resume}',
 			array(
@@ -793,13 +793,13 @@ function loadSearchAPIs()
  */
 function detectFulltextIndex()
 {
-	global $smcFunc, $context, $db_prefix;
+	global $pmxcFunc, $context, $db_prefix;
 
 	// We need this for db_get_version
 	db_extend();
 
-	if ($smcFunc['db_title'] == 'PostgreSQL'){
-		$request = $smcFunc['db_query']('', '
+	if ($pmxcFunc['db_title'] == 'PostgreSQL'){
+		$request = $pmxcFunc['db_query']('', '
 			SELECT
 				indexname
 			FROM pg_tables t
@@ -816,31 +816,31 @@ function detectFulltextIndex()
 				'messages_ftx' => $db_prefix.'messages_ftx',
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$context['fulltext_index'][] = $row['indexname'];
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SHOW INDEX
 			FROM {db_prefix}messages',
 			array(
 			)
 		);
 		$context['fulltext_index'] = '';
-		if ($request !== false || $smcFunc['db_num_rows']($request) != 0)
+		if ($request !== false || $pmxcFunc['db_num_rows']($request) != 0)
 		{
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
 				$context['fulltext_index'][] = $row['Key_name'];
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			if (is_array($context['fulltext_index']))
 				$context['fulltext_index'] = array_unique($context['fulltext_index']);
 		}
 
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 			SHOW TABLE STATUS
 			FROM {string:database_name}
 			LIKE {string:table_name}',
@@ -850,7 +850,7 @@ function detectFulltextIndex()
 			)
 			);
 		else
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
 			array(
@@ -860,10 +860,10 @@ function detectFulltextIndex()
 
 		if ($request !== false)
 		{
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			if (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam' && !(strtolower($row['Engine']) == 'innodb' && version_compare($smcFunc['db_get_version'], '5.6.4', '>=')))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
+			if (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam' && !(strtolower($row['Engine']) == 'innodb' && version_compare($pmxcFunc['db_get_version'], '5.6.4', '>=')))
 				$context['cannot_create_fulltext'] = true;
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 	}
 }

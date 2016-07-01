@@ -1,13 +1,13 @@
 <?php
 
 /**
- * This is a slightly strange file. It is not designed to ever be run directly from within SMF's
+ * This is a slightly strange file. It is not designed to ever be run directly from within PMX's
  * conventional running, but called externally to facilitate background tasks. It can be called
  * either directly or via cron, and in either case will completely ignore anything supplied
  * via command line, or $_GET, $_POST, $_COOKIE etc. because those things should never affect the
  * running of this script.
  *
- * Because of the way this runs, etc. we do need some of SMF but not everything to try to keep this
+ * Because of the way this runs, etc. we do need some of PMX but not everything to try to keep this
  * running a little bit faster.
  *
  * PortaMx Forum
@@ -19,7 +19,7 @@
  * @version 2.1 Beta 4
  */
 
-define('SMF', 'BACKGROUND');
+define('PMX', 'BACKGROUND');
 define('FROM_CLI', empty($_SERVER['REQUEST_METHOD']));
 
 // This one setting is worth bearing in mind. If you are running this from proper cron, make sure you
@@ -35,7 +35,7 @@ global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $boarddir, $sourcedir, $webmaster_email;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $db_connection, $modSettings, $context, $sc, $user_info, $txt;
-global $smcFunc, $ssi_db_user, $scripturl, $db_passwd, $cachedir;
+global $pmxcFunc, $ssi_db_user, $scripturl, $db_passwd, $cachedir;
 
 define('TIME_START', microtime(true));
 
@@ -77,8 +77,8 @@ require_once($sourcedir . '/Errors.php');
 require_once($sourcedir . '/Load.php');
 require_once($sourcedir . '/Subs.php');
 
-// Create a variable to store some SMF specific functions in.
-$smcFunc = array();
+// Create a variable to store some PMX specific functions in.
+$pmxcFunc = array();
 
 // This is our general bootstrap, a la SSI.php but with a few differences.
 unset ($db_show_debug);
@@ -86,7 +86,7 @@ loadDatabase();
 reloadSettings();
 
 // Just in case there's a problem...
-set_error_handler('smf_error_handler_cron');
+set_error_handler('pmx_error_handler_cron');
 $sc = '';
 $_SERVER['QUERY_STRING'] = '';
 $_SERVER['REQUEST_URL'] = FROM_CLI ? 'CLI cron.php' : $boardurl . '/cron.php';
@@ -101,7 +101,7 @@ while ($task_details = fetch_task())
 	$result = perform_task($task_details);
 	if ($result)
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}background_tasks
 			WHERE id_task = {int:task}',
 			array(
@@ -119,7 +119,7 @@ exit;
  */
 function fetch_task()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// Check we haven't run over our time limit.
 	if (microtime(true) - TIME_START > MAX_CRON_TIME)
@@ -128,7 +128,7 @@ function fetch_task()
 	// Try to find a task. Specifically, try to find one that hasn't been claimed previously, or failing that,
 	// a task that was claimed but failed for whatever reason and failed long enough ago. We should not care
 	// what task it is, merely that it is one in the queue, the order is irrelevant.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_task, task_file, task_class, task_data, claimed_time
 		FROM {db_prefix}background_tasks
 		WHERE claimed_time < {int:claim_limit}
@@ -137,11 +137,11 @@ function fetch_task()
 			'claim_limit' => time() - MAX_CLAIM_THRESHOLD,
 		)
 	);
-	if ($row = $smcFunc['db_fetch_assoc']($request))
+	if ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// We found one. Let's try and claim it immediately.
-		$smcFunc['db_free_result']($request);
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_free_result']($request);
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}background_tasks
 			SET claimed_time = {int:new_claimed}
 			WHERE id_task = {int:task}
@@ -153,7 +153,7 @@ function fetch_task()
 			)
 		);
 		// Could we claim it? If so, return it back.
-		if ($smcFunc['db_affected_rows']() != 0)
+		if ($pmxcFunc['db_affected_rows']() != 0)
 		{
 			// Update the time and go back.
 			$row['claimed_time'] = time();
@@ -168,7 +168,7 @@ function fetch_task()
 	else
 	{
 		// No dice. Clean up and go home.
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 		return false;
 	}
 }
@@ -198,7 +198,7 @@ function perform_task($task_details)
 	}
 
 	// All background tasks need to be classes.
-	elseif (class_exists($task_details['task_class']) && is_subclass_of($task_details['task_class'], 'SMF_BackgroundTask'))
+	elseif (class_exists($task_details['task_class']) && is_subclass_of($task_details['task_class'], 'PMX_BackgroundTask'))
 	{
 		$details = empty($task_details['task_data']) ? array() : json_decode($task_details['task_data'], true);
 		$bgtask = new $task_details['task_class']($details);
@@ -240,7 +240,7 @@ function cleanRequest_cron()
  * @param int $line What line of the specified file the error occurred on
  * @return void
  */
-function smf_error_handler_cron($error_level, $error_string, $file, $line)
+function pmx_error_handler_cron($error_level, $error_string, $file, $line)
 {
 	global $modSettings;
 
@@ -274,9 +274,9 @@ function obExit_cron()
 // We would like this to be defined, but we don't want to have to load more stuff than necessary.
 // Thus we declare it here, and any legitimate background task must implement this.
 /**
- * Class SMF_BackgroundTask
+ * Class PMX_BackgroundTask
  */
-abstract class SMF_BackgroundTask
+abstract class PMX_BackgroundTask
 {
 
 	/**

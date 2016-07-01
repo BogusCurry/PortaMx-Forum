@@ -49,7 +49,7 @@ $timeLimitThreshold = 3;
 $upgrade_path = dirname(__FILE__);
 $upgradeurl = $_SERVER['PHP_SELF'];
 // Where the SMF images etc are kept.
-$smfsite = 'http://www.simplemachines.org/smf';
+$smfsite = 'http://portamx.com';
 // Disable the need for admins to login?
 $disable_security = false;
 // How long, in seconds, must admin be inactive to allow someone else to run?
@@ -563,7 +563,7 @@ if (!isset($modSettings['smfVersion']))
 // This only exists if we're on SMF ;)
 if (isset($modSettings['smfVersion']))
 {
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
 		WHERE id_theme = {int:id_theme}
@@ -576,9 +576,9 @@ if (isset($modSettings['smfVersion']))
 			'db_error_skip' => true,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$modSettings[$row['variable']] = $row['value'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 }
 
 if (!isset($modSettings['theme_url']))
@@ -594,7 +594,7 @@ if (!isset($settings['default_theme_dir']))
 
 $upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['smfVersion']) ? 'Updating Your SMF Install!' : 'Upgrading from YaBB SE!';
+$upcontext['page_title'] = isset($modSettings['smfVersion']) ? 'Updating Your Forum Install!' : 'Upgrading from YaBB SE!';
 
 // Have we got tracking data - if so use it (It will be clean!)
 if (isset($_GET['data']))
@@ -706,7 +706,7 @@ function upgradeExit($fallThrough = false)
 			if (function_exists('debug_print_backtrace'))
 				debug_print_backtrace();
 
-			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the SMF support forum to tell the Developers that they\'ve made a boo boo; they\'ll get you up and running again.';
+			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the PortaMx support forum to tell the Developers that they\'ve made a boo boo; they\'ll get you up and running again.';
 			flush();
 			die();
 		}
@@ -803,27 +803,27 @@ function redirectLocation($location, $addForm = true)
 function loadEssentialData()
 {
 	global $db_server, $db_user, $db_passwd, $db_name, $db_connection, $db_prefix, $db_character_set, $db_type;
-	global $modSettings, $sourcedir, $smcFunc;
+	global $modSettings, $sourcedir, $pmxcFunc;
 
 	// Do the non-SSI stuff...
 	if (function_exists('set_magic_quotes_runtime'))
 		@set_magic_quotes_runtime(0);
 
 	error_reporting(E_ALL);
-	define('SMF', 1);
+	define('PMX', 1);
 
 	// Start the session.
 	if (@ini_get('session.save_handler') == 'user')
 		@ini_set('session.save_handler', 'files');
 	@session_start();
 
-	if (empty($smcFunc))
-		$smcFunc = array();
+	if (empty($pmxcFunc))
+		$pmxcFunc = array();
 
 	// We need this for authentication and some upgrade code
 	require_once($sourcedir . '/Subs-Auth.php');
 
-	$smcFunc['strtolower'] = 'smf_strtolower';
+	$pmxcFunc['strtolower'] = 'pmx_strtolower';
 
 
 	// Initialize everything...
@@ -837,14 +837,14 @@ function loadEssentialData()
 		require_once($sourcedir . '/Subs-Db-' . $db_type . '.php');
 
 		// Make the connection...
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
+		$db_connection = pmx_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true));
 
 		// Oh dear god!!
 		if ($db_connection === null)
 			die('Unable to connect to database - please check username and password are correct in Settings.php');
 
 		if (($db_type == 'mysql' || $db_type == 'mysqli') && isset($db_character_set) && preg_match('~^\w+$~', $db_character_set) === 1)
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 			SET NAMES ' . $db_character_set,
 			array(
 				'db_error_skip' => true,
@@ -852,7 +852,7 @@ function loadEssentialData()
 		);
 
 		// Load the modSettings data...
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array(
@@ -860,9 +860,9 @@ function loadEssentialData()
 			)
 		);
 		$modSettings = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$modSettings[$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 	{
@@ -939,6 +939,20 @@ function initialize_inputs()
 		// 2.0 Sources files not in 2.1+
 		@unlink(dirname(__FILE__) . '/Sources/DumpDatabase.php');
 		@unlink(dirname(__FILE__) . '/Sources/LockTopic.php');
+		@unlink(dirname(__FILE__) . '/Sources/DBExtra-sqlite.php');
+		@unlink(dirname(__FILE__) . '/Sources/DBPackages-sqlite.php');
+		@unlink(dirname(__FILE__) . '/Sources/DBSearch-sqlite.php');
+		@unlink(dirname(__FILE__) . '/Sources/Karma.php');
+		@unlink(dirname(__FILE__) . '/Sources/SendTopic.php');
+		@unlink(dirname(__FILE__) . '/Sources/Subs-DB-sqlite.php');
+		@unlink(dirname(__FILE__) . '/Sources/Subs-OpenID.php');
+
+		// 2.0 Template files not in 2.1+
+		@unlink(dirname(__FILE__) . '/Themes/default/SendTopic.template.php');
+		@unlink(dirname(__FILE__) . '/Themes/default/Wireless.template.php');
+
+		// 2.0 Language files not in 2.1+
+		@unlink(dirname(__FILE__) . '/Themes/default/languages/'. glob('Wireless.*.php'));
 
 		header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
 		exit;
@@ -972,7 +986,7 @@ function initialize_inputs()
 function WelcomeLogin()
 {
 	global $boarddir, $sourcedir, $modSettings, $cachedir, $upgradeurl, $upcontext;
-	global $smcFunc, $db_type, $databases, $txt, $boardurl;
+	global $pmxcFunc, $db_type, $databases, $txt, $boardurl;
 
 	$upcontext['sub_template'] = 'welcome_message';
 
@@ -1004,22 +1018,22 @@ function WelcomeLogin()
 
 	// Do they meet the install requirements?
 	if (!php_version_check())
-		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets SMF\'s minimum installations requirements.<br><br>Please ask your host to upgrade.');
+		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets PortaMx Forum minimum installations requirements.<br><br>Please ask your host to upgrade.');
 
 	if (!db_version_check())
-		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of SMF.<br><br>Please ask your host to upgrade.');
+		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of PortaMx Forum.<br><br>Please ask your host to upgrade.');
 
 	// Do some checks to make sure they have proper privileges
 	db_extend('packages');
 
 	// CREATE
-	$create = $smcFunc['db_create_table']('{db_prefix}priv_check', array(array('name' => 'id_test', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true)), array(array('columns' => array('id_test'), 'type' => 'primary')), array(), 'overwrite');
+	$create = $pmxcFunc['db_create_table']('{db_prefix}priv_check', array(array('name' => 'id_test', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true)), array(array('columns' => array('id_test'), 'type' => 'primary')), array(), 'overwrite');
 
 	// ALTER
-	$alter = $smcFunc['db_add_column']('{db_prefix}priv_check', array('name' => 'txt', 'type' => 'varchar', 'size' => 4, 'null' => false, 'default' => ''));
+	$alter = $pmxcFunc['db_add_column']('{db_prefix}priv_check', array('name' => 'txt', 'type' => 'varchar', 'size' => 4, 'null' => false, 'default' => ''));
 
 	// DROP
-	$drop = $smcFunc['db_drop_table']('{db_prefix}priv_check');
+	$drop = $pmxcFunc['db_drop_table']('{db_prefix}priv_check');
 
 	// Sorry... we need CREATE, ALTER and DROP
 	if (!$create || !$alter || !$drop)
@@ -1120,7 +1134,7 @@ function WelcomeLogin()
 function checkLogin()
 {
 	global $modSettings, $upcontext, $disable_security;
-	global $smcFunc, $db_type, $support_js;
+	global $pmxcFunc, $db_type, $support_js;
 
 	// Are we trying to login?
 	if (isset($_POST['contbutt']) && (!empty($_POST['user']) || $disable_security))
@@ -1133,7 +1147,7 @@ function checkLogin()
 		$oldDB = false;
 		if (empty($db_type) || $db_type == 'mysql' || $db_type == 'mysqli')
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SHOW COLUMNS
 				FROM {db_prefix}members
 				LIKE {string:member_name}',
@@ -1142,16 +1156,16 @@ function checkLogin()
 					'db_error_skip' => true,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) != 0)
+			if ($pmxcFunc['db_num_rows']($request) != 0)
 				$oldDB = true;
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 
 		// Get what we believe to be their details.
 		if (!$disable_security)
 		{
 			if ($oldDB)
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT id_member, memberName AS member_name, passwd, id_group,
 					additionalGroups AS additional_groups, lngfile
 					FROM {db_prefix}members
@@ -1162,7 +1176,7 @@ function checkLogin()
 					)
 				);
 			else
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT id_member, member_name, passwd, id_group, additional_groups, lngfile
 					FROM {db_prefix}members
 					WHERE member_name = {string:member_name}',
@@ -1171,9 +1185,9 @@ function checkLogin()
 						'db_error_skip' => true,
 					)
 				);
-			if ($smcFunc['db_num_rows']($request) != 0)
+			if ($pmxcFunc['db_num_rows']($request) != 0)
 			{
-				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $smcFunc['db_fetch_row']($request);
+				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $pmxcFunc['db_fetch_row']($request);
 
 				$groups = explode(',', $addGroups);
 				$groups[] = $id_group;
@@ -1185,7 +1199,7 @@ function checkLogin()
 			}
 			else
 				$upcontext['username_incorrect'] = true;
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 		$upcontext['username'] = $_POST['user'];
 
@@ -1223,7 +1237,7 @@ function checkLogin()
 				// Do we actually have permission?
 				if (!in_array(1, $groups))
 				{
-					$request = $smcFunc['db_query']('', '
+					$request = $pmxcFunc['db_query']('', '
 						SELECT permission
 						FROM {db_prefix}permissions
 						WHERE id_group IN ({array_int:groups})
@@ -1234,9 +1248,9 @@ function checkLogin()
 							'db_error_skip' => true,
 						)
 					);
-					if ($smcFunc['db_num_rows']($request) == 0)
+					if ($pmxcFunc['db_num_rows']($request) == 0)
 						return throw_error('You need to be an admin to perform an upgrade!');
-					$smcFunc['db_free_result']($request);
+					$pmxcFunc['db_free_result']($request);
 				}
 
 				$upcontext['user']['id'] = $id_member;
@@ -1290,7 +1304,7 @@ function checkLogin()
 // Step 1: Do the maintenance and backup.
 function UpgradeOptions()
 {
-	global $db_prefix, $command_line, $modSettings, $is_debug, $smcFunc, $packagesdir, $tasksdir;
+	global $db_prefix, $command_line, $modSettings, $is_debug, $pmxcFunc, $packagesdir, $tasksdir;
 	global $boarddir, $boardurl, $sourcedir, $maintenance, $cachedir, $upcontext, $db_type, $db_server, $db_last_error;
 
 	$upcontext['sub_template'] = 'upgrade_options';
@@ -1298,7 +1312,7 @@ function UpgradeOptions()
 
 	db_extend('packages');
 	$upcontext['karma_installed'] = array('good' => false, 'bad' => false);
-	$member_columns = $smcFunc['db_list_columns']('{db_prefix}members');
+	$member_columns = $pmxcFunc['db_list_columns']('{db_prefix}members');
 
 	$upcontext['karma_installed']['good'] = in_array('karma_good', $member_columns);
 	$upcontext['karma_installed']['bad'] = in_array('karma_bad', $member_columns);
@@ -1312,51 +1326,11 @@ function UpgradeOptions()
 	require_once($sourcedir . '/Subs-Admin.php');
 	updateSettingsFile(array('image_proxy_secret' => '\'' . substr(sha1(mt_rand()), 0, 20) . '\''));
 
-	// Firstly, if they're enabling SM stat collection just do it.
-	if (!empty($_POST['stats']) && substr($boardurl, 0, 16) != 'http://localhost' && empty($modSettings['allow_sm_stats']))
-	{
-		// Attempt to register the site etc.
-		$fp = @fsockopen('www.simplemachines.org', 80, $errno, $errstr);
-		if ($fp)
-		{
-			$out = 'GET /smf/stats/register_stats.php?site=' . base64_encode($boardurl) . ' HTTP/1.1' . "\r\n";
-			$out .= 'Host: www.simplemachines.org' . "\r\n";
-			$out .= 'Connection: Close' . "\r\n\r\n";
-			fwrite($fp, $out);
-
-			$return_data = '';
-			while (!feof($fp))
-				$return_data .= fgets($fp, 128);
-
-			fclose($fp);
-
-			// Get the unique site ID.
-			preg_match('~SITE-ID:\s(\w{10})~', $return_data, $ID);
-
-			if (!empty($ID[1]))
-				$smcFunc['db_insert']('replace',
-					$db_prefix . 'settings',
-					array('variable' => 'string', 'value' => 'string'),
-					array('allow_sm_stats', $ID[1]),
-					array('variable')
-				);
-		}
-	}
-	else
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}settings
-			WHERE variable = {string:allow_sm_stats}',
-			array(
-				'allow_sm_stats' => 'allow_sm_stats',
-				'db_error_skip' => true,
-			)
-		);
-
 	// Deleting old karma stuff?
 	if (!empty($_POST['delete_karma']))
 	{
 		// Delete old settings vars.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}settings
 			WHERE variable IN ({array_string:karma_vars})',
 			array(
@@ -1366,7 +1340,7 @@ function UpgradeOptions()
 
 		// Cleaning up old karma member settings.
 		if ($upcontext['karma_installed']['good'])
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				ALTER TABLE {db_prefix}members
 				DROP karma_good',
 				array()
@@ -1374,14 +1348,14 @@ function UpgradeOptions()
 
 		// Does karma bad was enable?
 		if ($upcontext['karma_installed']['bad'])
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				ALTER TABLE {db_prefix}members
 				DROP karma_bad',
 				array()
 			);
 
 		// Cleaning up old karma permissions.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}permissions
 			WHERE permission = {string:karma_vars}',
 			array(
@@ -1392,7 +1366,7 @@ function UpgradeOptions()
 
 	// Emptying the error log?
 	if (!empty($_POST['empty_error']))
-		$smcFunc['db_query']('truncate_table', '
+		$pmxcFunc['db_query']('truncate_table', '
 			TRUNCATE {db_prefix}log_errors',
 			array(
 			)
@@ -1574,7 +1548,7 @@ if (!isset($db_last_error))
 // Backup the database - why not...
 function BackupDatabase()
 {
-	global $upcontext, $db_prefix, $command_line, $is_debug, $support_js, $file_steps, $smcFunc;
+	global $upcontext, $db_prefix, $command_line, $is_debug, $support_js, $file_steps, $pmxcFunc;
 
 	$upcontext['sub_template'] = isset($_GET['xml']) ? 'backup_xml' : 'backup_database';
 	$upcontext['page_title'] = 'Backup Database';
@@ -1592,7 +1566,7 @@ function BackupDatabase()
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
 	$db = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
-	$tables = $smcFunc['db_list_tables']($db, $filter);
+	$tables = $pmxcFunc['db_list_tables']($db, $filter);
 
 	$table_names = array();
 	foreach ($tables as $table)
@@ -1655,7 +1629,7 @@ function BackupDatabase()
 // Backup one table...
 function backupTable($table)
 {
-	global $is_debug, $command_line, $db_prefix, $smcFunc;
+	global $is_debug, $command_line, $db_prefix, $pmxcFunc;
 
 	if ($command_line)
 	{
@@ -1663,7 +1637,7 @@ function backupTable($table)
 		flush();
 	}
 
-	$smcFunc['db_backup_table']($table, 'backup_' . $table);
+	$pmxcFunc['db_backup_table']($table, 'backup_' . $table);
 
 	if ($command_line)
 		echo ' done.';
@@ -1672,7 +1646,7 @@ function backupTable($table)
 // Step 2: Everything.
 function DatabaseChanges()
 {
-	global $db_prefix, $modSettings, $command_line, $smcFunc;
+	global $db_prefix, $modSettings, $command_line, $pmxcFunc;
 	global $upcontext, $support_js, $db_type;
 
 	// Have we just completed this?
@@ -1725,7 +1699,7 @@ function DatabaseChanges()
 				if ($nextFile)
 				{
 					// Only update the version of this if complete.
-					$smcFunc['db_insert']('replace',
+					$pmxcFunc['db_insert']('replace',
 						$db_prefix . 'settings',
 						array('variable' => 'string', 'value' => 'string'),
 						array('smfVersion', $file[2]),
@@ -1767,7 +1741,7 @@ function DatabaseChanges()
 // Clean up any mods installed...
 function CleanupMods()
 {
-	global $db_prefix, $upcontext, $boarddir, $packagesdir, $settings, $smcFunc, $command_line;
+	global $db_prefix, $upcontext, $boarddir, $packagesdir, $settings, $pmxcFunc, $command_line;
 
 	// Sorry. Not supported for command line users.
 	if ($command_line)
@@ -1811,7 +1785,7 @@ function CleanupMods()
 		$packagesdir = $boarddir . '/Packages';
 
 	// Load all theme paths....
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:id_member}
@@ -1824,17 +1798,17 @@ function CleanupMods()
 		)
 	);
 	$theme_paths = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if ($row['id_theme'] == 1)
 			$settings['default_' . $row['variable']] = $row['value'];
 		elseif ($row['variable'] == 'theme_dir')
 			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Are there are mods installed that may need uninstalling?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_install, filename, name, themes_installed, version
 		FROM {db_prefix}log_packages
 		WHERE install_state = {int:installed}
@@ -1845,7 +1819,7 @@ function CleanupMods()
 		)
 	);
 	$upcontext['packages'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Work out the status.
 		if (!file_exists($packagesdir . '/' . $row['filename']))
@@ -1876,7 +1850,7 @@ function CleanupMods()
 			'needs_removing' => false,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Don't carry on if there are none.
 	if (empty($upcontext['packages']))
@@ -2093,7 +2067,7 @@ function CleanupMods()
 // Delete the damn thing!
 function DeleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $boarddir, $sourcedir, $forum_version, $user_info, $maintenance, $smcFunc, $db_type;
+	global $command_line, $language, $upcontext, $boarddir, $sourcedir, $forum_version, $user_info, $maintenance, $pmxcFunc, $db_type;
 
 	// Now it's nice to have some of the basic SMF source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -2150,7 +2124,7 @@ function DeleteUpgrade()
 		$user_info['id'] = !empty($upcontext['user']['id']) ? $upcontext['user']['id'] : 0;
 
 	// Log the action manually, so CLI still works.
-	$smcFunc['db_insert']('',
+	$pmxcFunc['db_insert']('',
 		'{db_prefix}log_actions',
 		array(
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
@@ -2165,7 +2139,7 @@ function DeleteUpgrade()
 	$user_info['id'] = 0;
 
 	// Save the current database version.
-	$server_version = $smcFunc['db_server_info']();
+	$server_version = $pmxcFunc['db_server_info']();
 	if (($db_type == 'mysql' || $db_type == 'mysqli') && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 		updateSettings(array('db_mysql_group_by_fix' => '1'));
 
@@ -2189,13 +2163,13 @@ function DeleteUpgrade()
 // Just like the built in one, but setup for CLI to not use themes.
 function cli_scheduled_fetchSMfiles()
 {
-	global $sourcedir, $language, $forum_version, $modSettings, $smcFunc;
+	global $sourcedir, $language, $forum_version, $modSettings, $pmxcFunc;
 
 	if (empty($modSettings['time_format']))
 		$modSettings['time_format'] = '%B %d, %Y, %I:%M:%S %p';
 
 	// What files do we want to get
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_file, filename, path, parameters
 		FROM {db_prefix}admin_info_files',
 		array(
@@ -2203,7 +2177,7 @@ function cli_scheduled_fetchSMfiles()
 	);
 
 	$js_files = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$js_files[$row['id_file']] = array(
 			'filename' => $row['filename'],
@@ -2211,7 +2185,7 @@ function cli_scheduled_fetchSMfiles()
 			'parameters' => sprintf($row['parameters'], $language, urlencode($modSettings['time_format']), urlencode($forum_version)),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// We're gonna need fetch_web_data() to pull this off.
 	require_once($sourcedir . '/Subs-Package.php');
@@ -2230,7 +2204,7 @@ function cli_scheduled_fetchSMfiles()
 			return throw_error(sprintf('Could not retrieve the file %1$s.', $url));
 
 		// Save the file to the database.
-		$smcFunc['db_query']('substring', '
+		$pmxcFunc['db_query']('substring', '
 			UPDATE {db_prefix}admin_info_files
 			SET data = SUBSTRING({string:file_data}, 1, 65534)
 			WHERE id_file = {int:id_file}',
@@ -2245,7 +2219,7 @@ function cli_scheduled_fetchSMfiles()
 
 function convertSettingsToTheme()
 {
-	global $db_prefix, $modSettings, $smcFunc;
+	global $db_prefix, $modSettings, $pmxcFunc;
 
 	$values = array(
 		'show_latest_member' => @$GLOBALS['showlatestmember'],
@@ -2276,7 +2250,7 @@ function convertSettingsToTheme()
 	}
 	if (!empty($themeData))
 	{
-		$smcFunc['db_insert']('ignore',
+		$pmxcFunc['db_insert']('ignore',
 			$db_prefix . 'themes',
 			array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
 			$themeData,
@@ -2288,7 +2262,7 @@ function convertSettingsToTheme()
 // This function only works with MySQL but that's fine as it is only used for v1.0.
 function convertSettingstoOptions()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 
 	// Format: new_setting -> old_setting_name.
 	$values = array(
@@ -2302,7 +2276,7 @@ function convertSettingstoOptions()
 		if (empty($modSettings[$value[0]]))
 			continue;
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			INSERT IGNORE INTO {db_prefix}themes
 				(id_member, id_theme, variable, value)
 			SELECT id_member, 1, {string:variable}, {string:value}
@@ -2314,7 +2288,7 @@ function convertSettingstoOptions()
 			)
 		);
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			INSERT IGNORE INTO {db_prefix}themes
 				(id_member, id_theme, variable, value)
 			VALUES (-1, 1, {string:variable}, {string:value})',
@@ -2418,13 +2392,13 @@ function db_version_check()
 
 function getMemberGroups()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 	static $member_groups = array();
 
 	if (!empty($member_groups))
 		return $member_groups;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT group_name, id_group
 		FROM {db_prefix}membergroups
 		WHERE id_group = {int:admin_group} OR id_group > {int:old_group}',
@@ -2436,7 +2410,7 @@ function getMemberGroups()
 	);
 	if ($request === false)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT membergroup, id_group
 			FROM {db_prefix}membergroups
 			WHERE id_group = {int:admin_group} OR id_group > {int:old_group}',
@@ -2447,9 +2421,9 @@ function getMemberGroups()
 			)
 		);
 	}
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $pmxcFunc['db_fetch_row']($request))
 		$member_groups[trim($row[0])] = $row[1];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $member_groups;
 }
@@ -2465,7 +2439,7 @@ function fixRelativePath($path)
 function parse_sql($filename)
 {
 	global $db_prefix, $db_collation, $boarddir, $boardurl, $command_line, $file_steps, $step_progress, $custom_warning;
-	global $upcontext, $support_js, $is_debug, $smcFunc, $databases, $db_type, $db_character_set;
+	global $upcontext, $support_js, $is_debug, $pmxcFunc, $databases, $db_type, $db_character_set;
 
 /*
 	Failure allowed on:
@@ -2514,7 +2488,7 @@ function parse_sql($filename)
 	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
 	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], eval($databases[$db_type]['utf8_version_check']), '>'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
 			array(
@@ -2522,14 +2496,14 @@ function parse_sql($filename)
 				'db_error_skip' => true,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($pmxcFunc['db_num_rows']($request) === 0)
 			die('Unable to find members table!');
-		$table_status = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$table_status = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (!empty($table_status['Collation']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SHOW COLLATION
 				LIKE {string:collation}',
 				array(
@@ -2538,9 +2512,9 @@ function parse_sql($filename)
 				)
 			);
 			// Got something?
-			if ($smcFunc['db_num_rows']($request) !== 0)
-				$collation_info = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			if ($pmxcFunc['db_num_rows']($request) !== 0)
+				$collation_info = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Excellent!
 			if (!empty($collation_info['Collation']) && !empty($collation_info['Charset']))
@@ -2676,7 +2650,7 @@ function parse_sql($filename)
 					continue;
 				}
 
-				if (eval('global $db_prefix, $modSettings, $smcFunc; ' . $current_data) === false)
+				if (eval('global $db_prefix, $modSettings, $pmxcFunc; ' . $current_data) === false)
 				{
 					$upcontext['error_message'] = 'Error in upgrade script ' . basename($filename) . ' on line ' . $line_number . '!' . $endl;
 					if ($command_line)
@@ -2708,14 +2682,14 @@ function parse_sql($filename)
 
 				// @todo This will be how it kinda does it once mysql all stripped out - needed for postgre (etc).
 				/*
-				$result = $smcFunc['db_query']('', $current_data, false, false);
+				$result = $pmxcFunc['db_query']('', $current_data, false, false);
 				// Went wrong?
 				if (!$result)
 				{
 					// Bit of a bodge - do we want the error?
 					if (!empty($upcontext['return_error']))
 					{
-						$upcontext['error_message'] = $smcFunc['db_error']($db_connection);
+						$upcontext['error_message'] = $pmxcFunc['db_error']($db_connection);
 						return false;
 					}
 				}*/
@@ -2751,19 +2725,19 @@ function parse_sql($filename)
 function upgrade_query($string, $unbuffered = false)
 {
 	global $db_connection, $db_server, $db_user, $db_passwd, $db_type, $command_line, $upcontext, $upgradeurl, $modSettings;
-	global $db_name, $db_unbuffered, $smcFunc;
+	global $db_name, $db_unbuffered, $pmxcFunc;
 
 	// Get the query result - working around some SMF specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
 	$db_unbuffered = $unbuffered;
-	$result = $smcFunc['db_query']('', $string, array('security_override' => true, 'db_error_skip' => true));
+	$result = $pmxcFunc['db_query']('', $string, array('security_override' => true, 'db_error_skip' => true));
 	$db_unbuffered = false;
 
 	// Failure?!
 	if ($result !== false)
 		return $result;
 
-	$db_error_message = $smcFunc['db_error']($db_connection);
+	$db_error_message = $pmxcFunc['db_error']($db_connection);
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql' || $db_type == 'mysqli')
 	{
@@ -2893,37 +2867,37 @@ function upgrade_query($string, $unbuffered = false)
 	upgradeExit();
 }
 
-function smf_mysql_fetch_assoc($rs)
+function pmx_mysql_fetch_assoc($rs)
 {
 	global $db_type;
 	return ($db_type == 'mysql') ? mysql_fetch_assoc($rs) : mysqli_fetch_assoc($rs);
 }
 
-function smf_mysql_fetch_row($rs)
+function pmx_mysql_fetch_row($rs)
 {
 	global $db_type;
 	return ($db_type == 'mysql') ? mysql_fetch_row($rs) : mysqli_fetch_row($rs);
 }
 
-function smf_mysql_free_result($rs)
+function pmx_mysql_free_result($rs)
 {
 	global $db_type;
 	return ($db_type == 'mysql') ? mysql_free_result($rs) : mysqli_free_result($rs);
 }
 
-function smf_mysql_insert_id($rs)
+function pmx_mysql_insert_id($rs)
 {
 	global $db_type;
 	return ($db_type == 'mysql') ? mysql_insert_id($rs) : mysqli_insert_id($rs);
 }
 
-function smf_mysql_num_rows($rs)
+function pmx_mysql_num_rows($rs)
 {
 	global $db_type;
 	return ($db_type == 'mysql') ? mysql_num_rows($rs) : mysqli_num_rows($rs);
 }
 
-function smf_mysql_real_escape_string($string)
+function pmx_mysql_real_escape_string($string)
 {
 	global $db_type, $db_connection;
 	return ($db_type == 'mysql') ? mysql_real_escape_string($string, $db_connection) : mysqli_real_escape_string($db_connection, $string);
@@ -2932,7 +2906,7 @@ function smf_mysql_real_escape_string($string)
 // This performs a table alter, but does it unbuffered so the script can time out professionally.
 function protected_alter($change, $substep, $is_test = false)
 {
-	global $db_prefix, $smcFunc;
+	global $db_prefix, $pmxcFunc;
 
 	db_extend('packages');
 
@@ -2940,7 +2914,7 @@ function protected_alter($change, $substep, $is_test = false)
 	$found = false;
 	if ($change['type'] === 'column')
 	{
-		$columns = $smcFunc['db_list_columns']('{db_prefix}' . $change['table'], true);
+		$columns = $pmxcFunc['db_list_columns']('{db_prefix}' . $change['table'], true);
 		foreach ($columns as $column)
 		{
 			// Found it?
@@ -2966,14 +2940,14 @@ function protected_alter($change, $substep, $is_test = false)
 		{
 			$cur_index = array();
 
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				if ($row['Key_name'] === $change['name'])
 					$cur_index[(int) $row['Seq_in_index']] = $row['Column_name'];
 
 			ksort($cur_index, SORT_NUMERIC);
 			$found = array_values($cur_index) === $change['target_columns'];
 
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 	}
 
@@ -2994,7 +2968,7 @@ function protected_alter($change, $substep, $is_test = false)
 	{
 		$request = upgrade_query('
 			SHOW FULL PROCESSLIST');
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (strpos($row['Info'], 'ALTER TABLE ' . $db_prefix . $change['table']) !== false && strpos($row['Info'], $change['text']) !== false)
 				$found = true;
@@ -3003,7 +2977,7 @@ function protected_alter($change, $substep, $is_test = false)
 		// Can't find it? Then we need to run it fools!
 		if (!$found && !$running)
 		{
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			$success = upgrade_query('
 				ALTER TABLE ' . $db_prefix . $change['table'] . '
@@ -3018,7 +2992,7 @@ function protected_alter($change, $substep, $is_test = false)
 		// What if we've not found it, but we'd ran it already? Must of completed.
 		elseif (!$found)
 		{
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 			return true;
 		}
 
@@ -3036,7 +3010,7 @@ function protected_alter($change, $substep, $is_test = false)
 // Alter a text column definition preserving its character set.
 function textfield_alter($change, $substep)
 {
-	global $db_prefix, $databases, $db_type, $smcFunc;
+	global $db_prefix, $databases, $db_type, $pmxcFunc;
 
 	// Versions of MySQL < 4.1 wouldn't benefit from character set detection.
 	if (empty($databases[$db_type]['utf8_support']) || version_compare($databases[$db_type]['utf8_version'], eval($databases[$db_type]['utf8_version_check']), '>'))
@@ -3046,7 +3020,7 @@ function textfield_alter($change, $substep)
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SHOW FULL COLUMNS
 			FROM {db_prefix}' . $change['table'] . '
 			LIKE {string:column}',
@@ -3055,10 +3029,10 @@ function textfield_alter($change, $substep)
 				'db_error_skip' => true,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($pmxcFunc['db_num_rows']($request) === 0)
 			die('Unable to find column ' . $change['column'] . ' inside table ' . $db_prefix . $change['table']);
-		$table_row = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$table_row = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// If something of the current column definition is different, fix it.
 		$column_fix = $table_row['Type'] !== $change['type'] || (strtolower($table_row['Null']) === 'yes') !== $change['null_allowed'] || ($table_row['Default'] === null) !== !isset($change['default']) || (isset($change['default']) && $change['default'] !== $table_row['Default']);
@@ -3069,7 +3043,7 @@ function textfield_alter($change, $substep)
 		// Get the character set that goes with the collation of the column.
 		if ($column_fix && !empty($table_row['Collation']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SHOW COLLATION
 				LIKE {string:collation}',
 				array(
@@ -3078,11 +3052,11 @@ function textfield_alter($change, $substep)
 				)
 			);
 			// No results? Just forget it all together.
-			if ($smcFunc['db_num_rows']($request) === 0)
+			if ($pmxcFunc['db_num_rows']($request) === 0)
 				unset($table_row['Collation']);
 			else
-				$collation_info = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+				$collation_info = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 	}
 
@@ -3090,7 +3064,7 @@ function textfield_alter($change, $substep)
 	{
 		// Make sure there are no NULL's left.
 		if ($null_fix)
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}' . $change['table'] . '
 				SET ' . $change['column'] . ' = {string:default}
 				WHERE ' . $change['column'] . ' IS NULL',
@@ -3101,7 +3075,7 @@ function textfield_alter($change, $substep)
 			);
 
 		// Do the actual alteration.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			ALTER TABLE {db_prefix}' . $change['table'] . '
 			CHANGE COLUMN ' . $change['column'] . ' ' . $change['column'] . ' ' . $change['type'] . (isset($collation_info['Charset']) ? ' CHARACTER SET ' . $collation_info['Charset'] . ' COLLATE ' . $collation_info['Collation'] : '') . ($change['null_allowed'] ? '' : ' NOT NULL') . (isset($change['default']) ? ' default {string:default}' : ''),
 			array(
@@ -3116,7 +3090,7 @@ function textfield_alter($change, $substep)
 // Check if we need to alter this query.
 function checkChange(&$change)
 {
-	global $smcFunc, $db_type, $databases;
+	global $pmxcFunc, $db_type, $databases;
 	static $database_version, $where_field_support;
 
 	// Attempt to find a database_version.
@@ -3137,7 +3111,7 @@ function checkChange(&$change)
 	if ($where_field_support)
 	{
 		// Get the details about this change.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SHOW FIELDS
 			FROM {db_prefix}{raw:table}
 			WHERE Field = {string:old_name} OR Field = {string:new_name}',
@@ -3147,16 +3121,16 @@ function checkChange(&$change)
 				'new_name' => $temp[2],
 		));
 		// !!! This doesn't technically work because we don't pass request into it, but it hasn't broke anything yet.
-		if ($smcFunc['db_num_rows'] != 1)
+		if ($pmxcFunc['db_num_rows'] != 1)
 			return;
 
-		list (, $current_type) = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		list (, $current_type) = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 	{
 		// Do this the old fashion, sure method way.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SHOW FIELDS
 			FROM {db_prefix}{raw:table}',
 			array(
@@ -3164,11 +3138,11 @@ function checkChange(&$change)
 		));
 		// Mayday!
 		// !!! This doesn't technically work because we don't pass request into it, but it hasn't broke anything yet.
-		if ($smcFunc['db_num_rows'] == 0)
+		if ($pmxcFunc['db_num_rows'] == 0)
 			return;
 
 		// Oh where, oh where has my little field gone. Oh where can it be...
-		while ($row = $smcFunc['db_query']($request))
+		while ($row = $pmxcFunc['db_query']($request))
 			if ($row['Field'] == $temp[1] || $row['Field'] == $temp[2])
 			{
 				$current_type = $row['Type'];
@@ -3247,7 +3221,7 @@ function nextSubstep($substep)
 
 function cmdStep0()
 {
-	global $boarddir, $sourcedir, $language, $modSettings, $start_time, $cachedir, $databases, $db_type, $smcFunc, $upcontext;
+	global $boarddir, $sourcedir, $language, $modSettings, $start_time, $cachedir, $databases, $db_type, $pmxcFunc, $upcontext;
 	global $language, $is_debug;
 	$start_time = time();
 
@@ -3296,13 +3270,13 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	db_extend('packages');
 
 	// CREATE
-	$create = $smcFunc['db_create_table']('{db_prefix}priv_check', array(array('name' => 'id_test', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true)), array(array('columns' => array('id_test'), 'primary' => true)), array(), 'overwrite');
+	$create = $pmxcFunc['db_create_table']('{db_prefix}priv_check', array(array('name' => 'id_test', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true)), array(array('columns' => array('id_test'), 'primary' => true)), array(), 'overwrite');
 
 	// ALTER
-	$alter = $smcFunc['db_add_column']('{db_prefix}priv_check', array('name' => 'txt', 'type' => 'tinytext', 'null' => false, 'default' => ''));
+	$alter = $pmxcFunc['db_add_column']('{db_prefix}priv_check', array('name' => 'txt', 'type' => 'tinytext', 'null' => false, 'default' => ''));
 
 	// DROP
-	$drop = $smcFunc['db_drop_table']('{db_prefix}priv_check');
+	$drop = $pmxcFunc['db_drop_table']('{db_prefix}priv_check');
 
 	// Sorry... we need CREATE, ALTER and DROP
 	if (!$create || !$alter || !$drop)
@@ -3615,7 +3589,7 @@ function quickFileWritable($file)
 			@chmod($file, $val);
 	}
 }
-function smf_strtolower($string)
+function pmx_strtolower($string)
 {
 	global $sourcedir;
 	if (function_exists('mb_strtolower'))
@@ -3629,7 +3603,7 @@ function smf_strtolower($string)
  */
 function convertUtf8()
 {
-	global $upcontext, $db_character_set, $sourcedir, $smcFunc, $modSettings, $language, $db_prefix, $db_type, $command_line, $support_js, $is_debug;
+	global $upcontext, $db_character_set, $sourcedir, $pmxcFunc, $modSettings, $language, $db_prefix, $db_type, $command_line, $support_js, $is_debug;
 
 	// First make sure they aren't already on UTF-8 before we go anywhere...
 	if ($db_type == 'postgresql' || ($db_character_set === 'utf8' && !empty($modSettings['global_character_set']) && $modSettings['global_character_set'] === 'UTF-8'))
@@ -3674,22 +3648,22 @@ function convertUtf8()
 		);
 
 		// Get a list of character sets supported by your MySQL server.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SHOW CHARACTER SET',
 			array(
 			)
 		);
 		$db_charsets = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$db_charsets[] = $row['Charset'];
 
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Character sets supported by both MySQL and SMF's language files.
 		$charsets = array_intersect($charsets, $db_charsets);
 
 		// Use the messages.body column as indicator for the database charset.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SHOW FULL COLUMNS
 			FROM {db_prefix}messages
 			LIKE {string:body_like}',
@@ -3697,15 +3671,15 @@ function convertUtf8()
 				'body_like' => 'body',
 			)
 		);
-		$column_info = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$column_info = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// A collation looks like latin1_swedish. We only need the character set.
 		list($upcontext['database_charset']) = explode('_', $column_info['Collation']);
 		$upcontext['database_charset'] = in_array($upcontext['database_charset'], $charsets) ? array_search($upcontext['database_charset'], $charsets) : $upcontext['database_charset'];
 
 		// Detect whether a fulltext index is set.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
  			SHOW INDEX
 	  	    FROM {db_prefix}messages',
 			array(
@@ -3715,12 +3689,12 @@ function convertUtf8()
 		$upcontext['dropping_index'] = false;
 
 		// If there's a fulltext index, we need to drop it first...
-		if ($request !== false || $smcFunc['db_num_rows']($request) != 0)
+		if ($request !== false || $pmxcFunc['db_num_rows']($request) != 0)
 		{
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
 					$upcontext['fulltext_index'][] = $row['Key_name'];
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			if (isset($upcontext['fulltext_index']))
 				$upcontext['fulltext_index'] = array_unique($upcontext['fulltext_index']);
@@ -3731,7 +3705,7 @@ function convertUtf8()
 		{
 			$upcontext['dropping_index'] = true;
 
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
   			ALTER TABLE {db_prefix}messages
 	  		DROP INDEX ' . implode(',
 		  	DROP INDEX ', $upcontext['fulltext_index']),
@@ -3741,7 +3715,7 @@ function convertUtf8()
 			);
 
 			// Update the settings table
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}settings',
 				array('variable' => 'string', 'value' => 'string'),
 				array('db_search_index', ''),
@@ -3921,7 +3895,7 @@ function convertUtf8()
 
 		// Get a list of table names ahead of time... This makes it easier to set our substep and such
 		db_extend();
-		$queryTables = $smcFunc['db_list_tables'](false, $db_prefix);
+		$queryTables = $pmxcFunc['db_list_tables'](false, $db_prefix);
 
 		$upcontext['table_count'] = count($queryTables);
 		$file_steps = $upcontext['table_count'];
@@ -3933,7 +3907,7 @@ function convertUtf8()
 			// Do we need to pause?
 			nextSubstep($substep);
 
-			$getTableStatus = $smcFunc['db_query']('', '
+			$getTableStatus = $pmxcFunc['db_query']('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
 				array(
@@ -3942,8 +3916,8 @@ function convertUtf8()
 			);
 
 			// Only one row so we can just fetch_assoc and free the result...
-			$table_info = $smcFunc['db_fetch_assoc']($getTableStatus);
-			$smcFunc['db_free_result']($getTableStatus);
+			$table_info = $pmxcFunc['db_fetch_assoc']($getTableStatus);
+			$pmxcFunc['db_free_result']($getTableStatus);
 
 			$upcontext['cur_table_num'] = $_GET['substep'];
 			$upcontext['cur_table_name'] = $table_info['Name'];
@@ -3956,13 +3930,13 @@ function convertUtf8()
 			$table_charsets = array();
 
 			// Loop through each column.
-			$queryColumns = $smcFunc['db_query']('', '
+			$queryColumns = $pmxcFunc['db_query']('', '
 				SHOW FULL COLUMNS
 				FROM ' . $table_info['Name'],
 				array(
 				)
 			);
-			while ($column_info = $smcFunc['db_fetch_assoc']($queryColumns))
+			while ($column_info = $pmxcFunc['db_fetch_assoc']($queryColumns))
 			{
 				// Only text'ish columns have a character set and need converting.
 				if (strpos($column_info['Type'], 'text') !== false || strpos($column_info['Type'], 'char') !== false)
@@ -3979,7 +3953,7 @@ function convertUtf8()
 					}
 				}
 			}
-			$smcFunc['db_free_result']($queryColumns);
+			$pmxcFunc['db_free_result']($queryColumns);
 
 			// Only change the column if the data doesn't match the current charset.
 			if ((count($table_charsets) === 1 && key($table_charsets) !== $charsets[$upcontext['charset_detected']]) || count($table_charsets) > 1)
@@ -4001,7 +3975,7 @@ function convertUtf8()
 				}
 
 				// Change the columns to binary form.
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					ALTER TABLE {raw:table_name}{raw:updates_blob}',
 					array(
 						'table_name' => $table_info['Name'],
@@ -4018,7 +3992,7 @@ function convertUtf8()
 							$update .= '
 								' . $column['Field'] . ' = ' . strtr($replace, array('%field%' => $column['Field'])) . ',';
 
-					$smcFunc['db_query']('', '
+					$pmxcFunc['db_query']('', '
 						UPDATE {raw:table_name}
 						SET {raw:updates}',
 						array(
@@ -4029,7 +4003,7 @@ function convertUtf8()
 				}
 
 				// Change the columns back, but with the proper character set.
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					ALTER TABLE {raw:table_name}{raw:updates_text}',
 					array(
 						'table_name' => $table_info['Name'],
@@ -4044,7 +4018,7 @@ function convertUtf8()
 				if ($command_line)
 					echo 'Converting table ' . $table_info['Name'] . ' to UTF-8...';
 
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					ALTER TABLE {raw:table_name}
 					CONVERT TO CHARACTER SET utf8',
 						array(
@@ -4059,7 +4033,7 @@ function convertUtf8()
 
 		$prev_charset = empty($translation_tables[$upcontext['charset_detected']]) ? $charsets[$upcontext['charset_detected']] : $translation_tables[$upcontext['charset_detected']];
 
-		$smcFunc['db_insert']('replace',
+		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array(array('global_character_set', 'UTF-8'), array('previousCharacterSet', $prev_charset)),
@@ -4072,7 +4046,7 @@ function convertUtf8()
 		updateSettingsFile(array('db_character_set' => '\'utf8\''));
 
 		// The conversion might have messed up some serialized strings. Fix them!
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_action, extra
 			FROM {db_prefix}log_actions
 			WHERE action IN ({string:remove}, {string:delete})',
@@ -4081,10 +4055,10 @@ function convertUtf8()
 				'delete' => 'delete',
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (@safe_unserialize($row['extra']) === false && preg_match('~^(a:3:{s:5:"topic";i:\d+;s:7:"subject";s:)(\d+):"(.+)"(;s:6:"member";s:5:"\d+";})$~', $row['extra'], $matches) === 1)
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}log_actions
 					SET extra = {string:extra}
 					WHERE id_action = {int:current_action}',
@@ -4094,7 +4068,7 @@ function convertUtf8()
 					)
 				);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if ($upcontext['dropping_index'] && $command_line)
 		{
@@ -4108,7 +4082,7 @@ function convertUtf8()
 
 function serialize_to_json()
 {
-	global $command_line, $smcFunc, $modSettings, $sourcedir, $upcontext, $support_js, $is_debug;
+	global $command_line, $pmxcFunc, $modSettings, $sourcedir, $upcontext, $support_js, $is_debug;
 
 	$upcontext['sub_template'] = isset($_GET['xml']) ? 'serialize_json_xml' : 'serialize_json';
 	// First thing's first - did we already do this?
@@ -4226,7 +4200,7 @@ function serialize_to_json()
 			elseif ($table == 'themes')
 			{
 				// Finally, fix the admin prefs. Unfortunately this is stored per theme, but hopefully they only have one theme installed at this point...
-				$query = $smcFunc['db_query']('', '
+				$query = $pmxcFunc['db_query']('', '
 					SELECT id_member, id_theme, value FROM {db_prefix}themes
 					WHERE variable = {string:admin_prefs}',
 						array(
@@ -4234,9 +4208,9 @@ function serialize_to_json()
 						)
 				);
 
-				if ($smcFunc['db_num_rows']($query) != 0)
+				if ($pmxcFunc['db_num_rows']($query) != 0)
 				{
-					while ($row = $smcFunc['db_fetch_assoc']($query))
+					while ($row = $pmxcFunc['db_fetch_assoc']($query))
 					{
 						$temp = @safe_unserialize($row['value']);
 
@@ -4253,7 +4227,7 @@ function serialize_to_json()
 							$row['value'] = json_encode($temp);
 
 							// Even though we have all values from the table, UPDATE is still faster than REPLACE
-							$smcFunc['db_query']('', '
+							$pmxcFunc['db_query']('', '
 								UPDATE {db_prefix}themes
 								SET value = {string:prefs}
 								WHERE id_theme = {int:theme}
@@ -4270,7 +4244,7 @@ function serialize_to_json()
 						}
 					}
 
-					$smcFunc['db_free_result']($query);
+					$pmxcFunc['db_free_result']($query);
 				}
 			}
 			else
@@ -4290,13 +4264,13 @@ function serialize_to_json()
 					$col_select = implode(', ', $info);
 				}
 
-				$query = $smcFunc['db_query']('', '
+				$query = $pmxcFunc['db_query']('', '
 					SELECT ' . $key . ', ' . $col_select . '
 					FROM {db_prefix}' . $table . $where,
 					array()
 				);
 
-				if ($smcFunc['db_num_rows']($query) != 0)
+				if ($pmxcFunc['db_num_rows']($query) != 0)
 				{
 					if ($command_line)
 					{
@@ -4304,7 +4278,7 @@ function serialize_to_json()
 						flush();
 					}
 
-					while ($row = $smcFunc['db_fetch_assoc']($query))
+					while ($row = $pmxcFunc['db_fetch_assoc']($query))
 					{
 						$update = '';
 
@@ -4335,7 +4309,7 @@ function serialize_to_json()
 						// In a few cases, we might have empty data, so don't try to update in those situations...
 						if (!empty($update))
 						{
-							$smcFunc['db_query']('', '
+							$pmxcFunc['db_query']('', '
 								UPDATE {db_prefix}' . $table . '
 								SET ' . $update . '
 								WHERE ' . $key . ' = {' . ($key == 'session' ? 'string' : 'int') . ':' . $key . '}',
@@ -4348,7 +4322,7 @@ function serialize_to_json()
 						echo ' done.';
 
 					// Free up some memory...
-					$smcFunc['db_free_result']($query);
+					$pmxcFunc['db_free_result']($query);
 				}
 			}
 			// If this is XML to keep it nice for the user do one table at a time anyway!
@@ -4509,8 +4483,8 @@ function template_upgrade_above()
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script>
-			var smf_scripturl = \'', $upgradeurl, '\';
-			var smf_charset = \'', (empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'UTF-8' : $txt['lang_character_set']) : $modSettings['global_character_set']), '\';
+			var pmx_scripturl = \'', $upgradeurl, '\';
+			var pmx_charset = \'', (empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'UTF-8' : $txt['lang_character_set']) : $modSettings['global_character_set']), '\';
 			var startPercent = ', $upcontext['overall_percent'], ';
 
 			// This function dynamically updates the step progress bar - and overall one as required.
@@ -4704,6 +4678,24 @@ function template_error_message()
 function template_welcome_message()
 {
 	global $upcontext, $disable_security, $settings, $txt;
+
+	echo '
+		<script src="http://docserver.portamx.com/pmxforum/infofiles/current-version.js"></script>
+		<script>document.cookie = "currentVersion=\'"+window.smfVersion+"\'";</script>';
+
+$forum_version = 'PortaMx-Forum 2.1 Beta 4';
+
+	$temp = file_get_contents(dirname(__FILE__) .'/index.php');
+	preg_match('/\$forum_version\s=\s\'([a-zA-Z0-9\.\s]+)\'/', $temp, $match);
+	if(isset($match[1]) && $match[1] == $_COOKIE['currentVersion'])
+	{
+		echo '
+			<h3>Your Forum is allready up to date.<br>The current version is <b>PortaMx-Forum 2.1 Beta 4</b></h3>';
+			setcookie('currentVersion', '');
+		exit;
+	}
+	else
+		setcookie('currentVersion', '');
 
 	echo '
 		<script src="http://www.simplemachines.org/smf/current-version.js?version=' . SMF_VERSION . '"></script>
@@ -4934,8 +4926,7 @@ function template_upgrade_options()
 						</td>
 						<td width="100%">
 							<label for="convertMysql">Use MySQLi functionality (MySQL compatible).</span>
-							<strong class="smalltext"><a href="http://wiki.simplemachines.org/smf/Upgrading-MySQLi-Functionality" target="_blank">More information about MySQLi</a></strong><br>
-						</td>
+^						</td>
 					</tr>';
 
 	echo '
@@ -4968,18 +4959,8 @@ function template_upgrade_options()
 					</tr>';
 
 	echo '
-					<tr valign="top">
-						<td width="2%">
-							<input type="checkbox" name="stat" id="stat" value="1"', empty($modSettings['allow_sm_stats']) ? '' : ' checked', ' class="input_check">
-						</td>
-						<td width="100%">
-							<label for="stat">
-								Allow Simple Machines to Collect Basic Stats Monthly.<br>
-								<span class="smalltext">If enabled, this will allow Simple Machines to visit your site once a month to collect basic statistics. This will help us make decisions as to which configurations to optimise the software for. For more information please visit our <a href="http://www.simplemachines.org/about/stats.php" target="_blank">info page</a>.</span>
-							</label>
-						</td>
-					</tr>
 				</table>
+				<input type="hidden" name="stat" value="0">
 				<input type="hidden" name="upcont" value="1">';
 
 	// We need a normal continue button here!
@@ -5851,7 +5832,7 @@ function template_upgrade_complete()
 	global $upcontext, $upgradeurl, $settings, $boardurl, $is_debug;
 
 	echo '
-	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of SMF</a>.  Hope you like it!</h3>
+	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of PortaMx Forum</a>.  Hope you like it!</h3>
 	<form action="', $boardurl, '/index.php">';
 
 	if (!empty($upcontext['can_delete_script']))
@@ -5888,10 +5869,10 @@ function template_upgrade_complete()
 		echo '<br> Upgrade completed in ', $totalTime, '<br><br>';
 
 	echo '<br>
-			If you had any problems with this upgrade, or have any problems using SMF, please don\'t hesitate to <a href="http://www.simplemachines.org/community/index.php">look to us for assistance</a>.<br>
+			If you had any problems with this upgrade, or have any problems using PortaMx Forum, please don\'t hesitate to <a href="http://portamx.com">look to us for assistance</a>.<br>
 			<br>
 			Best of luck,<br>
-			Simple Machines';
+			PortaMx Corp.';
 }
 
 /**
@@ -5901,13 +5882,13 @@ function template_upgrade_complete()
  */
 function MySQLConvertOldIp($targetTable, $oldCol, $newCol, $limit = 50000, $setSize = 100)
 {
-	global $smcFunc, $step_progress;
+	global $pmxcFunc, $step_progress;
 
 	$step_progress['name'] = 'Converting ips';
 	$step_progress['current'] = $_GET['a'];
 
 	// Skip this if we don't have the column
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SHOW FIELDS
 		FROM {db_prefix}{raw:table}
 		WHERE Field = {string:name}',
@@ -5915,12 +5896,12 @@ function MySQLConvertOldIp($targetTable, $oldCol, $newCol, $limit = 50000, $setS
 			'table' => $targetTable,
 			'name' => $oldCol,
 	));
-	if ($smcFunc['db_num_rows']($request) !== 1)
+	if ($pmxcFunc['db_num_rows']($request) !== 1)
 	{
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 		return;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	//mysql default max length is 1mb http://dev.mysql.com/doc/refman/5.1/en/packet-too-large.html
 	$arIp = array();
@@ -5930,7 +5911,7 @@ function MySQLConvertOldIp($targetTable, $oldCol, $newCol, $limit = 50000, $setS
 	{
 		nextSubStep($substep);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT DISTINCT {raw:old_col}
 			FROM {db_prefix}{raw:table_name}
 			WHERE {raw:new_col} IS NULL
@@ -5942,9 +5923,9 @@ function MySQLConvertOldIp($targetTable, $oldCol, $newCol, $limit = 50000, $setS
 				'empty' => '',
 				'limit' => $limit,
 		));
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$arIp[] = $row[$oldCol];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Special case, null ip could keep us in a loop.
 		if (is_null($arIp[0]))
@@ -5970,7 +5951,7 @@ function MySQLConvertOldIp($targetTable, $oldCol, $newCol, $limit = 50000, $setS
 					continue;
 
 				$updates['whereSet'] = array_values($updates);
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}' . $targetTable . '
 					SET ' . $newCol . ' = CASE ' .
 					implode('
@@ -5993,7 +5974,7 @@ function MySQLConvertOldIp($targetTable, $oldCol, $newCol, $limit = 50000, $setS
 			{
 				foreach ($updates as $key => $ip)
 				{
-					$request = $smcFunc['db_query']('', '
+					$request = $pmxcFunc['db_query']('', '
 						UPDATE {db_prefix}' . $targetTable . '
 						SET ' . $newCol . ' = {inet:ip}
 						WHERE ' . $oldCol . ' = {string:ip}',
@@ -6005,7 +5986,7 @@ function MySQLConvertOldIp($targetTable, $oldCol, $newCol, $limit = 50000, $setS
 			else
 			{
 				$updates['whereSet'] = array_values($updates);
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}' . $targetTable . '
 					SET ' . $newCol . ' = CASE ' .
 					implode('

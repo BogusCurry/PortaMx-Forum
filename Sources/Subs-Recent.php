@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -23,11 +23,11 @@ if (!defined('SMF'))
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $modSettings, $smcFunc;
+	global $scripturl, $modSettings, $pmxcFunc;
 
 	// Find all the posts.  Newer ones will have higher IDs.  (assuming the last 20 * number are accessible...)
 	// @todo SLOW This query is now slow, NEEDS to be fixed.  Maybe break into two?
-	$request = $smcFunc['db_query']('substring', '
+	$request = $pmxcFunc['db_query']('substring', '
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg,
 			COALESCE(mem.real_name, m.poster_name) AS poster_name, t.id_board, b.name AS board_name,
@@ -51,15 +51,15 @@ function getLastPosts($latestPostOptions)
 		)
 	);
 	$posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Censor the subject and post for the preview ;).
 		censorText($row['subject']);
 		censorText($row['body']);
 
 		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br>' => '&#10;')));
-		if ($smcFunc['strlen']($row['body']) > 128)
-			$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+		if ($pmxcFunc['strlen']($row['body']) > 128)
+			$row['body'] = $pmxcFunc['substr']($row['body'], 0, 128) . '...';
 
 		// Build the array.
 		$posts[] = array(
@@ -86,7 +86,7 @@ function getLastPosts($latestPostOptions)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>'
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $posts;
 }

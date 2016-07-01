@@ -807,7 +807,7 @@ function template_search()
 		// Some javascript for the advanced toggling
 		echo '
 		<script>
-			var oAdvancedPanelToggle = new smc_Toggle({
+			var oAdvancedPanelToggle = new pmxc_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -997,7 +997,7 @@ function template_send()
 		</div>';
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
+	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);pmxc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
 		<div>
 			<div class="roundframe">
 				<br class="clear">';
@@ -1174,7 +1174,7 @@ function template_send()
 						if (checkboxFields[i] in document.forms.postmodify && document.forms.postmodify.elements[checkboxFields[i]].checked)
 							x[x.length] = checkboxFields[i] + \'=\' + document.forms.postmodify.elements[checkboxFields[i]].value;
 
-					sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=pm;sa=send2;preview;xml\', x.join(\'&\'), onDocSent);
+					sendXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=pm;sa=send2;preview;xml\', x.join(\'&\'), onDocSent);
 
 					document.getElementById(\'preview_section\').style.display = \'\';
 					setInnerHTML(document.getElementById(\'preview_subject\'), txt_preview_title);
@@ -1236,7 +1236,7 @@ function template_send()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new pmxc_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -1280,10 +1280,10 @@ function template_send()
 
 	echo '
 		<script>
-			var oPersonalMessageSend = new smf_PersonalMessageSend({
+			var oPersonalMessageSend = new pmx_PersonalMessageSend({
 				sSelf: \'oPersonalMessageSend\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: pmx_session_id,
+				sSessionVar: pmx_session_var,
 				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 				sToControlId: \'to_control\',
 				aToRecipients: [';

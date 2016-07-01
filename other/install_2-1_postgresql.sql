@@ -1767,10 +1767,10 @@ BEGIN;
 INSERT INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, filetype, data)
 VALUES
-	(1, 'current-version.js', '/pmxforum/infofiles/', '', 'text/javascript', ''),
-	(2, 'detailed-version.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
-	(3, 'latest-news.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
-	(4, 'latest-versions.txt', '/pmxforum/infofiles/', '', 'text/plain', '');
+	(1, 'current-version.js', 'infofiles/', '', 'text/javascript', ''),
+	(2, 'detailed-version.js', 'infofiles/', '%1$s/', 'text/javascript', ''),
+	(3, 'latest-news.js', 'infofiles/', '%1$s/', 'text/javascript', ''),
+	(4, 'latest-versions.txt', 'infofiles/', '', 'text/plain', '');
 # --------------------------------------------------------
 
 #
@@ -2291,7 +2291,7 @@ VALUES ('xx', 'Standard', '0'),
 
 INSERT INTO {$db_prefix}messages
 	(id_msg, id_msg_modified, id_topic, id_board, poster_time, subject, poster_name, poster_email, poster_ip, modified_name, body, icon)
-VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Simple Machines', 'info@simplemachines.org', '127.0.0.1', '', '{$default_topic_message}', 'xx');
+VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'PortaMx', 'support@portamx.com', '127.0.0.1', '', '{$default_topic_message}', 'xx');
 # --------------------------------------------------------
 
 #
@@ -2300,10 +2300,10 @@ VALUES (1, 1, 1, 1, {$current_time}, '{$default_topic_subject}', 'Simple Machine
 
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('Simple Machines Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
+VALUES ('PortaMx File Server', 'http://docserver.portamx.com');
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('PortaMx File Server', 'http://docserver.portamx.com');
+VALUES ('Simple Machines Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
 
 # --------------------------------------------------------
 
@@ -2402,7 +2402,7 @@ VALUES
 
 INSERT INTO {$db_prefix}settings
 	(variable, value)
-VALUES ('smfVersion', '{$smf_version}'),
+VALUES ('smfVersion', '{$pmx_version}'),
 	('news', '{$default_news}'),
 	('compactTopicPagesContiguous', '5'),
 	('compactTopicPagesEnable', '1'),
@@ -2528,9 +2528,9 @@ VALUES ('smfVersion', '{$smf_version}'),
 	('time_offset', '0'),
 	('cookieTime', '60'),
 	('lastActive', '15'),
-	('smiley_sets_known', 'default,aaron,akyhne,fugue'),
-	('smiley_sets_names', '{$default_smileyset_name}\n{$default_aaron_smileyset_name}\n{$default_akyhne_smileyset_name}\n{$default_fugue_smileyset_name}'),
-	('smiley_sets_default', 'default'),
+	('smiley_sets_known', 'portamx,aaron,akyhne,fugue'),
+	('smiley_sets_names', '{$default_portamx_smileyset_name}\n{$default_aaron_smileyset_name}\n{$default_akyhne_smileyset_name}\n{$default_fugue_smileyset_name}'),
+	('smiley_sets_default', 'portamx'),
 	('cal_days_for_index', '7'),
 	('requireAgreement', '1'),
 	('unapprovedMembers', '0'),
@@ -2601,7 +2601,7 @@ VALUES ('smfVersion', '{$smf_version}'),
 	('allow_expire_redirect', '1'),
 	('json_done', '1'),
 	('minimize_files', '1'),
-	('ecl_topofs', 36),
+	('ecl_topofs', 39),
 	('pmx_docserver', 'http://docserver.portamx.com/pmxforum/');
 
 # --------------------------------------------------------
@@ -2616,7 +2616,7 @@ VALUES (':)', 'smiley.gif', '{$default_smiley_smiley}', 0, 0),
 	(';)', 'wink.gif', '{$default_wink_smiley}', 1, 0),
 	(':D', 'cheesy.gif', '{$default_cheesy_smiley}', 2, 0),
 	(';D', 'grin.gif', '{$default_grin_smiley}', 3, 0),
-	('>:(', 'angry.gif', '{$default_angry_smiley}', 4, 0),
+	(':>(', 'angry.gif', '{$default_angry_smiley}', 4, 0),
 	(':(', 'sad.gif', '{$default_sad_smiley}', 5, 0),
 	(':o', 'shocked.gif', '{$default_shocked_smiley}', 6, 0),
 	('8)', 'cool.gif', '{$default_cool_smiley}', 7, 0),
@@ -2628,7 +2628,7 @@ VALUES (':)', 'smiley.gif', '{$default_smiley_smiley}', 0, 0),
 	(':-\\', 'undecided.gif', '{$default_undecided_smiley}', 13, 0),
 	(':-*', 'kiss.gif', '{$default_kiss_smiley}', 14, 0),
 	(':''(', 'cry.gif', '{$default_cry_smiley}', 15, 0),
-	('>:D', 'evil.gif', '{$default_evil_smiley}', 16, 1),
+	(':>D', 'evil.gif', '{$default_evil_smiley}', 16, 1),
 	('^-^', 'azn.gif', '{$default_azn_smiley}', 17, 1),
 	('O0', 'afro.gif', '{$default_afro_smiley}', 18, 1),
 	(':))', 'laugh.gif', '{$default_laugh_smiley}', 19, 1),

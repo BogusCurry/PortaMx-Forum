@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -66,7 +66,7 @@ function activateAccount($memID)
 function issueWarning($memID)
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $smcFunc, $sourcedir;
+	global $context, $cur_profile, $pmxcFunc, $sourcedir;
 
 	// Get all the actual settings.
 	list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
@@ -97,7 +97,7 @@ function issueWarning($memID)
 	if ($context['warning_limit'] > 0)
 	{
 		// Make sure we cannot go outside of our limit for the day.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT SUM(counter)
 			FROM {db_prefix}log_comments
 			WHERE id_recipient = {int:selected_member}
@@ -111,8 +111,8 @@ function issueWarning($memID)
 				'warning' => 'warning',
 			)
 		);
-		list ($current_applied) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($current_applied) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		$context['min_allowed'] = max(0, $cur_profile['warning'] - $current_applied - $context['warning_limit']);
 		$context['max_allowed'] = min(100, $cur_profile['warning'] - $current_applied + $context['warning_limit']);
@@ -136,7 +136,7 @@ function issueWarning($memID)
 		$_POST['warn_reason'] = isset($_POST['warn_reason']) ? trim($_POST['warn_reason']) : '';
 		if ($_POST['warn_reason'] == '' && !$context['user']['is_owner'])
 			$issueErrors[] = 'warning_no_reason';
-		$_POST['warn_reason'] = $smcFunc['htmlspecialchars']($_POST['warn_reason']);
+		$_POST['warn_reason'] = $pmxcFunc['htmlspecialchars']($_POST['warn_reason']);
 
 		$_POST['warning_level'] = (int) $_POST['warning_level'];
 		$_POST['warning_level'] = max(0, min(100, $_POST['warning_level']));
@@ -165,17 +165,17 @@ function issueWarning($memID)
 				sendpm(array('to' => array($memID), 'bcc' => array()), $_POST['warn_sub'], $_POST['warn_body'], false, $from);
 
 				// Log the notice!
-				$smcFunc['db_insert']('',
+				$pmxcFunc['db_insert']('',
 					'{db_prefix}log_member_notices',
 					array(
 						'subject' => 'string-255', 'body' => 'string-65534',
 					),
 					array(
-						$smcFunc['htmlspecialchars']($_POST['warn_sub']), $smcFunc['htmlspecialchars']($_POST['warn_body']),
+						$pmxcFunc['htmlspecialchars']($_POST['warn_sub']), $pmxcFunc['htmlspecialchars']($_POST['warn_body']),
 					),
 					array('id_notice')
 				);
-				$id_notice = $smcFunc['db_insert_id']('{db_prefix}log_member_notices', 'id_notice');
+				$id_notice = $pmxcFunc['db_insert_id']('{db_prefix}log_member_notices', 'id_notice');
 			}
 		}
 
@@ -190,7 +190,7 @@ function issueWarning($memID)
 		{
 			// Log what we've done!
 			if (!$context['user']['is_owner'])
-				$smcFunc['db_insert']('',
+				$pmxcFunc['db_insert']('',
 					'{db_prefix}log_comments',
 					array(
 						'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int', 'recipient_name' => 'string-255',
@@ -227,7 +227,7 @@ function issueWarning($memID)
 	if (isset($_POST['preview']))
 	{
 		$warning_body = !empty($_POST['warn_body']) ? trim(censorText($_POST['warn_body'])) : '';
-		$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim($smcFunc['htmlspecialchars']($_POST['warn_sub'])) : '';
+		$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim($pmxcFunc['htmlspecialchars']($_POST['warn_sub'])) : '';
 		if (empty($_POST['warn_sub']) || empty($_POST['warn_body']))
 			$issueErrors[] = 'warning_notify_blank';
 
@@ -369,7 +369,7 @@ function issueWarning($memID)
 	// Are they warning because of a message?
 	if (isset($_REQUEST['msg']) && 0 < (int) $_REQUEST['msg'])
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT subject
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -380,12 +380,12 @@ function issueWarning($memID)
 				'message' => (int) $_REQUEST['msg'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) != 0)
+		if ($pmxcFunc['db_num_rows']($request) != 0)
 		{
 			$context['warning_for_message'] = (int) $_REQUEST['msg'];
-			list ($context['warned_message_subject']) = $smcFunc['db_fetch_row']($request);
+			list ($context['warned_message_subject']) = $pmxcFunc['db_fetch_row']($request);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 	}
 
@@ -399,7 +399,7 @@ function issueWarning($memID)
 	// Any custom templates?
 	$context['notification_templates'] = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {literal:warntpl}
@@ -409,7 +409,7 @@ function issueWarning($memID)
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// If we're not warning for a message skip any that are.
 		if (!$context['warning_for_message'] && strpos($row['body'], '{MESSAGE}') !== false)
@@ -420,7 +420,7 @@ function issueWarning($memID)
 			'body' => $row['body'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Setup the "default" templates.
 	foreach (array('spamming', 'offence', 'insulting') as $type)
@@ -442,9 +442,9 @@ function issueWarning($memID)
  */
 function list_getUserWarningCount($memID)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE id_recipient = {int:selected_member}
@@ -453,8 +453,8 @@ function list_getUserWarningCount($memID)
 			'selected_member' => $memID,
 		)
 	);
-	list ($total_warnings) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_warnings) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $total_warnings;
 }
@@ -470,9 +470,9 @@ function list_getUserWarningCount($memID)
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $scripturl;
+	global $pmxcFunc, $scripturl;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
 			lc.log_time, lc.body, lc.counter, lc.id_notice
 		FROM {db_prefix}log_comments AS lc
@@ -489,7 +489,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$previous_warnings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$previous_warnings[] = array(
 			'issuer' => array(
@@ -502,7 +502,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 			'id_notice' => $row['id_notice'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $previous_warnings;
 }
@@ -539,7 +539,7 @@ function deleteAccount($memID)
  */
 function deleteAccount2($memID)
 {
-	global $user_info, $sourcedir, $context, $cur_profile, $modSettings, $smcFunc;
+	global $user_info, $sourcedir, $context, $cur_profile, $modSettings, $pmxcFunc;
 
 	// Try get more time...
 	@set_time_limit(600);
@@ -561,7 +561,7 @@ function deleteAccount2($memID)
 		// Are you allowed to administrate the forum, as they are?
 		isAllowedTo('admin_forum');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -572,8 +572,8 @@ function deleteAccount2($memID)
 				'selected_member' => $memID,
 			)
 		);
-		list ($another) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($another) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (empty($another))
 			fatal_lang_error('at_least_one_admin', 'critical');
@@ -591,7 +591,7 @@ function deleteAccount2($memID)
 		if (!empty($_POST['deleteVotes']) && allowedTo('moderate_forum'))
 		{
 			// First we find any polls that this user has voted in...
-			$get_voted_polls = $smcFunc['db_query']('', '
+			$get_voted_polls = $pmxcFunc['db_query']('', '
 				SELECT DISTINCT id_poll
 				FROM {db_prefix}log_polls
 				WHERE id_member = {int:selected_member}',
@@ -602,17 +602,17 @@ function deleteAccount2($memID)
 
 			$polls_to_update = array();
 
-			while ($row = $smcFunc['db_fetch_assoc']($get_voted_polls))
+			while ($row = $pmxcFunc['db_fetch_assoc']($get_voted_polls))
 			{
 				$polls_to_update[] = $row['id_poll'];
 			}
 
-			$smcFunc['db_free_result']($get_voted_polls);
+			$pmxcFunc['db_free_result']($get_voted_polls);
 
 			// Now we delete the votes and update the polls
 			if (!empty($polls_to_update))
 			{
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}log_polls
 					WHERE id_member = {int:selected_member}',
 					array(
@@ -620,7 +620,7 @@ function deleteAccount2($memID)
 					)
 				);
 
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}polls
 					SET votes = votes - 1
 					WHERE id_poll IN {array_int:polls_to_update}',
@@ -645,7 +645,7 @@ function deleteAccount2($memID)
 			if ($_POST['remove_type'] == 'topics')
 			{
 				// Fetch all topics started by this user within the time period.
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT t.id_topic
 					FROM {db_prefix}topics AS t
 					WHERE t.id_member_started = {int:selected_member}' . $extra,
@@ -655,9 +655,9 @@ function deleteAccount2($memID)
 					)
 				);
 				$topicIDs = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
 					$topicIDs[] = $row['id_topic'];
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 
 				// Actually remove the topics. Ignore recycling if we want to perma-delete things...
 				// @todo This needs to check permissions, but we'll let it slide for now because of moderate_forum already being had.
@@ -665,7 +665,7 @@ function deleteAccount2($memID)
 			}
 
 			// Now delete the remaining messages.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT m.id_msg
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic
@@ -677,14 +677,14 @@ function deleteAccount2($memID)
 				)
 			);
 			// This could take a while... but ya know it's gonna be worth it in the end.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if (function_exists('apache_reset_timeout'))
 					@apache_reset_timeout();
 
 				removeMessage($row['id_msg']);
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 
 		// Only delete this poor members account if they are actually being booted out of camp.
@@ -718,7 +718,7 @@ function deleteAccount2($memID)
  */
 function subscriptions($memID)
 {
-	global $context, $txt, $sourcedir, $modSettings, $smcFunc, $scripturl;
+	global $context, $txt, $sourcedir, $modSettings, $pmxcFunc, $scripturl;
 
 	// Load the paid template anyway.
 	loadTemplate('ManagePaid');
@@ -733,7 +733,7 @@ function subscriptions($memID)
 	foreach ($context['subscriptions'] as $id => $sub)
 	{
 		// Work out the costs.
-		$costs = smf_json_decode($sub['real_cost'], true);
+		$costs = pmx_json_decode($sub['real_cost'], true);
 
 		$cost_array = array();
 		if ($sub['real_length'] == 'F')
@@ -773,7 +773,7 @@ function subscriptions($memID)
 		fatal_error($txt['paid_admin_not_setup_gateway']);
 
 	// Get the current subscriptions.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_sublog, id_subscribe, start_time, end_time, status, payments_pending, pending_details
 		FROM {db_prefix}log_subscribed
 		WHERE id_member = {int:selected_member}',
@@ -782,7 +782,7 @@ function subscriptions($memID)
 		)
 	);
 	$context['current'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// The subscription must exist!
 		if (!isset($context['subscriptions'][$row['id_subscribe']]))
@@ -803,7 +803,7 @@ function subscriptions($memID)
 		if ($row['status'] == 1)
 			$context['subscriptions'][$row['id_subscribe']]['subscribed'] = true;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Simple "done"?
 	if (isset($_GET['done']))
@@ -814,7 +814,7 @@ function subscriptions($memID)
 		if (isset($context['current'][$_GET['sub_id']]))
 		{
 			// What are the details like?
-			$current_pending = smf_json_decode($context['current'][$_GET['sub_id']]['pending_details'], true);
+			$current_pending = pmx_json_decode($context['current'][$_GET['sub_id']]['pending_details'], true);
 			if (!empty($current_pending))
 			{
 				$current_pending = array_reverse($current_pending);
@@ -831,7 +831,7 @@ function subscriptions($memID)
 				// Save the details back.
 				$pending_details = json_encode($current_pending);
 
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_id}
@@ -912,7 +912,7 @@ function subscriptions($memID)
 			// What are the details like?
 			$current_pending = array();
 			if ($context['current'][$context['sub']['id']]['pending_details'] != '')
-				$current_pending = smf_json_decode($context['current'][$context['sub']['id']]['pending_details'], true);
+				$current_pending = pmx_json_decode($context['current'][$context['sub']['id']]['pending_details'], true);
 			// Don't get silly.
 			if (count($current_pending) > 9)
 				$current_pending = array();
@@ -927,7 +927,7 @@ function subscriptions($memID)
 				$current_pending[] = $new_data;
 				$pending_details = json_encode($current_pending);
 
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = {int:pending_count}, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_item}
@@ -946,7 +946,7 @@ function subscriptions($memID)
 		else
 		{
 			$pending_details = json_encode(array($new_data));
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}log_subscribed',
 				array(
 					'id_subscribe' => 'int', 'id_member' => 'int', 'status' => 'int', 'payments_pending' => 'int', 'pending_details' => 'string-65534',

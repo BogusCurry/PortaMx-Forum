@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -192,7 +192,7 @@ function GroupList()
  */
 function MembergroupMembers()
 {
-	global $txt, $scripturl, $context, $modSettings, $sourcedir, $user_info, $settings, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $sourcedir, $user_info, $settings, $pmxcFunc;
 
 	$_REQUEST['group'] = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
@@ -201,7 +201,7 @@ function MembergroupMembers()
 		fatal_lang_error('membergroup_does_not_exist', false);
 
 	// Load up the group details.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_group AS id, group_name AS name, CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable, hidden, online_color,
 			icons, description, CASE WHEN min_posts != {int:min_posts} THEN 1 ELSE 0 END AS is_post_group, group_type
 		FROM {db_prefix}membergroups
@@ -213,10 +213,10 @@ function MembergroupMembers()
 		)
 	);
 	// Doesn't exist?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('membergroup_does_not_exist', false);
-	$context['group'] = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$context['group'] = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Fix the membergroup icons.
 	$context['group']['icons'] = explode('#', $context['group']['icons']);
@@ -230,7 +230,7 @@ function MembergroupMembers()
 	$context['can_send_email'] = allowedTo('moderate_forum');
 
 	// Load all the group moderators, for fun.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT mem.id_member, mem.real_name
 		FROM {db_prefix}group_moderators AS mods
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
@@ -240,7 +240,7 @@ function MembergroupMembers()
 		)
 	);
 	$context['group']['moderators'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$context['group']['moderators'][] = array(
 			'id' => $row['id_member'],
@@ -250,7 +250,7 @@ function MembergroupMembers()
 		if ($user_info['id'] == $row['id_member'] && $context['group']['group_type'] != 1)
 			$context['group']['can_moderate'] = true;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// If this group is hidden then it can only "exists" if the user can moderate it!
 	if ($context['group']['hidden'] && !$context['group']['can_moderate'])
@@ -286,13 +286,13 @@ function MembergroupMembers()
 		$member_parameters = array();
 
 		// Get all the members to be added... taking into account names can be quoted ;)
-		$_REQUEST['toAdd'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['toAdd'], ENT_QUOTES), array('&quot;' => '"'));
+		$_REQUEST['toAdd'] = strtr($pmxcFunc['htmlspecialchars']($_REQUEST['toAdd'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_REQUEST['toAdd'], $matches);
 		$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['toAdd']))));
 
 		foreach ($member_names as $index => $member_name)
 		{
-			$member_names[$index] = trim($smcFunc['strtolower']($member_names[$index]));
+			$member_names[$index] = trim($pmxcFunc['strtolower']($member_names[$index]));
 
 			if (strlen($member_names[$index]) == 0)
 				unset($member_names[$index]);
@@ -321,7 +321,7 @@ function MembergroupMembers()
 		$members = array();
 		if (!empty($member_query))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE (' . implode(' OR ', $member_query) . ')
@@ -331,9 +331,9 @@ function MembergroupMembers()
 					'id_group' => $_REQUEST['group'],
 				))
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				$members[] = $row['id_member'];
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 
 		// @todo Add $_POST['additional'] to templates!
@@ -377,7 +377,7 @@ function MembergroupMembers()
 		$where = $context['group']['is_post_group'] ? 'id_post_group = {int:group}' : 'id_group = {int:group}';
 
 	// Count members of the group.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members
 		WHERE ' . $where,
@@ -385,8 +385,8 @@ function MembergroupMembers()
 			'group' => $_REQUEST['group'],
 		)
 	);
-	list ($context['total_members']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($context['total_members']) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 	$context['total_members'] = comma_format($context['total_members']);
 
 	// Create the page index.
@@ -395,7 +395,7 @@ function MembergroupMembers()
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 	// Load up all members of this group.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, member_name, real_name, email_address, member_ip, date_registered, last_login,
 			posts, is_activated, real_name
 		FROM {db_prefix}members
@@ -409,7 +409,7 @@ function MembergroupMembers()
 		)
 	);
 	$context['members'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$row['member_ip'] = inet_dtop($row['member_ip']);
 		$last_online = empty($row['last_login']) ? $txt['never'] : timeformat($row['last_login']);
@@ -429,7 +429,7 @@ function MembergroupMembers()
 			'is_activated' => $row['is_activated'] % 10 == 1,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Select the template.
 	$context['sub_template'] = 'group_members';
@@ -437,7 +437,7 @@ function MembergroupMembers()
 	createToken('mod-mgm');
 
 	if ($context['group']['assignable'])
-		loadJavascriptFile('suggest.js', array('defer' => false), 'smf_suggest');
+		loadJavascriptFile('suggest.js', array('defer' => false), 'pmx_suggest');
 }
 
 /**
@@ -445,7 +445,7 @@ function MembergroupMembers()
  */
 function GroupRequests()
 {
-	global $txt, $context, $scripturl, $user_info, $sourcedir, $smcFunc, $modSettings;
+	global $txt, $context, $scripturl, $user_info, $sourcedir, $pmxcFunc, $modSettings;
 
 	// Set up the template stuff...
 	$context['page_title'] = $txt['mc_group_requests'];
@@ -499,7 +499,7 @@ function GroupRequests()
 		// Otherwise we do something!
 		else
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT lgr.id_request
 				FROM {db_prefix}log_group_requests AS lgr
 				WHERE ' . $where . '
@@ -510,7 +510,7 @@ function GroupRequests()
 				)
 			);
 			$request_list = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if (!isset($log_changes[$row['id_request']]))
 					$log_changes[$row['id_request']] = array(
@@ -519,15 +519,15 @@ function GroupRequests()
 						'id_member_acted' => $user_info['id'],
 						'member_name_acted' => $user_info['name'],
 						'time_acted' => time(),
-						'act_reason' => $_POST['req_action'] != 'approve' && !empty($_POST['groupreason']) && !empty($_POST['groupreason'][$row['id_request']]) ? $smcFunc['htmlspecialchars']($_POST['groupreason'][$row['id_request']], ENT_QUOTES) : '',
+						'act_reason' => $_POST['req_action'] != 'approve' && !empty($_POST['groupreason']) && !empty($_POST['groupreason'][$row['id_request']]) ? $pmxcFunc['htmlspecialchars']($_POST['groupreason'][$row['id_request']], ENT_QUOTES) : '',
 					);
 				$request_list[] = $row['id_request'];
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Add a background task to handle notifying people of this request
 			$data = json_encode(array('member_id' => $user_info['id'], 'member_ip' => $user_info['ip'], 'request_list' => $request_list, 'status' => $_POST['req_action'], 'reason' => isset($_POST['groupreason']) ? $_POST['groupreason'] : '', 'time' => time()));
-			$smcFunc['db_insert']('insert', '{db_prefix}background_tasks',
+			$pmxcFunc['db_insert']('insert', '{db_prefix}background_tasks',
 				array('task_file' => 'string-255', 'task_class' => 'string-255', 'task_data' => 'string', 'claimed_time' => 'int'),
 				array('$sourcedir/tasks/GroupAct-Notify.php', 'GroupAct_Notify_Background', $data, 0), array()
 			);
@@ -537,7 +537,7 @@ function GroupRequests()
 			{
 				foreach ($log_changes as $id_request => $details)
 				{
-					$smcFunc['db_query']('', '
+					$pmxcFunc['db_query']('', '
 						UPDATE {db_prefix}log_group_requests
 						SET status = {int:status},
 							id_member_acted = {int:id_member_acted},
@@ -688,17 +688,17 @@ function GroupRequests()
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_group_requests AS lgr
 		WHERE ' . $where,
 		array_merge($where_parameters, array(
 		))
 	);
-	list ($totalRequests) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalRequests) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $totalRequests;
 }
@@ -721,9 +721,9 @@ function list_getGroupRequestCount($where, $where_parameters)
  */
 function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
 {
-	global $smcFunc, $scripturl, $txt;
+	global $pmxcFunc, $scripturl, $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
 			lgr.status, lgr.id_member_acted, lgr.member_name_acted, lgr.time_acted, lgr.act_reason,
@@ -741,7 +741,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		))
 	);
 	$group_requests = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if (empty($row['reason']))
 			$reason = '<em>(' . $txt['mc_groupr_no_reason'] .  ')</em>';
@@ -768,7 +768,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 			'time_submitted' => timeformat($row['time_applied']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $group_requests;
 }

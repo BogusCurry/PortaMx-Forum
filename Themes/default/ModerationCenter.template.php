@@ -73,7 +73,7 @@ function template_group_requests_block()
 		</div>
 
 	<script>
-		var oGroupRequestsPanelToggle = new smc_Toggle({
+		var oGroupRequestsPanelToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', !empty($context['admin_prefs']['mcgr']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -96,8 +96,8 @@ function template_group_requests_block()
 			oThemeOptions: {
 				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: pmx_session_var,
+				sSessionId: pmx_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=mcgr\'
 			}
@@ -142,7 +142,7 @@ function template_watched_users()
 		</div>
 
 	<script>
-		var oWatchedUsersToggle = new smc_Toggle({
+		var oWatchedUsersToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', !empty($context['admin_prefs']['mcwu']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -165,8 +165,8 @@ function template_watched_users()
 			oThemeOptions: {
 				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: pmx_session_var,
+				sSessionId: pmx_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=mcwu\'
 			}
@@ -211,7 +211,7 @@ function template_reported_posts_block()
 		</div>
 
 	<script>
-		var oWatchedUsersToggle = new smc_Toggle({
+		var oWatchedUsersToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', !empty($context['admin_prefs']['mcrp']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -234,8 +234,8 @@ function template_reported_posts_block()
 			oThemeOptions: {
 				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: pmx_session_var,
+				sSessionId: pmx_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=mcrp\'
 			}
@@ -280,7 +280,7 @@ function template_reported_users_block()
 		</div>
 
 	<script>
-		var oWatchedUsersToggle = new smc_Toggle({
+		var oWatchedUsersToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', !empty($context['admin_prefs']['mcur']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -303,8 +303,8 @@ function template_reported_users_block()
 			oThemeOptions: {
 				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: pmx_session_var,
+				sSessionId: pmx_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=mcur\'
 			}

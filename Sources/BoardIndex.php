@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -137,8 +137,8 @@ function BoardIndex()
 
 	if (!empty($settings['show_newsfader']))
 	{
-		loadJavascriptFile('slippry.min.js', array(), 'smf_jquery_slippry');
-		loadCSSFile('slider.min.css', array(), 'smf_jquery_slider');
+		loadJavascriptFile('slippry.min.js', array(), 'pmx_jquery_slippry');
+		loadCSSFile('slider.min.css', array(), 'pmx_jquery_slider');
 	}
 }
 

@@ -143,7 +143,7 @@ function template_reported_posts_block()
 		</div>
 
 	<script>
-		var oReportedPostsPanelToggle = new smc_Toggle({
+		var oReportedPostsPanelToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', !empty($context['admin_prefs']['mcrp']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -166,8 +166,8 @@ function template_reported_posts_block()
 			oThemeOptions: {
 				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: pmx_session_var,
+				sSessionId: pmx_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=mcrp\'
 			}
@@ -352,7 +352,7 @@ function template_reported_members_block()
 		</div>
 
 	<script>
-		var oReportedPostsPanelToggle = new smc_Toggle({
+		var oReportedPostsPanelToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', !empty($context['admin_prefs']['mcrm']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -375,8 +375,8 @@ function template_reported_members_block()
 			oThemeOptions: {
 				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: pmx_session_var,
+				sSessionId: pmx_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=mcrm\'
 			}

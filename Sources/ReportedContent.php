@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -25,7 +25,7 @@ if (!defined('SMF'))
  */
 function ReportedContent()
 {
-	global $txt, $context, $user_info, $smcFunc;
+	global $txt, $context, $user_info, $pmxcFunc;
 	global $sourcedir;
 
 	// First order of business - what are these reports about?
@@ -70,7 +70,7 @@ function ReportedContent()
 
 	// By default we call the open sub-action.
 	if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-		$context['sub_action'] = $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_REQUEST['sa']), ENT_QUOTES);
+		$context['sub_action'] = $pmxcFunc['htmltrim']($pmxcFunc['htmlspecialchars']($_REQUEST['sa']), ENT_QUOTES);
 
 	else
 		$context['sub_action'] = 'show';
@@ -389,7 +389,7 @@ function ReportDetails()
  */
 function HandleComment()
 {
-	global $smcFunc, $scripturl, $user_info, $context;
+	global $pmxcFunc, $scripturl, $user_info, $context;
 
 	$comment = array();
 
@@ -406,7 +406,7 @@ function HandleComment()
 		checkSession();
 		validateToken('mod-reportC-add');
 
-		$new_comment = trim($smcFunc['htmlspecialchars']($_POST['mod_comment']));
+		$new_comment = trim($pmxcFunc['htmlspecialchars']($_POST['mod_comment']));
 
 		saveModComment($report_id, array($report_id, $new_comment, time()));
 
@@ -457,7 +457,7 @@ function HandleComment()
  */
 function EditComment()
 {
-	global $smcFunc, $context, $txt, $scripturl, $user_info;
+	global $pmxcFunc, $context, $txt, $scripturl, $user_info;
 
 	$comment = array();
 
@@ -499,7 +499,7 @@ function EditComment()
 			fatal_lang_error('report_action_message_edit_cannot');
 
 		// All good!
-		$edited_comment = trim($smcFunc['htmlspecialchars']($_POST['mod_comment']));
+		$edited_comment = trim($pmxcFunc['htmlspecialchars']($_POST['mod_comment']));
 
 		editModComment($context['comment_id'], $edited_comment);
 

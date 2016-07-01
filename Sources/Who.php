@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -28,7 +28,7 @@ if (!defined('SMF'))
  */
 function Who()
 {
-	global $context, $scripturl, $txt, $modSettings, $memberContext, $smcFunc;
+	global $context, $scripturl, $txt, $modSettings, $memberContext, $pmxcFunc;
 
 	// Permissions, permissions, permissions.
 	isAllowedTo('who_view');
@@ -114,7 +114,7 @@ function Who()
 	$conditions[] = $show_methods[$context['show_by']];
 
 	// Get the total amount of members online.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_online AS lo
 			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
@@ -122,15 +122,15 @@ function Who()
 		array(
 		)
 	);
-	list ($totalMembers) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalMembers) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Prepare some page index variables.
 	$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $_REQUEST['start'], $totalMembers, $modSettings['defaultMaxMembers']);
 	$context['start'] = $_REQUEST['start'];
 
 	// Look for people online, provided they don't mind if you see they are.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			lo.log_time, lo.id_member, lo.url, lo.ip AS ip, mem.real_name,
 			lo.session, mg.online_color, COALESCE(mem.show_online, 1) AS show_online,
@@ -152,9 +152,9 @@ function Who()
 	$context['members'] = array();
 	$member_ids = array();
 	$url_data = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
-		$actions = smf_json_decode($row['url'], true);
+		$actions = pmx_json_decode($row['url'], true);
 		if ($actions === false)
 			continue;
 
@@ -174,7 +174,7 @@ function Who()
 		$url_data[$row['session']] = array($row['url'], $row['id_member']);
 		$member_ids[] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Load the user data for these members.
 	loadMemberData($member_ids);
@@ -194,7 +194,7 @@ function Who()
 	$spiderContext = array();
 	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
 	{
-		foreach (smf_json_decode($modSettings['spider_name_cache'], true) as $id => $name)
+		foreach (pmx_json_decode($modSettings['spider_name_cache'], true) as $id => $name)
 			$spiderContext[$id] = array(
 				'id' => 0,
 				'name' => $name,
@@ -260,7 +260,7 @@ function Who()
  */
 function determineActions($urls, $preferred_prefix = false)
 {
-	global $txt, $user_info, $modSettings, $smcFunc;
+	global $txt, $user_info, $modSettings, $pmxcFunc;
 
 	if (!allowedTo('who_view'))
 		return array();
@@ -305,7 +305,7 @@ function determineActions($urls, $preferred_prefix = false)
 	foreach ($url_list as $k => $url)
 	{
 		// Get the request parameters..
-		$actions = smf_json_decode($url[0], true);
+		$actions = pmx_json_decode($url[0], true);
 		if ($actions === false)
 			continue;
 
@@ -375,7 +375,7 @@ function determineActions($urls, $preferred_prefix = false)
 				// Find out what message they are accessing.
 				$msgid = (int) (isset($actions['msg']) ? $actions['msg'] : (isset($actions['quote']) ? $actions['quote'] : 0));
 
-				$result = $smcFunc['db_query']('', '
+				$result = $pmxcFunc['db_query']('', '
 					SELECT m.id_topic, m.subject
 					FROM {db_prefix}messages AS m
 						INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -389,9 +389,9 @@ function determineActions($urls, $preferred_prefix = false)
 						'id_msg' => $msgid,
 					)
 				);
-				list ($id_topic, $subject) = $smcFunc['db_fetch_row']($result);
+				list ($id_topic, $subject) = $pmxcFunc['db_fetch_row']($result);
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $id_topic, $subject);
-				$smcFunc['db_free_result']($result);
+				$pmxcFunc['db_free_result']($result);
 
 				if (empty($id_topic))
 					$data[$k] = $txt['who_hidden'];
@@ -453,7 +453,7 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load topic names.
 	if (!empty($topic_ids))
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT t.id_topic, m.subject
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -468,19 +468,19 @@ function determineActions($urls, $preferred_prefix = false)
 				'limit' => count($topic_ids),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 		{
 			// Show the topic's subject for each of the actions.
 			foreach ($topic_ids[$row['id_topic']] as $k => $session_text)
 				$data[$k] = sprintf($session_text, $row['id_topic'], censorText($row['subject']));
 		}
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 	}
 
 	// Load board names.
 	if (!empty($board_ids))
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT b.id_board, b.name
 			FROM {db_prefix}boards AS b
 			WHERE {query_see_board}
@@ -491,13 +491,13 @@ function determineActions($urls, $preferred_prefix = false)
 				'limit' => count($board_ids),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 		{
 			// Put the board name into the string for each member...
 			foreach ($board_ids[$row['id_board']] as $k => $session_text)
 				$data[$k] = sprintf($session_text, $row['id_board'], $row['name']);
 		}
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 	}
 
 	// Load member names for the profile. (is_not_guest permission for viewing their own profile)
@@ -505,7 +505,7 @@ function determineActions($urls, $preferred_prefix = false)
 	$allow_view_any = allowedTo('profile_view');
 	if (!empty($profile_ids) && ($allow_view_any || $allow_view_own))
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT id_member, real_name
 			FROM {db_prefix}members
 			WHERE id_member IN ({array_int:member_list})
@@ -514,7 +514,7 @@ function determineActions($urls, $preferred_prefix = false)
 				'member_list' => array_keys($profile_ids),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 		{
 			// If they aren't allowed to view this person's profile, skip it.
 			if (!$allow_view_any && ($user_info['id'] != $row['id_member']))
@@ -524,7 +524,7 @@ function determineActions($urls, $preferred_prefix = false)
 			foreach ($profile_ids[$row['id_member']] as $k => $session_text)
 				$data[$k] = sprintf($session_text, $row['id_member'], $row['real_name']);
 		}
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 	}
 
 	call_integration_hook('whos_online_after', array(&$urls, &$data));
@@ -542,7 +542,7 @@ function determineActions($urls, $preferred_prefix = false)
  */
 function Credits($in_admin = false)
 {
-	global $context, $smcFunc, $forum_copyright, $forum_version, $software_year, $txt, $user_info;
+	global $context, $pmxcFunc, $forum_copyright, $forum_version, $software_year, $txt, $user_info;
 
 	// Don't blink. Don't even blink. Blink and you're dead.
 	loadLanguage('Who');
@@ -603,7 +603,7 @@ function Credits($in_admin = false)
 	if (($mods = cache_get_data('mods_credits', 86400)) === null)
 	{
 		$mods = array();
-		$request = $smcFunc['db_query']('substring', '
+		$request = $pmxcFunc['db_query']('substring', '
 			SELECT version, name, credits
 			FROM {db_prefix}log_packages
 			WHERE install_state = {int:installed_mods}
@@ -611,19 +611,19 @@ function Credits($in_admin = false)
 				AND SUBSTRING(filename, 1, 9) != {string:patch_name}',
 			array(
 				'installed_mods' => 1,
-				'patch_name' => 'smf_patch',
+				'patch_name' => 'pmx_patch',
 				'empty' => '',
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
-			$credit_info = smf_json_decode($row['credits'], true);
+			$credit_info = pmx_json_decode($row['credits'], true);
 
-			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . $smcFunc['htmlspecialchars']($credit_info['copyright']);
-			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . (!empty($credit_info['licenseurl']) ? '<a href="'. $smcFunc['htmlspecialchars']($credit_info['licenseurl']) .'">'. $smcFunc['htmlspecialchars']($credit_info['license']) .'</a>' : $smcFunc['htmlspecialchars']($credit_info['license']));
+			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . $pmxcFunc['htmlspecialchars']($credit_info['copyright']);
+			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . (!empty($credit_info['licenseurl']) ? '<a href="'. $pmxcFunc['htmlspecialchars']($credit_info['licenseurl']) .'">'. $pmxcFunc['htmlspecialchars']($credit_info['license']) .'</a>' : $pmxcFunc['htmlspecialchars']($credit_info['license']));
 			$version = $txt['credits_version'] . ' ' . $row['version'];
-			$title = (empty($credit_info['title']) ? $row['name'] : $smcFunc['htmlspecialchars']($credit_info['title'])) . ': ' . $version;
+			$title = (empty($credit_info['title']) ? $row['name'] : $pmxcFunc['htmlspecialchars']($credit_info['title'])) . ': ' . $version;
 
 			// build this one out and stash it away
 			$mod_name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
@@ -634,7 +634,7 @@ function Credits($in_admin = false)
 	$context['credits_modifications'] = $mods;
 
 	$context['copyrights'] = array(
-		'smf' => sprintf($forum_copyright, $forum_version, $software_year),
+		'portamx' => sprintf($forum_copyright, $forum_version, $software_year),
 		/* Modification Authors:  You may add a copyright statement to this array for your mods.
 			Copyright statements should be in the form of a value only without a array key.  I.E.:
 				'Some Mod by Thantos &copy; 2010',

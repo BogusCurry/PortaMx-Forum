@@ -364,12 +364,12 @@ foreach ($nameChanges as $table_name => $table)
 	$request = upgrade_query("
 		SHOW TABLES
 		LIKE '{$db_prefix}$table_name'");
-	if (smf_mysql_num_rows($request) == 0)
+	if (pmx_mysql_num_rows($request) == 0)
 	{
-		smf_mysql_free_result($request);
+		pmx_mysql_free_result($request);
 		continue;
 	}
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 	// Check each column!
 	$actualChanges = array();
@@ -536,7 +536,7 @@ $request = upgrade_query("
 	SELECT value
 	FROM {$db_prefix}themes
 	WHERE variable = 'show_sp1_info'");
-if (smf_mysql_num_rows($request) != 0)
+if (pmx_mysql_num_rows($request) != 0)
 {
 	upgrade_query("
 		DELETE FROM {$db_prefix}themes
@@ -561,18 +561,18 @@ if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] <= '2.0 Beta
 		SELECT value
 		FROM {$db_prefix}settings
 		WHERE variable = 'cache_enable'");
-	list ($cache_enable) = $smcFunc['db_fetch_row']($request);
+	list ($cache_enable) = $pmxcFunc['db_fetch_row']($request);
 
 	// No cache before 1.1.
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		upgrade_query("
 			INSERT INTO {$db_prefix}settings
 				(variable, value)
-			VALUES ('cache_enable', '1')");
+			VALUES ('cache_enable', '0')");
 	elseif (empty($cache_enable))
 		upgrade_query("
 			UPDATE {$db_prefix}settings
-			SET value = '1'
+			SET value = '0'
 			WHERE variable = 'cache_enable'");
 }
 ---}
@@ -584,9 +584,9 @@ $request = upgrade_query("
 	SELECT value
 	FROM {$db_prefix}settings
 	WHERE variable = 'disable_visual_verification'");
-if (smf_mysql_num_rows($request) != 0)
+if (pmx_mysql_num_rows($request) != 0)
 {
-	list ($oldValue) = smf_mysql_fetch_row($request);
+	list ($oldValue) = pmx_mysql_fetch_row($request);
 	if ($oldValue != 0)
 	{
 		// We have changed the medium setting from SMF 1.1.2.
@@ -611,7 +611,7 @@ $request = upgrade_query("
 	SELECT value
 	FROM {$db_prefix}settings
 	WHERE variable = 'reg_verification'");
-if (smf_mysql_num_rows($request) == 0)
+if (pmx_mysql_num_rows($request) == 0)
 {
 	// Upgrade visual verification again!
 	if (!empty($modSettings['visual_verification_type']))
@@ -696,9 +696,9 @@ if (!isset($modSettings['cal_showholidays']) || !isset($modSettings['cal_showbda
 		VALUES
 			('cal_showholidays', $modSettings[cal_showholidays]),
 			('cal_showbdays', $modSettings[cal_showbdays]),
-			('cal_showevents', $modSettings[cal_showevents]),
-			('ecl_topofs', 36),
-			('pmx_docserver', 'http://docserver.portamx.com/pmxforum/')");
+			('cal_showevents', $modSettings[cal_showevents])");
+}
+
 ---}
 ---#
 
@@ -762,7 +762,9 @@ upgrade_query("
 	INSERT IGNORE INTO {$db_prefix}settings
 		(variable, value)
 	VALUES
-		('pm_spam_settings', '$modSettings[pm_spam_settings]')");
+		('pm_spam_settings', '$modSettings[pm_spam_settings]'),
+		('ecl_topofs', 39),
+		('pmx_docserver', 'http://docserver.portamx.com/pmxforum/')");
 
 upgrade_query("
 	DELETE FROM {$db_prefix}settings
@@ -786,6 +788,196 @@ upgrade_query("
 ---}
 ---#
 
+/******************************************************************************/
+--- Installing new default theme...
+/******************************************************************************/
+
+---# Installing theme settings...
+---{
+// This is Grudge's secret "I'm not a developer" theme install code - keep this quiet ;)
+
+// Firstly, I'm going out of my way to not do this twice!
+if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC2') && empty($modSettings['dont_repeat_theme_core']))
+{
+	// Check it's not already here, just in case.
+	$theme_request = upgrade_query("
+		SELECT id_theme
+		FROM {$db_prefix}themes
+		WHERE variable = 'theme_dir'
+			AND value LIKE '%core'");
+	// Only do the upgrade if it doesn't find the theme already.
+	if ($pmxcFunc['db_num_rows']($theme_request) == 0)
+	{
+		// Try to get some settings from the current default theme.
+		$request = upgrade_query("
+			SELECT t1.value AS theme_dir, t2.value AS theme_url, t3.value AS images_url
+			FROM ({$db_prefix}themes AS t1, {$db_prefix}themes AS t2, {$db_prefix}themes AS t3)
+			WHERE t1.id_theme = 1
+				AND t1.id_member = 0
+				AND t1.variable = 'theme_dir'
+				AND t2.id_theme = 1
+				AND t2.id_member = 0
+				AND t2.variable = 'theme_url'
+				AND t3.id_theme = 1
+				AND t3.id_member = 0
+				AND t3.variable = 'images_url'
+			LIMIT 1");
+		if ($pmxcFunc['db_num_rows']($request) != 0)
+		{
+			$curve = $pmxcFunc['db_fetch_assoc']($request);
+
+			if (substr_count($curve['theme_dir'], 'default') === 1)
+				$core['theme_dir'] = strtr($curve['theme_dir'], array('default' => 'core'));
+			if (substr_count($curve['theme_url'], 'default') === 1)
+				$core['theme_url'] = strtr($curve['theme_url'], array('default' => 'core'));
+			if (substr_count($curve['images_url'], 'default') === 1)
+				$core['images_url'] = strtr($curve['images_url'], array('default' => 'core'));
+		}
+		$pmxcFunc['db_free_result']($request);
+
+		if (!isset($core['theme_dir']))
+			$core['theme_dir'] = addslashes($GLOBALS['boarddir']) . '/Themes/core';
+		if (!isset($core['theme_url']))
+			$core['theme_url'] = $GLOBALS['boardurl'] . '/Themes/core';
+		if (!isset($core['images_url']))
+			$core['images_url'] = $GLOBALS['boardurl'] . '/Themes/core/images';
+
+		// Get an available id_theme first...
+		$request = upgrade_query("
+			SELECT MAX(id_theme) + 1
+			FROM {$db_prefix}themes");
+		list ($id_core_theme) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
+
+		// Insert the core theme into the tables.
+		$pmxcFunc['db_insert']('ignore',
+			'{db_prefix}themes',
+				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-255'),
+				array(
+					array(0, $id_core_theme, 'name', 'Core Theme'),
+					array(0, $id_core_theme, 'theme_url', $core['theme_url']),
+					array(0, $id_core_theme, 'images_url', $core['images_url']),
+					array(0, $id_core_theme, 'theme_dir', $core['theme_dir'])
+				),
+				array()
+		);
+
+		// Update the name of the default theme in the database.
+		upgrade_query("
+			UPDATE {$db_prefix}themes
+			SET value = 'PortaMx Forum Default Theme'
+			WHERE id_theme = 1
+				AND variable = 'name'");
+
+		$newSettings = array();
+		// Now that we have the old theme details - switch anyone who used the default to it (Make sense?!)
+		if (!empty($modSettings['theme_default']) && $modSettings['theme_default'] == 1)
+			$newSettings[] = "('theme_default', $id_core_theme)";
+		// Did guests use to use the default?
+		if (!empty($modSettings['theme_guests']) && $modSettings['theme_guests'] == 1)
+			$newSettings[] = "('theme_guests', $id_core_theme)";
+
+		// If known themes aren't set, let's just pick all themes available.
+		if (empty($modSettings['knownThemes']))
+		{
+			$request = upgrade_query("
+				SELECT DISTINCT id_theme
+				FROM {$db_prefix}themes");
+			$themes = array();
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
+				$themes[] = $row['id_theme'];
+			$modSettings['knownThemes'] = implode(',', $themes);
+			upgrade_query("
+				UPDATE {$db_prefix}settings
+				SET value = '$modSettings[knownThemes]'
+				WHERE variable = 'knownThemes'");
+		}
+
+		// Known themes.
+		$allThemes = explode(',', $modSettings['knownThemes']);
+		$allThemes[] = $id_core_theme;
+		$newSettings[] = "('knownThemes', '" . implode(',', $allThemes) . "')";
+
+		// Since we want to do a replace, just delete the old settings and re-insert them
+		upgrade_query("
+			DELETE FROM {$db_prefix}settings
+			WHERE variable IN ('theme_default', 'theme_guests', 'knownThemes')");
+
+		foreach ($new_settings AS $a_new_setting)
+		{
+			upgrade_query("
+				INSERT INTO {$db_prefix}settings
+				(variable, value)
+				VALUES " . implode(', ', $a_new_setting));
+		}
+
+		// What about members?
+		upgrade_query("
+			UPDATE {$db_prefix}members
+			SET id_theme = $id_core_theme
+			WHERE id_theme = 1");
+
+		// Boards?
+		upgrade_query("
+			UPDATE {$db_prefix}boards
+			SET id_theme = $id_core_theme
+			WHERE id_theme = 1");
+
+		// The other themes used to use core as their base theme.
+		if (isset($core['theme_dir']) && isset($core['theme_url']))
+		{
+			$coreBasedThemes = array_diff($allThemes, array(1));
+
+			// Exclude the themes that already have a base_theme_dir.
+			$request = upgrade_query("
+				SELECT DISTINCT id_theme
+				FROM {$db_prefix}themes
+				WHERE variable = 'base_theme_dir'");
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
+				$coreBasedThemes = array_diff($coreBasedThemes, array($row['id_theme']));
+			$pmxcFunc['db_free_result']($request);
+
+			// Only base themes if there are templates that need a fall-back.
+			$insertRows = array();
+			$request = upgrade_query("
+				SELECT id_theme, value AS theme_dir
+				FROM {$db_prefix}themes
+				WHERE id_theme IN (" . implode(', ', $coreBasedThemes) . ")
+					AND id_member = 0
+					AND variable = 'theme_dir'");
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
+			{
+				if (!file_exists($row['theme_dir'] . '/BoardIndex.template.php') || !file_exists($row['theme_dir'] . '/Display.template.php') || !file_exists($row['theme_dir'] . '/index.template.php') || !file_exists($row['theme_dir'] . '/MessageIndex.template.php') || !file_exists($row['theme_dir'] . '/Settings.template.php'))
+				{
+					$insertRows[] = "(0, $row[id_theme], 'base_theme_dir', '" . addslashes($core['theme_dir']) . "')";
+					$insertRows[] = "(0, $row[id_theme], 'base_theme_url', '" . addslashes($core['theme_url']) . "')";
+				}
+			}
+			$pmxcFunc['db_free_result']($request);
+
+			if (!empty($insertRows))
+				upgrade_query("
+					INSERT IGNORE INTO {$db_prefix}themes
+						(id_member, id_theme, variable, value)
+					VALUES
+						" . implode(',
+						', $insertRows));
+		}
+	}
+	$pmxcFunc['db_free_result']($theme_request);
+
+	// This ain't running twice either - not with the risk of log_tables timing us all out!
+	$pmxcFunc['db_insert']('replace',
+		'{db_prefix}settings',
+		array('variable' => 'string-255', 'value' => 'string-255'),
+		array('dont_repeat_theme_core', '1'),
+		array('variable', 'value')
+	);
+}
+
+---}
+---#
+
 ---# Checking theme layers are correct for default themes.
 ---{
 $request = upgrade_query("
@@ -794,11 +986,11 @@ $request = upgrade_query("
 	WHERE variable = 'theme_layers'
 		OR variable = 'theme_dir'");
 $themeLayerChanges = array();
-while ($row = smf_mysql_fetch_assoc($request))
+while ($row = pmx_mysql_fetch_assoc($request))
 {
 	$themeLayerChanges[$row['id_theme']][$row['variable']] = $row['value'];
 }
-smf_mysql_free_result($request);
+pmx_mysql_free_result($request);
 
 foreach ($themeLayerChanges as $id_theme => $data)
 {
@@ -893,7 +1085,7 @@ $request = upgrade_query("
 		AND active = 1
 		AND private != 2");
 $fields = array();
-while ($row = smf_mysql_fetch_assoc($request))
+while ($row = pmx_mysql_fetch_assoc($request))
 {
 	$fields[] = array(
 		'c' => strtr($row['col_name'], array('|' => '', ';' => '')),
@@ -901,11 +1093,11 @@ while ($row = smf_mysql_fetch_assoc($request))
 		'b' => ($row['bbc'] ? '1' : '0')
 	);
 }
-smf_mysql_free_result($request);
+pmx_mysql_free_result($request);
 
 upgrade_query("
 	UPDATE {$db_prefix}settings
-	SET value = '" . smf_mysql_real_escape_string(serialize($fields)) . "'
+	SET value = '" . pmx_mysql_real_escape_string(serialize($fields)) . "'
 	WHERE variable = 'displayFields'");
 }
 ---}
@@ -1083,11 +1275,11 @@ if (@$modSettings['smfVersion'] < '2.0')
 		FROM {$db_prefix}permissions
 		WHERE permission = 'calendar_edit_any'");
 	$inserts = array();
-	while ($row = smf_mysql_fetch_assoc($request))
+	while ($row = pmx_mysql_fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], 'access_mod_center', $row[add_deny])";
 	}
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -1246,8 +1438,8 @@ if (@$modSettings['smfVersion'] < '2.0' || @$modSettings['smfVersion'] === '2.0 
 	$request = upgrade_query("
 		SELECT MAX(id_attach)
 		FROM {$db_prefix}attachments");
-	list ($step_progress['total']) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($step_progress['total']) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$_GET['a'] = isset($_GET['a']) ? (int) $_GET['a'] : 0;
 	$step_progress['name'] = 'Calculating MIME Types';
@@ -1304,9 +1496,9 @@ if (@$modSettings['smfVersion'] < '2.0' || @$modSettings['smfVersion'] === '2.0 
 				AND mime_type = ''
 			LIMIT $_GET[a], 100");
 		// Finished?
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($pmxcFunc['db_num_rows']($request) == 0)
 			$is_done = true;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			$filename = getAttachmentFilename($row['filename'], $row['id_attach']);
 			if (!file_exists($filename))
@@ -1335,7 +1527,7 @@ if (@$modSettings['smfVersion'] < '2.0' || @$modSettings['smfVersion'] === '2.0 
 				);
 			$ext_updates[$row['fileext'] . $size['mime']]['files'][] = $row['id_attach'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Do the updates?
 		foreach ($ext_updates as $key => $update)
@@ -1411,11 +1603,11 @@ if (@$modSettings['smfVersion'] < '2.0')
 		FROM {$db_prefix}board_permissions
 		WHERE permission = 'modify_any'");
 	$inserts = array();
-	while ($row = smf_mysql_fetch_assoc($request))
+	while ($row = pmx_mysql_fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], $row[id_board], 'approve_posts', $row[add_deny])";
 	}
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -1444,8 +1636,8 @@ ADD line mediumint(8) unsigned NOT NULL default '0';
 $request = upgrade_query("
 	SELECT COUNT(*)
 	FROM {$db_prefix}log_errors");
-list($totalActions) = smf_mysql_fetch_row($request);
-smf_mysql_free_result($request);
+list($totalActions) = pmx_mysql_fetch_row($request);
+pmx_mysql_free_result($request);
 
 $_GET['m'] = !empty($_GET['m']) ? (int) $_GET['m'] : '0';
 $step_progress['total'] = $totalActions;
@@ -1459,7 +1651,7 @@ while ($_GET['m'] < $totalActions)
 		SELECT id_error, message, file, line
 		FROM {$db_prefix}log_errors
 		LIMIT $_GET[m], 500");
-	while($row = smf_mysql_fetch_assoc($request))
+	while($row = pmx_mysql_fetch_assoc($request))
 	{
 		preg_match('~<br />(%1\$s: )?([\w\. \\\\/\-_:]+)<br />(%2\$s: )?([\d]+)~', $row['message'], $matches);
 		if (!empty($matches[2]) && !empty($matches[4]) && empty($row['file']) && empty($row['line']))
@@ -1633,9 +1825,9 @@ $request = upgrade_query("
 	FROM {$db_prefix}permission_profiles
 	WHERE profile_name = ''");
 $profiles = array();
-while ($row = smf_mysql_fetch_assoc($request))
+while ($row = pmx_mysql_fetch_assoc($request))
 	$profiles[] = $row['id_profile'];
-smf_mysql_free_result($request);
+pmx_mysql_free_result($request);
 
 if (!empty($profiles))
 {
@@ -1644,20 +1836,20 @@ if (!empty($profiles))
 		FROM {$db_prefix}boards
 		WHERE id_profile IN (" . implode(',', $profiles) . ")");
 	$done_ids = array();
-	while ($row = smf_mysql_fetch_assoc($request))
+	while ($row = pmx_mysql_fetch_assoc($request))
 	{
 		if (isset($done_ids[$row['id_profile']]))
 			continue;
 		$done_ids[$row['id_profile']] = true;
 
-		$row['name'] = smf_mysql_real_escape_string($row['name']);
+		$row['name'] = pmx_mysql_real_escape_string($row['name']);
 
 		upgrade_query("
 			UPDATE {$db_prefix}permission_profiles
 			SET profile_name = '$row[name]'
 			WHERE id_profile = $row[id_profile]");
 	}
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 }
 ---}
 ---#
@@ -1669,8 +1861,8 @@ if (!empty($profiles))
 $request = upgrade_query("
 	SELECT COUNT(*)
 	FROM {$db_prefix}permission_profiles");
-list ($profileCount) = smf_mysql_fetch_row($request);
-smf_mysql_free_result($request);
+list ($profileCount) = pmx_mysql_fetch_row($request);
+pmx_mysql_free_result($request);
 
 if ($profileCount == 0)
 {
@@ -1701,16 +1893,16 @@ if ($profileCount == 0)
 		FROM {$db_prefix}board_permissions
 		WHERE id_profile = 0");
 	$all_perms = array();
-	while ($row = smf_mysql_fetch_assoc($request))
+	while ($row = pmx_mysql_fetch_assoc($request))
 		$all_perms[$row['id_board']][$row['id_group']][$row['permission']] = $row['add_deny'];
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 	// Now we have the profile profiles for this installation. We now need to go through each board and work out what the permission profile should be!
 	$request = upgrade_query("
 		SELECT id_board, name, permission_mode
 		FROM {$db_prefix}boards");
 	$board_updates = array();
-	while ($row = smf_mysql_fetch_assoc($request))
+	while ($row = pmx_mysql_fetch_assoc($request))
 	{
 		$row['name'] = addslashes($row['name']);
 
@@ -1723,7 +1915,7 @@ if ($profileCount == 0)
 					(profile_name)
 				VALUES
 					('$row[name]')");
-			$board_updates[smf_mysql_insert_id()][] = $row['id_board'];
+			$board_updates[pmx_mysql_insert_id()][] = $row['id_board'];
 		}
 		// Otherwise, dear god, this is an old school "simple" permission...
 		elseif ($row['permission_mode'] > 1 && $row['permission_mode'] < 5)
@@ -1734,7 +1926,7 @@ if ($profileCount == 0)
 		else
 			$board_updates[1][] = $row['id_board'];
 	}
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 	// Update the board tables.
 	foreach ($board_updates as $profile => $boards)
@@ -1813,7 +2005,7 @@ $request = upgrade_query("
 	WHERE id_group != 0
 		AND min_posts = -1");
 $inserts = array();
-while ($row = smf_mysql_fetch_assoc($request))
+while ($row = pmx_mysql_fetch_assoc($request))
 {
 	if ($row['id_group'] == 2 || $row['id_group'] == 3)
 	{
@@ -1834,7 +2026,7 @@ while ($row = smf_mysql_fetch_assoc($request))
 			$inserts[] = "($row[id_group], 4, '$permission')";
 	}
 }
-smf_mysql_free_result($request);
+pmx_mysql_free_result($request);
 
 upgrade_query("
 	INSERT INTO {$db_prefix}board_permissions
@@ -1961,8 +2153,8 @@ ADD KEY id_log (id_log);
 $request = upgrade_query("
 	SELECT COUNT(*)
 	FROM {$db_prefix}log_actions");
-list($totalActions) = smf_mysql_fetch_row($request);
-smf_mysql_free_result($request);
+list($totalActions) = pmx_mysql_fetch_row($request);
+pmx_mysql_free_result($request);
 
 $_GET['m'] = !empty($_GET['m']) ? (int) $_GET['m'] : '0';
 $step_progress['total'] = $totalActions;
@@ -1977,7 +2169,7 @@ while ($_GET['m'] < $totalActions)
 		FROM {$db_prefix}log_actions
 		LIMIT $_GET[m], 500");
 
-	while ($row = smf_mysql_fetch_assoc($mrequest))
+	while ($row = pmx_mysql_fetch_assoc($mrequest))
 	{
 		if (!empty($row['id_board']) || !empty($row['id_topic']) || !empty($row['id_msg']))
 			continue;
@@ -2008,9 +2200,9 @@ while ($_GET['m'] < $totalActions)
 					FROM {$db_prefix}topics
 					WHERE id_topic=$topic_id
 					LIMIT 1");
-				if (smf_mysql_num_rows($trequest))
-					list($board_id) = smf_mysql_fetch_row($trequest);
-				smf_mysql_free_result($trequest);
+				if (pmx_mysql_num_rows($trequest))
+					list($board_id) = pmx_mysql_fetch_row($trequest);
+				pmx_mysql_free_result($trequest);
 			}
 		}
 		else
@@ -2027,9 +2219,9 @@ while ($_GET['m'] < $totalActions)
 					FROM {$db_prefix}messages
 					WHERE id_msg=$msg_id
 					LIMIT 1");
-				if (smf_mysql_num_rows($trequest))
-					list($board_id, $topic_id) = smf_mysql_fetch_row($trequest);
-				smf_mysql_free_result($trequest);
+				if (pmx_mysql_num_rows($trequest))
+					list($board_id, $topic_id) = pmx_mysql_fetch_row($trequest);
+				pmx_mysql_free_result($trequest);
 			}
 		}
 		else
@@ -2066,19 +2258,19 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
 		WHERE id_file > 0;
 ---#
 
----# Add in the files to get from Simple Machines...
-INSERT IGNORE INTO {$db_prefix}admin_info_files
-	(id_file, filename, path, parameters, filetype, data)
-VALUES
-	(1, 'current-version.js', '/pmxforum/infofiles/', '', 'text/javascript', ''),
-	(2, 'detailed-version.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
-	(3, 'latest-news.js', '/pmxforum/infofiles/', '%1$s/', 'text/javascript', ''),
-	(4, 'latest-versions.txt', '/pmxforum/infofiles/', '', 'text/plain', '');
----#
-
 ---# Ensure that the table has the filetype column
 ALTER TABLE {$db_prefix}admin_info_files
 ADD filetype varchar(255) NOT NULL default '';
+---#
+
+---# Add in the files to get from Simple Machines...
+INSERT IGNORE INTO {$db_prefix}admin_info_files
+	(id_file, filename, path, parameters, filetype)
+VALUES
+	(1, 'current-version.js', 'infofiles/', '', 'text/javascript'),
+	(2, 'detailed-version.js', 'infofiles/', '%1$s/', 'text/javascript'),
+	(3, 'latest-news.js', 'infofiles/', '%1$s/', 'text/javascript'),
+	(4, 'latest-versions.txt', 'infofiles/', '', 'text/plain');
 ---#
 
 ---# Ensure that the files from Simple Machines get updated
@@ -2238,14 +2430,14 @@ $request = upgrade_query("
 	FROM {$db_prefix}subscriptions");
 $new_cols = array('repeatable', 'reminder', 'email_complete', 'allow_partial');
 $new_cols = array_flip($new_cols);
-while ($request && $row = smf_mysql_fetch_row($request))
+while ($request && $row = pmx_mysql_fetch_row($request))
 {
 	$row[0] = strtolower($row[0]);
 	if (isset($new_cols[$row[0]]))
 		unset($new_cols[$row[0]]);
 }
 if ($request)
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 if (isset($new_cols['repeatable']))
 	upgrade_query("
@@ -2269,13 +2461,13 @@ $request = upgrade_query("
 	FROM {$db_prefix}log_subscribed");
 $new_cols = array('reminder_sent', 'vendor_ref', 'payments_pending', 'pending_details');
 $new_cols = array_flip($new_cols);
-while ($request && $row = smf_mysql_fetch_row($request))
+while ($request && $row = pmx_mysql_fetch_row($request))
 {
 	if (isset($new_cols[$row[0]]))
 		unset($new_cols[$row[0]]);
 }
 if ($request)
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 if (isset($new_cols['reminder_sent']))
 	upgrade_query("
@@ -2392,7 +2584,7 @@ $request = upgrade_query("
 		AND p.num_guest_voters = 0
 	GROUP BY p.id_poll");
 
-while ($request && $row = $smcFunc['db_fetch_assoc']($request))
+while ($request && $row = $pmxcFunc['db_fetch_assoc']($request))
 	upgrade_query("
 		UPDATE {$db_prefix}polls
 		SET num_guest_voters = ". $row['guest_voters']. "
@@ -2560,25 +2752,25 @@ foreach ($nameChanges as $table_name => $table)
 	$request = upgrade_query("
 		SHOW TABLES
 		LIKE '{$db_prefix}$table_name'");
-	if (smf_mysql_num_rows($request) == 0)
+	if (pmx_mysql_num_rows($request) == 0)
 	{
-		smf_mysql_free_result($request);
+		pmx_mysql_free_result($request);
 		continue;
 	}
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 	// Converting is intensive, so make damn sure that we need to do it.
 	$request = upgrade_query("
 		SHOW FIELDS
 		FROM `{$db_prefix}$table_name`");
 	$tinytextColumns = array();
-	while($row = smf_mysql_fetch_assoc($request))
+	while($row = pmx_mysql_fetch_assoc($request))
 	{
 		// Tinytext detected so store column name.
 		if ($row['Type'] == 'tinytext')
 			$tinytextColumns[$row['Field']] = $row['Field'];
 	}
-	smf_mysql_free_result($request);
+	pmx_mysql_free_result($request);
 
 	// Check each column!
 	$actualChanges = array();
@@ -2772,7 +2964,7 @@ if (file_exists($GLOBALS['boarddir'] . '/Themes/babylon'))
 			AND value ='$babylon_dir'");
 
 	// Don't do anything if this theme is already uninstalled
-	if (smf_mysql_num_rows($theme_request) == 1)
+	if (pmx_mysql_num_rows($theme_request) == 1)
 	{
 		$id_theme = mysql_result($theme_request, 0);
 		mysql_free_result($theme_request);
@@ -2830,13 +3022,13 @@ if (empty($modSettings['installed_new_smiley_sets_20']))
 	// First, the entries.
 	upgrade_query("
 		UPDATE {$db_prefix}settings
-		SET value = CONCAT(value, ',aaron,akyhne')
+		SET value = CONCAT(value, ',aaron,akyhne,portamx')
 		WHERE variable = 'smiley_sets_known'");
 
 	// Second, the names.
 	upgrade_query("
 		UPDATE {$db_prefix}settings
-		SET value = CONCAT(value, '\nAaron\nAkyhne')
+		SET value = CONCAT(value, '\nAaron\nAkyhne\nPortaMx')
 		WHERE variable = 'smiley_sets_names'");
 
 	// This ain't running twice either.
@@ -2891,7 +3083,7 @@ $request = upgrade_query("
 );
 
 // Drop the existing index before we recreate it.
-while ($row = smf_mysql_fetch_assoc($request))
+while ($row = pmx_mysql_fetch_assoc($request))
 {
 	if ($row['Key_name'] === 'real_name' && $row['Sub_part'] == 30)
 	{
@@ -2903,7 +3095,7 @@ while ($row = smf_mysql_fetch_assoc($request))
 	}
 }
 
-smf_mysql_free_result($request);
+pmx_mysql_free_result($request);
 ---}
 ---#
 
@@ -2921,7 +3113,7 @@ $request = upgrade_query("
 );
 
 // Drop the existing index before we recreate it.
-while ($row = smf_mysql_fetch_assoc($request))
+while ($row = pmx_mysql_fetch_assoc($request))
 {
 	if ($row['Key_name'] === 'member_name' && $row['Sub_part'] == 30)
 	{
@@ -2933,7 +3125,7 @@ while ($row = smf_mysql_fetch_assoc($request))
 	}
 }
 
-smf_mysql_free_result($request);
+pmx_mysql_free_result($request);
 
 ---}
 ---#
@@ -3002,8 +3194,8 @@ $request = upgrade_query("
 	FROM {$db_prefix}membergroups
 	WHERE id_group = 1
 	LIMIT 1");
-list ($admin_group_type) = smf_mysql_fetch_row($request);
-smf_mysql_free_result($request);
+list ($admin_group_type) = pmx_mysql_fetch_row($request);
+pmx_mysql_free_result($request);
 
 // Not protected means we haven't updated yet!
 if ($admin_group_type != 1)

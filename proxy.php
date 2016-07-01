@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-define('SMF', 'proxy');
+define('PMX', 'proxy');
 
 /**
  * Class ProxyServer

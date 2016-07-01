@@ -130,6 +130,9 @@ div.sceditor-grip {
 	width: 10px;
 	height: 10px;
 }
+.sceditor-insertemoticon {
+	padding-bottom: 5px !important;
+}
 .rtl div.sceditor-grip {
 	background-position: 0 -650px;
 	width: 10px;

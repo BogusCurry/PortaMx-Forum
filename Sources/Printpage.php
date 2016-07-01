@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -28,7 +28,7 @@ if (!defined('SMF'))
 function PrintTopic()
 {
 	global $topic, $txt, $scripturl, $context, $user_info;
-	global $board_info, $smcFunc, $modSettings;
+	global $board_info, $pmxcFunc, $modSettings;
 
 	// Redirect to the boardindex if no valid topic id is provided.
 	if (empty($topic))
@@ -45,7 +45,7 @@ function PrintTopic()
 	$context['robot_no_index'] = true;
 
 	// Get the topic starter information.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT mem.id_member, m.poster_time, COALESCE(mem.real_name, m.poster_name) AS poster_name, t.id_poll
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -58,16 +58,16 @@ function PrintTopic()
 		)
 	);
 	// Redirect to the boardindex if no valid topic id is provided.
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		redirectexit();
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($row['id_poll']))
 	{
 		loadLanguage('Post');
 		// Get the question and if it's locked.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT
 				p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 				p.guest_vote, p.id_member, COALESCE(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
@@ -79,10 +79,10 @@ function PrintTopic()
 				'id_poll' => $row['id_poll'],
 			)
 		);
-		$pollinfo = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$pollinfo = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT COUNT(DISTINCT id_member) AS total
 			FROM {db_prefix}log_polls
 			WHERE id_poll = {int:id_poll}
@@ -92,14 +92,14 @@ function PrintTopic()
 				'not_guest' => 0,
 			)
 		);
-		list ($pollinfo['total']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($pollinfo['total']) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Total voters needs to include guest voters
 		$pollinfo['total'] += $pollinfo['num_guest_voters'];
 
 		// Get all the options, and calculate the total votes.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT pc.id_choice, pc.label, pc.votes, COALESCE(lp.id_choice, -1) AS voted_this
 			FROM {db_prefix}poll_choices AS pc
 				LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
@@ -113,14 +113,14 @@ function PrintTopic()
 		$pollOptions = array();
 		$realtotal = 0;
 		$pollinfo['has_voted'] = false;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			censorText($row['label']);
 			$pollOptions[$row['id_choice']] = $row;
 			$realtotal += $row['votes'];
 			$pollinfo['has_voted'] |= $row['voted_this'] != -1;
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 		if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -236,7 +236,7 @@ function PrintTopic()
 		$context['parent_boards'][] = $parent['name'];
 
 	// Split the topics up so we can print them.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT subject, poster_time, body, COALESCE(mem.real_name, poster_name) AS poster_name, id_msg
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -250,7 +250,7 @@ function PrintTopic()
 		)
 	);
 	$context['posts'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Censor the subject and message.
 		censorText($row['subject']);
@@ -272,7 +272,7 @@ function PrintTopic()
 		if (!isset($context['topic_subject']))
 			$context['topic_subject'] = $row['subject'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Fetch attachments so we can print them if asked, enabled and allowed
 	if (isset($_REQUEST['images']) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
@@ -282,7 +282,7 @@ function PrintTopic()
 			$messages[] = $temp['id_msg'];
 
 		// build the request
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT
 				a.id_attach, a.id_msg, a.approved, a.width, a.height, a.file_hash, a.filename, a.id_folder, a.mime_type
 			FROM {db_prefix}attachments AS a
@@ -296,7 +296,7 @@ function PrintTopic()
 		);
 		$temp = array();
 		$showAttach = isset($context['show_attach_under_post']) && is_array($context['show_attach_under_post']);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if(!$showAttach || ($showAttach && !in_array($row['id_attach'], $context['show_attach_under_post'])))
 			{
@@ -305,7 +305,7 @@ function PrintTopic()
 					$context['printattach'][$row['id_msg']] = array();
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 		ksort($temp);
 
 		// load them into $context so the template can use them

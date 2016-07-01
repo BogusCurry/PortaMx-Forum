@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -30,7 +30,7 @@ if (!defined('SMF'))
 
 function cleanRequest()
 {
-	global $board, $topic, $boardurl, $scripturl, $modSettings, $smcFunc;
+	global $board, $topic, $boardurl, $scripturl, $modSettings, $pmxcFunc;
 
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
@@ -307,7 +307,7 @@ function cleanRequest()
 		$_SERVER['REQUEST_URL'] = $_SERVER['REQUEST_URI'];
 
 	// And make sure HTTP_USER_AGENT is set.
-	$_SERVER['HTTP_USER_AGENT'] = isset($_SERVER['HTTP_USER_AGENT']) ? (isset($smcFunc['htmlspecialchars']) ? $smcFunc['htmlspecialchars']($smcFunc['db_unescape_string']($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES) : htmlspecialchars($smcFunc['db_unescape_string']($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES)) : '';
+	$_SERVER['HTTP_USER_AGENT'] = isset($_SERVER['HTTP_USER_AGENT']) ? (isset($pmxcFunc['htmlspecialchars']) ? $pmxcFunc['htmlspecialchars']($pmxcFunc['db_unescape_string']($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES) : htmlspecialchars($pmxcFunc['db_unescape_string']($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES)) : '';
 
 	// Some final checking.
 	if (!isValidIP($_SERVER['BAN_CHECK_IP']))
@@ -437,17 +437,17 @@ function matchIPtoCIDR($ip_address, $cidr_address)
  */
 function escapestring__recursive($var)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (!is_array($var))
-		return $smcFunc['db_escape_string']($var);
+		return $pmxcFunc['db_escape_string']($var);
 
 	// Reindex the array with slashes.
 	$new_var = array();
 
 	// Add slashes to every element, even the indexes!
 	foreach ($var as $k => $v)
-		$new_var[$smcFunc['db_escape_string']($k)] = escapestring__recursive($v);
+		$new_var[$pmxcFunc['db_escape_string']($k)] = escapestring__recursive($v);
 
 	return $new_var;
 }
@@ -465,10 +465,10 @@ function escapestring__recursive($var)
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (!is_array($var))
-		return isset($smcFunc['htmlspecialchars']) ? $smcFunc['htmlspecialchars']($var, ENT_QUOTES) : htmlspecialchars($var, ENT_QUOTES);
+		return isset($pmxcFunc['htmlspecialchars']) ? $pmxcFunc['htmlspecialchars']($var, ENT_QUOTES) : htmlspecialchars($var, ENT_QUOTES);
 
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)
@@ -514,17 +514,17 @@ function urldecode__recursive($var, $level = 0)
  */
 function unescapestring__recursive($var)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (!is_array($var))
-		return $smcFunc['db_unescape_string']($var);
+		return $pmxcFunc['db_unescape_string']($var);
 
 	// Reindex the array without slashes, this time.
 	$new_var = array();
 
 	// Strip the slashes from every element.
 	foreach ($var as $k => $v)
-		$new_var[$smcFunc['db_unescape_string']($k)] = unescapestring__recursive($v);
+		$new_var[$pmxcFunc['db_unescape_string']($k)] = unescapestring__recursive($v);
 
 	return $new_var;
 }
@@ -568,11 +568,11 @@ function stripslashes__recursive($var, $level = 0)
  */
 function htmltrim__recursive($var, $level = 0)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
-		return isset($smcFunc) ? $smcFunc['htmltrim']($var) : trim($var, ' ' . "\t\n\r\x0B" . '\0' . "\xA0");
+		return isset($pmxcFunc) ? $pmxcFunc['htmltrim']($var) : trim($var, ' ' . "\t\n\r\x0B" . '\0' . "\xA0");
 
 	// Go through all the elements and remove the whitespace.
 	foreach ($var as $k => $v)
@@ -618,7 +618,7 @@ function JavaScriptEscape($string)
 		'<script' => '<scri\'+\'pt',
 		'<body>' => '<bo\'+\'dy>',
 		'<a href' => '<a hr\'+\'ef',
-		$scripturl => '\' + smf_scripturl + \'',
+		$scripturl => '\' + pmx_scripturl + \'',
 	)) . '\'';
 }
 

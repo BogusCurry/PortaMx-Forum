@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -96,7 +96,7 @@ function bbc_to_html($text, $compat_mode = false)
  */
 function html_to_bbc($text)
 {
-	global $modSettings, $smcFunc, $scripturl, $context;
+	global $modSettings, $pmxcFunc, $scripturl, $context;
 
 	// Replace newlines with spaces, as that's how browsers usually interpret them.
 	$text = preg_replace("~\s*[\r\n]+\s*~", ' ', $text);
@@ -115,7 +115,7 @@ function html_to_bbc($text)
 	// Remove any formatting within code tags.
 	if (strpos($text, '[code') !== false)
 	{
-		$text = preg_replace('~<br\s?/?' . '>~i', '#smf_br_spec_grudge_cool!#', $text);
+		$text = preg_replace('~<br\s?/?' . '>~i', '#pmx_br_spec_grudge_cool!#', $text);
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Only mess with stuff outside [code] tags.
@@ -126,7 +126,7 @@ function html_to_bbc($text)
 				$parts[$i] = strip_tags($parts[$i]);
 		}
 
-		$text = strtr(implode('', $parts), array('#smf_br_spec_grudge_cool!#' => '<br>'));
+		$text = strtr(implode('', $parts), array('#pmx_br_spec_grudge_cool!#' => '<br>'));
 	}
 
 	// Remove scripts, style and comment blocks.
@@ -142,7 +142,7 @@ function html_to_bbc($text)
 		// Easy if it's not custom.
 		if (empty($modSettings['smiley_enable']))
 		{
-			$smileysfrom = array('>:D', ':D', '::)', '>:(', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', '0:)');
+			$smileysfrom = array(':>D', ':D', '::)', ':>(', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', '0:)');
 			$smileysto = array('evil.gif', 'cheesy.gif', 'rolleyes.gif', 'angry.gif', 'smiley.gif', 'wink.gif', 'grin.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'tongue.gif', 'huh.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'kiss.gif', 'cry.gif', 'undecided.gif', 'azn.gif', 'afro.gif', 'police.gif', 'angel.gif');
 
 			foreach ($matches[1] as $k => $file)
@@ -150,7 +150,7 @@ function html_to_bbc($text)
 				$found = array_search($file, $smileysto);
 				// Note the weirdness here is to stop double spaces between smileys.
 				if ($found)
-					$matches[1][$k] = '-[]-smf_smily_start#|#' . $smcFunc['htmlspecialchars']($smileysfrom[$found]) . '-[]-smf_smily_end#|#';
+					$matches[1][$k] = '-[]-pmx_smily_start#|#' . $pmxcFunc['htmlspecialchars']($smileysfrom[$found]) . '-[]-pmx_smily_end#|#';
 				else
 					$matches[1][$k] = '';
 			}
@@ -165,7 +165,7 @@ function html_to_bbc($text)
 
 			if (!empty($names))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT code, filename
 					FROM {db_prefix}smileys
 					WHERE filename IN ({array_string:smiley_filenames})',
@@ -174,13 +174,13 @@ function html_to_bbc($text)
 					)
 				);
 				$mappings = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$mappings[$row['filename']] = $smcFunc['htmlspecialchars']($row['code']);
-				$smcFunc['db_free_result']($request);
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
+					$mappings[$row['filename']] = $pmxcFunc['htmlspecialchars']($row['code']);
+				$pmxcFunc['db_free_result']($request);
 
 				foreach ($matches[1] as $k => $file)
 					if (isset($mappings[$file]))
-						$matches[1][$k] = '-[]-smf_smily_start#|#' . $mappings[$file] . '-[]-smf_smily_end#|#';
+						$matches[1][$k] = '-[]-pmx_smily_start#|#' . $mappings[$file] . '-[]-pmx_smily_end#|#';
 			}
 		}
 
@@ -188,7 +188,7 @@ function html_to_bbc($text)
 		$text = str_replace($matches[0], $matches[1], $text);
 
 		// Now sort out spaces
-		$text = str_replace(array('-[]-smf_smily_end#|#-[]-smf_smily_start#|#', '-[]-smf_smily_end#|#', '-[]-smf_smily_start#|#'), ' ', $text);
+		$text = str_replace(array('-[]-pmx_smily_end#|#-[]-pmx_smily_start#|#', '-[]-pmx_smily_end#|#', '-[]-pmx_smily_start#|#'), ' ', $text);
 	}
 
 	// Only try to buy more time if the client didn't quit.
@@ -1495,7 +1495,7 @@ function loadLocale()
  */
 function getMessageIcons($board_id)
 {
-	global $modSettings, $txt, $settings, $smcFunc;
+	global $modSettings, $txt, $settings, $pmxcFunc;
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
@@ -1528,7 +1528,7 @@ function getMessageIcons($board_id)
 	{
 		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT title, filename
 				FROM {db_prefix}message_icons
 				WHERE id_board IN (0, {int:board_id})
@@ -1538,9 +1538,9 @@ function getMessageIcons($board_id)
 				)
 			);
 			$icon_data = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				$icon_data[] = $row;
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			$icons = array();
 			foreach ($icon_data as $icon)
@@ -1582,7 +1582,7 @@ function theme_postbox($msg)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, $smcFunc, $editortxt;
+	global $txt, $modSettings, $options, $pmxcFunc, $editortxt;
 	global $context, $settings, $user_info, $scripturl;
 
 	// Load the Post language file... for the moment at least.
@@ -1601,15 +1601,15 @@ function create_control_richedit($editorOptions)
 			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 60000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
-		loadCSSFile('jquery.sceditor.css', array('force_current' => false, 'validate' => true), 'smf_jquery_sceditor');
+		loadCSSFile('jquery.sceditor.css', array('force_current' => false, 'validate' => true), 'pmx_jquery_sceditor');
 		loadTemplate('GenericControls');
 
 		// JS makes the editor go round
-		loadJavascriptFile('editor.js', array(), 'smf_editor');
-		loadJavascriptFile('jquery.sceditor.bbcode.min.js', array(), 'smf_sceditor_bbcode');
-		loadJavascriptFile('jquery.sceditor.smf.js', array(), 'smf_sceditor_smf');
+		loadJavascriptFile('editor.js', array(), 'pmx_editor');
+		loadJavascriptFile('jquery.sceditor.bbcode.min.js', array(), 'pmx_sceditor_bbcode');
+		loadJavascriptFile('jquery.sceditor.js', array(), 'pmx_sceditor');
 		addInlineJavascript('
-	var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
+	var pmx_smileys_url = \'' . $settings['smileys_url'] . '\';
 	var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
 	var bbc_quote = \'' . addcslashes($txt['quote'], "'") . '\';
 	var bbc_search_on = \'' . addcslashes($txt['search_on'], "'") . '\';');
@@ -1621,7 +1621,7 @@ function create_control_richedit($editorOptions)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && (function_exists('pspell_new') || (function_exists('enchant_broker_init') && ($txt['lang_charset'] == 'UTF-8' || function_exists('iconv'))));
 		if ($context['show_spellchecking'])
 		{
-			loadJavascriptFile('spellcheck.js', array(), 'smf_spellcheck');
+			loadJavascriptFile('spellcheck.js', array(), 'pmx_spellcheck');
 
 			// Some hidden information is needed in order to make the spell checking work.
 			if (!isset($_REQUEST['xml']))
@@ -1908,7 +1908,7 @@ function create_control_richedit($editorOptions)
 						'description' => $txt['icon_grin']
 					),
 					array(
-						'code' => '>:(',
+						'code' => ':>(',
 						'filename' => 'angry.gif',
 						'description' => $txt['icon_angry'],
 					),
@@ -1975,7 +1975,7 @@ function create_control_richedit($editorOptions)
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
@@ -1983,14 +1983,14 @@ function create_control_richedit($editorOptions)
 					array(
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				{
-					$row['filename'] = $smcFunc['htmlspecialchars']($row['filename']);
-					$row['description'] = $smcFunc['htmlspecialchars']($row['description']);
+					$row['filename'] = $pmxcFunc['htmlspecialchars']($row['filename']);
+					$row['description'] = $pmxcFunc['htmlspecialchars']($row['description']);
 
 					$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
 				}
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 
 				foreach ($context['smileys'] as $section => $smileyRows)
 				{
@@ -2020,7 +2020,7 @@ function create_control_richedit($editorOptions)
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 	global $context, $user_info, $scripturl, $language;
 
 	// First verification means we need to set up some bits...
@@ -2031,7 +2031,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 
 		// Some javascript ma'am?
 		if (!empty($verificationOptions['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($verificationOptions['override_visual'])))
-			loadJavascriptFile('captcha.js', array(), 'smf_captcha');
+			loadJavascriptFile('captcha.js', array(), 'pmx_captcha');
 
 		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
 
@@ -2075,7 +2075,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	{
 		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestions', 300)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_question, lngfile, question, answers
 				FROM {db_prefix}qanda',
 				array()
@@ -2085,19 +2085,19 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 				'langs' => array(),
 			);
 			// This is like Captain Kirk climbing a mountain in some ways. This is L's fault, mkay? :P
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				$id_question = $row['id_question'];
 				unset ($row['id_question']);
-				// Make them all lowercase. We can't directly use $smcFunc['strtolower'] with array_walk, so do it manually, eh?
-				$row['answers'] = smf_json_decode($row['answers'], true);
+				// Make them all lowercase. We can't directly use $pmxcFunc['strtolower'] with array_walk, so do it manually, eh?
+				$row['answers'] = pmx_json_decode($row['answers'], true);
 				foreach ($row['answers'] as $k => $v)
-					$row['answers'][$k] = $smcFunc['strtolower']($v);
+					$row['answers'][$k] = $pmxcFunc['strtolower']($v);
 
 				$modSettings['question_id_cache']['questions'][$id_question] = $row;
 				$modSettings['question_id_cache']['langs'][$row['lngfile']][] = $id_question;
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			cache_put_data('verificationQuestions', $modSettings['question_id_cache'], 300);
 		}
@@ -2153,7 +2153,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 				// Second, is their answer in the list of possible answers?
 				else
 				{
-					$given_answer = trim($smcFunc['htmlspecialchars'](strtolower($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$q])));
+					$given_answer = trim($pmxcFunc['htmlspecialchars'](strtolower($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$q])));
 					if (!in_array($given_answer, $modSettings['question_id_cache']['questions'][$q]['answers']))
 						$incorrectQuestions[] = $q;
 				}
@@ -2238,7 +2238,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	{
 		// Same questions as before.
 		$questionIDs = !empty($_SESSION[$verificationOptions['id'] . '_vv']['q']) ? $_SESSION[$verificationOptions['id'] . '_vv']['q'] : array();
-		$thisVerification['text_value'] = !empty($_REQUEST[$verificationOptions['id'] . '_vv']['code']) ? $smcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['code']) : '';
+		$thisVerification['text_value'] = !empty($_REQUEST[$verificationOptions['id'] . '_vv']['code']) ? $pmxcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['code']) : '';
 	}
 
 	// If we do have an empty field, it would be nice to hide it from legitimate users who shouldn't be populating it anyway.
@@ -2262,7 +2262,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 				'q' => parse_bbc($row['question']),
 				'is_error' => !empty($incorrectQuestions) && in_array($q, $incorrectQuestions),
 				// Remember a previous submission?
-				'a' => isset($_REQUEST[$verificationOptions['id'] . '_vv'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'][$q]) ? $smcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$q]) : '',
+				'a' => isset($_REQUEST[$verificationOptions['id'] . '_vv'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'], $_REQUEST[$verificationOptions['id'] . '_vv']['q'][$q]) ? $pmxcFunc['htmlspecialchars']($_REQUEST[$verificationOptions['id'] . '_vv']['q'][$q]) : '',
 			);
 			$_SESSION[$verificationOptions['id'] . '_vv']['q'][] = $q;
 		}
@@ -2307,7 +2307,7 @@ function AutoSuggestHandler($checkRegistered = null)
 	loadTemplate('Xml');
 
 	// Any parameters?
-	$context['search_param'] = isset($_REQUEST['search_param']) ? smf_json_decode(base64_decode($_REQUEST['search_param']), true) : array();
+	$context['search_param'] = isset($_REQUEST['search_param']) ? pmx_json_decode(base64_decode($_REQUEST['search_param']), true) : array();
 
 	if (isset($_REQUEST['suggest_type'], $_REQUEST['search']) && isset($searchTypes[$_REQUEST['suggest_type']]))
 	{
@@ -2324,21 +2324,21 @@ function AutoSuggestHandler($checkRegistered = null)
  */
 function AutoSuggest_Search_Member()
 {
-	global $user_info, $smcFunc, $context;
+	global $user_info, $pmxcFunc, $context;
 
-	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
+	$_REQUEST['search'] = trim($pmxcFunc['strtolower']($_REQUEST['search'])) . '*';
 	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 	// Find the member.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
 		WHERE {raw:real_name} LIKE {string:search}' . (!empty($context['search_param']['buddies']) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN (1, 11)
-		LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
+		LIMIT ' . ($pmxcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
 		array(
-			'real_name' => $smcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name',
+			'real_name' => $pmxcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $user_info['buddies'],
 			'search' => $_REQUEST['search'],
 		)
@@ -2349,7 +2349,7 @@ function AutoSuggest_Search_Member()
 			'children' => array(),
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
@@ -2360,7 +2360,7 @@ function AutoSuggest_Search_Member()
 			'value' => $row['real_name'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $xml_data;
 }
@@ -2372,14 +2372,14 @@ function AutoSuggest_Search_Member()
  */
 function AutoSuggest_Search_MemberGroups()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
+	$_REQUEST['search'] = trim($pmxcFunc['strtolower']($_REQUEST['search'])) . '*';
 	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 	// Find the group.
 	// Only return groups which are not post-based and not "Hidden", but not the "Administrators" or "Moderators" groups.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_group, group_name
 		FROM {db_prefix}membergroups
 		WHERE {raw:group_name} LIKE {string:search}
@@ -2388,7 +2388,7 @@ function AutoSuggest_Search_MemberGroups()
 			AND hidden != {int:hidden}
 		',
 		array(
-			'group_name' => $smcFunc['db_case_sensitive'] ? 'LOWER(group_name}' : 'group_name',
+			'group_name' => $pmxcFunc['db_case_sensitive'] ? 'LOWER(group_name}' : 'group_name',
 			'min_posts' => -1,
 			'invalid_groups' => array(1,3),
 			'hidden' => 2,
@@ -2401,7 +2401,7 @@ function AutoSuggest_Search_MemberGroups()
 			'children' => array(),
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$row['group_name'] = strtr($row['group_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
@@ -2412,7 +2412,7 @@ function AutoSuggest_Search_MemberGroups()
 			'value' => $row['group_name'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $xml_data;
 }
@@ -2424,7 +2424,7 @@ function AutoSuggest_Search_MemberGroups()
  */
 function AutoSuggest_Search_SMFVersions()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	$xml_data = array(
 		'items' => array(
@@ -2435,32 +2435,32 @@ function AutoSuggest_Search_SMFVersions()
 
 	// First try and get it from the database.
 	$versions = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT data
 		FROM {db_prefix}admin_info_files
 		WHERE filename = {string:latest_versions}
 			AND path = {string:path}',
 		array(
 			'latest_versions' => 'latest-versions.txt',
-			'path' => '/smf/',
+			'path' => 'infofiles/',
 		)
 	);
-	if (($smcFunc['db_num_rows']($request) > 0) && ($row = $smcFunc['db_fetch_assoc']($request)) && !empty($row['data']))
+	if (($pmxcFunc['db_num_rows']($request) > 0) && ($row = $pmxcFunc['db_fetch_assoc']($request)) && !empty($row['data']))
 	{
 		// The file can be either Windows or Linux line endings, but let's ensure we clean it as best we can.
 		$possible_versions = explode("\n", $row['data']);
 		foreach ($possible_versions as $ver)
 		{
 			$ver = trim($ver);
-			if (strpos($ver, 'SMF') === 0)
+			if (strpos($ver, 'PortaMx-Forum') === 0)
 				$versions[] = $ver;
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Just in case we don't have ANYthing.
 	if (empty($versions))
-		$versions = array('SMF 2.0');
+		$versions = array('PortaMx-Forum 2.1 Beta 4');
 
 	foreach ($versions as $id => $version)
 		if (strpos($version, strtoupper($_REQUEST['search'])) !== false)

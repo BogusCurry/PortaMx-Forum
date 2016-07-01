@@ -124,7 +124,7 @@ function template_email_members()
 	// This is some javascript for the simple/advanced toggling and member suggest
 	echo '
 	<script>
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: true,
 			aSwappableContainers: [
@@ -147,10 +147,10 @@ function template_email_members()
 		});
 	</script>
 	<script>
-		var oMemberSuggest = new smc_AutoSuggest({
+		var oMemberSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var,
 			sSuggestId: \'members\',
 			sControlId: \'members\',
 			sSearchType: \'member\',
@@ -161,7 +161,7 @@ function template_email_members()
 			sItemListContainerId: \'members_container\',
 			aListItems: []
 		});
-		var oExcludeMemberSuggest = new smc_AutoSuggest({
+		var oExcludeMemberSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oExcludeMemberSuggest\',
 			sSessionId: \'', $context['session_id'], '\',
 			sSessionVar: \'', $context['session_var'], '\',
@@ -297,7 +297,7 @@ function template_email_members_compose()
 
 					x[x.length] = \'item=newsletterpreview\';
 
-					sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=xmlhttp;sa=previews;xml\', x.join(\'&\'), onDocSent);
+					sendXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=xmlhttp;sa=previews;xml\', x.join(\'&\'), onDocSent);
 
 					document.getElementById(\'preview_section\').style.display = \'\';
 					setInnerHTML(document.getElementById(\'preview_subject\'), txt_preview_title);

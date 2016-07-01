@@ -29,7 +29,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -183,7 +183,7 @@ function ThemeAdmin()
  */
 function ThemeList()
 {
-	global $context, $boarddir, $boardurl, $smcFunc;
+	global $context, $boarddir, $boardurl, $pmxcFunc;
 
 	loadLanguage('Admin');
 	isAllowedTo('admin_forum');
@@ -221,7 +221,7 @@ function ThemeList()
 
 		if (!empty($setValues))
 		{
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}themes',
 				array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				$setValues,
@@ -251,7 +251,7 @@ function ThemeList()
  */
 function SetThemeOptions()
 {
-	global $txt, $context, $settings, $modSettings, $smcFunc;
+	global $txt, $context, $settings, $modSettings, $pmxcFunc;
 
 	$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
@@ -259,7 +259,7 @@ function SetThemeOptions()
 
 	if (empty($_GET['th']) && empty($_GET['id']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE variable IN ({string:name}, {string:theme_dir})
@@ -271,7 +271,7 @@ function SetThemeOptions()
 			)
 		);
 		$context['themes'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (!isset($context['themes'][$row['id_theme']]))
 				$context['themes'][$row['id_theme']] = array(
@@ -281,9 +281,9 @@ function SetThemeOptions()
 				);
 			$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_theme, COUNT(*) AS value
 			FROM {db_prefix}themes
 			WHERE id_member = {int:guest_member}
@@ -292,24 +292,24 @@ function SetThemeOptions()
 				'guest_member' => -1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$context['themes'][$row['id_theme']]['num_default_options'] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Need to make sure we don't do custom fields.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT col_name
 			FROM {db_prefix}custom_fields',
 			array(
 			)
 		);
 		$customFields = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$customFields[] = $row['col_name'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 		$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
-		$request = $smcFunc['db_query']('themes_count', '
+		$request = $pmxcFunc['db_query']('themes_count', '
 			SELECT COUNT(DISTINCT id_member) AS value, id_theme
 			FROM {db_prefix}themes
 			WHERE id_member > {int:no_member}
@@ -320,9 +320,9 @@ function SetThemeOptions()
 				'custom_fields' => empty($customFields) ? array() : $customFields,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$context['themes'][$row['id_theme']]['num_members'] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// There has to be a Settings template!
 		foreach ($context['themes'] as $k => $v)
@@ -366,7 +366,7 @@ function SetThemeOptions()
 		{
 			// Are there options in non-default themes set that should be cleared?
 			if (!empty($old_settings))
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}themes
 					WHERE id_theme != {int:default_theme}
 						AND id_member = {int:guest_member}
@@ -378,7 +378,7 @@ function SetThemeOptions()
 					)
 				);
 
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}themes',
 				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				$setValues,
@@ -409,7 +409,7 @@ function SetThemeOptions()
 			elseif ($_POST['default_options_master'][$opt] == 1)
 			{
 				// Delete then insert for ease of database compatibility!
-				$smcFunc['db_query']('substring', '
+				$pmxcFunc['db_query']('substring', '
 					DELETE FROM {db_prefix}themes
 					WHERE id_theme = {int:default_theme}
 						AND id_member != {int:no_member}
@@ -420,7 +420,7 @@ function SetThemeOptions()
 						'option' => $opt,
 					)
 				);
-				$smcFunc['db_query']('substring', '
+				$pmxcFunc['db_query']('substring', '
 					INSERT INTO {db_prefix}themes
 						(id_member, id_theme, variable, value)
 					SELECT id_member, 1, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
@@ -435,7 +435,7 @@ function SetThemeOptions()
 			}
 			elseif ($_POST['default_options_master'][$opt] == 2)
 			{
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}themes
 					WHERE variable = {string:option_name}
 						AND id_member > {int:no_member}',
@@ -449,7 +449,7 @@ function SetThemeOptions()
 
 		// Delete options from other themes.
 		if (!empty($old_settings))
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}themes
 				WHERE id_theme != {int:default_theme}
 					AND id_member > {int:no_member}
@@ -468,7 +468,7 @@ function SetThemeOptions()
 			elseif ($_POST['options_master'][$opt] == 1)
 			{
 				// Delete then insert for ease of database compatibility - again!
-				$smcFunc['db_query']('substring', '
+				$pmxcFunc['db_query']('substring', '
 					DELETE FROM {db_prefix}themes
 					WHERE id_theme = {int:current_theme}
 						AND id_member != {int:no_member}
@@ -479,7 +479,7 @@ function SetThemeOptions()
 						'option' => $opt,
 					)
 				);
-				$smcFunc['db_query']('substring', '
+				$pmxcFunc['db_query']('substring', '
 					INSERT INTO {db_prefix}themes
 						(id_member, id_theme, variable, value)
 					SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
@@ -493,7 +493,7 @@ function SetThemeOptions()
 			}
 			elseif ($_POST['options_master'][$opt] == 2)
 			{
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}themes
 					WHERE variable = {string:option}
 						AND id_member > {int:no_member}
@@ -517,20 +517,20 @@ function SetThemeOptions()
 		// Don't delete custom fields!!
 		if ($_GET['th'] == 1)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT col_name
 				FROM {db_prefix}custom_fields',
 				array(
 				)
 			);
 			$customFields = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				$customFields[] = $row['col_name'];
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 		$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}themes
 			WHERE id_member > {int:no_member}
 				AND id_theme = {int:current_theme}
@@ -566,7 +566,7 @@ function SetThemeOptions()
 
 	if (empty($_REQUEST['who']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT variable, value
 			FROM {db_prefix}themes
 			WHERE id_theme IN (1, {int:current_theme})
@@ -577,9 +577,9 @@ function SetThemeOptions()
 			)
 		);
 		$context['theme_options'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$context['theme_options'][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		$context['theme_options_reset'] = false;
 	}
@@ -634,7 +634,7 @@ function SetThemeOptions()
  */
 function SetThemeSettings()
 {
-	global $txt, $context, $settings, $modSettings, $smcFunc;
+	global $txt, $context, $settings, $modSettings, $pmxcFunc;
 
 	if (empty($_GET['th']) && empty($_GET['id']))
 		return ThemeAdmin();
@@ -658,7 +658,7 @@ function SetThemeSettings()
 		'' => $txt['smileys_no_default']
 	);
 	foreach ($sets as $i => $set)
-		$context['smiley_sets'][$set] = $smcFunc['htmlspecialchars']($set_names[$i]);
+		$context['smiley_sets'][$set] = $pmxcFunc['htmlspecialchars']($set_names[$i]);
 
 	$old_id = $settings['theme_id'];
 	$old_settings = $settings;
@@ -727,7 +727,7 @@ function SetThemeSettings()
 		// If we're actually inserting something..
 		if (!empty($inserts))
 		{
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}themes',
 				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				$inserts,
@@ -884,7 +884,7 @@ function EnableTheme()
  */
 function PickTheme()
 {
-	global $txt, $context, $modSettings, $user_info, $language, $smcFunc, $settings, $scripturl;
+	global $txt, $context, $modSettings, $user_info, $language, $pmxcFunc, $settings, $scripturl;
 
 	loadLanguage('Profile');
 	loadTemplate('Themes');
@@ -927,7 +927,7 @@ function PickTheme()
 			// A variants to save for the user?
 			if (!empty($_GET['vrt']))
 			{
-				$smcFunc['db_insert']('replace',
+				$pmxcFunc['db_insert']('replace',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
@@ -944,7 +944,7 @@ function PickTheme()
 		// If changing members or guests - and there's a variant - assume changing default variant.
 		if (!empty($_GET['vrt']) && ($_REQUEST['u'] == '0' || $_REQUEST['u'] == '-1'))
 		{
-			$smcFunc['db_insert']('replace',
+			$pmxcFunc['db_insert']('replace',
 				'{db_prefix}themes',
 				array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				array($_GET['th'], 0, 'default_variant', $_GET['vrt']),
@@ -963,7 +963,7 @@ function PickTheme()
 			// Remove any custom variants.
 			if (!empty($_GET['vrt']))
 			{
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}themes
 					WHERE id_theme = {int:current_theme}
 						AND variable = {string:theme_variant}',
@@ -994,7 +994,7 @@ function PickTheme()
 
 			if (!empty($_GET['vrt']))
 			{
-				$smcFunc['db_insert']('replace',
+				$pmxcFunc['db_insert']('replace',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
@@ -1033,7 +1033,7 @@ function PickTheme()
 	{
 		$context['current_member'] = (int) $_REQUEST['u'];
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_theme
 			FROM {db_prefix}members
 			WHERE id_member = {int:current_member}
@@ -1042,15 +1042,15 @@ function PickTheme()
 				'current_member' => $context['current_member'],
 			)
 		);
-		list ($context['current_theme']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($context['current_theme']) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Get the theme name and descriptions.
 	$context['available_themes'] = array();
 	if (!empty($modSettings['knownThemes']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url}, {string:disable_user_variant})' . (!allowedTo('admin_forum') ? '
@@ -1070,7 +1070,7 @@ function PickTheme()
 				'enable_themes' => explode(',', $modSettings['enableThemes']),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (!isset($context['available_themes'][$row['id_theme']]))
 				$context['available_themes'][$row['id_theme']] = array(
@@ -1080,7 +1080,7 @@ function PickTheme()
 				);
 			$context['available_themes'][$row['id_theme']][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
@@ -1094,7 +1094,7 @@ function PickTheme()
 	else
 		$guest_theme = $modSettings['theme_guests'];
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_theme, COUNT(*) AS the_count
 		FROM {db_prefix}members
 		GROUP BY id_theme
@@ -1102,7 +1102,7 @@ function PickTheme()
 		array(
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Figure out which theme it is they are REALLY using.
 		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',',$modSettings['knownThemes'])))
@@ -1115,13 +1115,13 @@ function PickTheme()
 		else
 			$context['available_themes'][$guest_theme]['num_users'] += $row['the_count'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Get any member variant preferences.
 	$variant_preferences = array();
 	if ($context['current_member'] > 0)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_theme, value
 			FROM {db_prefix}themes
 			WHERE variable = {string:theme_variant}
@@ -1132,9 +1132,9 @@ function PickTheme()
 				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $context['current_member']) : array(-1),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$variant_preferences[$row['id_theme']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Save the setting first.
@@ -1228,7 +1228,7 @@ function PickTheme()
 function ThemeInstall()
 {
 	global $sourcedir, $txt, $context, $boarddir, $boardurl;
-	global $themedir, $themeurl, $smcFunc;
+	global $themedir, $themeurl, $pmxcFunc;
 
 	checkSession('request');
 	isAllowedTo('admin_forum');
@@ -1250,7 +1250,7 @@ function ThemeInstall()
 	// Is there a function to call?
 	if (isset($_GET['do']) && !empty($_GET['do']) && isset($subActions[$_GET['do']]))
 	{
-		$action = $smcFunc['htmlspecialchars'](trim($_GET['do']));
+		$action = $pmxcFunc['htmlspecialchars'](trim($_GET['do']));
 
 		// Got any info from the specific form?
 		if (!isset($_POST['save_'. $action]))
@@ -1303,7 +1303,7 @@ function InstallFile()
 	if (!is_writable($dirtemp))
 	{
 		// Lets give it a try.
-		smf_chmod($dirtemp, '0755');
+		pmx_chmod($dirtemp, '0755');
 
 		// How about now?
 		if (!is_writable($dirtemp))
@@ -1361,7 +1361,7 @@ function InstallFile()
  */
 function InstallCopy()
 {
-	global $themedir, $themeurl, $settings, $smcFunc, $context;
+	global $themedir, $themeurl, $settings, $pmxcFunc, $context;
 	global $forum_version;
 
 	// There's gotta be something to work with.
@@ -1382,7 +1382,7 @@ function InstallCopy()
 		'name' => $name,
 		'images_url' => $themeurl . '/' . $name . '/images',
 		'version' => '1.0',
-		'install_for' => '2.1 - 2.1.99, '. strtr($forum_version, array('SMF ' => '')),
+		'install_for' => '2.1 - 2.1.99, '. strtr($forum_version, array('PortaMx Forum ' => '')),
 		'based_on' => '',
 		'based_on_dir' => $themedir . '/default',
 	);
@@ -1406,7 +1406,7 @@ function InstallCopy()
 	foreach ($to_copy as $file)
 	{
 		copy($settings['default_theme_dir'] . $file, $context['to_install']['theme_dir'] . $file);
-		smf_chmod($context['to_install']['theme_dir'] . $file, 0777);
+		pmx_chmod($context['to_install']['theme_dir'] . $file, 0777);
 	}
 
 	// And now the entire images directory!
@@ -1414,7 +1414,7 @@ function InstallCopy()
 	package_flush_cache();
 
 	// Lets get some data for the new theme.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
 		WHERE variable IN ({string:theme_templates}, {string:theme_layers})
@@ -1428,7 +1428,7 @@ function InstallCopy()
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if ($row['variable'] == 'theme_templates')
 			$theme_templates = $row['value'];
@@ -1438,7 +1438,7 @@ function InstallCopy()
 			continue;
 	}
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$context['to_install'] += array(
 		'theme_layers' => empty($theme_layers) ? 'html,body' : $theme_layers,
@@ -1449,7 +1449,7 @@ function InstallCopy()
 	$xml_info = '<' . '?xml version="1.0"?' . '>
 <theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:smf="http://www.simplemachines.org/">
 <!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-<id>smf:' . $smcFunc['strtolower']($context['to_install']['name']) . '</id>
+<id>smf:' . $pmxcFunc['strtolower']($context['to_install']['name']) . '</id>
 <!-- The theme\'s version, please try to use semantic versioning. -->
 <version>1.0</version>
 <!-- Install for, the SMF versions this theme was designed for. Uses the same wildcards used in the packager manager. This field is mandatory. -->
@@ -1573,7 +1573,7 @@ function WrapAction()
  */
 function SetJavaScript()
 {
-	global $settings, $user_info, $smcFunc, $options;
+	global $settings, $user_info, $pmxcFunc, $options;
 
 	// Check the session id.
 	checkSession('get');
@@ -1622,7 +1622,7 @@ function SetJavaScript()
 	// If this is the admin preferences the passed value will just be an element of it.
 	if ($_GET['var'] == 'admin_preferences')
 	{
-		$options['admin_preferences'] = !empty($options['admin_preferences']) ? smf_json_decode($options['admin_preferences'], true) : array();
+		$options['admin_preferences'] = !empty($options['admin_preferences']) ? pmx_json_decode($options['admin_preferences'], true) : array();
 		// New thingy...
 		if (isset($_GET['admin_key']) && strlen($_GET['admin_key']) < 5)
 			$options['admin_preferences'][$_GET['admin_key']] = $_GET['val'];
@@ -1632,7 +1632,7 @@ function SetJavaScript()
 	}
 
 	// Update the option.
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}themes',
 		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 		array($settings['theme_id'], $user_info['id'], $_GET['var'], is_array($_GET['val']) ? implode(',', $_GET['val']) : $_GET['val']),
@@ -1652,7 +1652,7 @@ function SetJavaScript()
  */
 function EditTheme()
 {
-	global $context, $scripturl, $boarddir, $smcFunc, $txt;
+	global $context, $scripturl, $boarddir, $pmxcFunc, $txt;
 
 	// @todo Should this be removed?
 	if (isset($_REQUEST['preview']))
@@ -1790,11 +1790,11 @@ function EditTheme()
 
 			// Recycle the submitted data.
 			if (is_array($_POST['entire_file']))
-				$context['entire_file'] = $smcFunc['htmlspecialchars'](implode("\n", $_POST['entire_file']));
+				$context['entire_file'] = $pmxcFunc['htmlspecialchars'](implode("\n", $_POST['entire_file']));
 			else
-				$context['entire_file'] = $smcFunc['htmlspecialchars']($_POST['entire_file']);
+				$context['entire_file'] = $pmxcFunc['htmlspecialchars']($_POST['entire_file']);
 
-			$context['edit_filename'] = $smcFunc['htmlspecialchars']($_POST['filename']);
+			$context['edit_filename'] = $pmxcFunc['htmlspecialchars']($_POST['filename']);
 
 			// You were able to submit it, so it's reasonable to assume you are allowed to save.
 			$context['allow_save'] = true;
@@ -1808,13 +1808,13 @@ function EditTheme()
 
 	$context['allow_save'] = is_writable($currentTheme['theme_dir'] . '/' . $_REQUEST['filename']);
 	$context['allow_save_filename'] = strtr($currentTheme['theme_dir'] . '/' . $_REQUEST['filename'], array($boarddir => '...'));
-	$context['edit_filename'] = $smcFunc['htmlspecialchars']($_REQUEST['filename']);
+	$context['edit_filename'] = $pmxcFunc['htmlspecialchars']($_REQUEST['filename']);
 
 	if (substr($_REQUEST['filename'], -4) == '.css')
 	{
 		$context['sub_template'] = 'edit_style';
 
-		$context['entire_file'] = $smcFunc['htmlspecialchars'](strtr(file_get_contents($currentTheme['theme_dir'] . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+		$context['entire_file'] = $pmxcFunc['htmlspecialchars'](strtr(file_get_contents($currentTheme['theme_dir'] . '/' . $_REQUEST['filename']), array("\t" => '   ')));
 	}
 	elseif (substr($_REQUEST['filename'], -13) == '.template.php')
 	{
@@ -1845,16 +1845,16 @@ function EditTheme()
 			}
 
 			$context['file_parts'][$j]['lines']++;
-			$context['file_parts'][$j]['data'] .= $smcFunc['htmlspecialchars'](strtr($file_data[$i], array("\t" => '   ')));
+			$context['file_parts'][$j]['data'] .= $pmxcFunc['htmlspecialchars'](strtr($file_data[$i], array("\t" => '   ')));
 		}
 
-		$context['entire_file'] = $smcFunc['htmlspecialchars'](strtr(implode('', $file_data), array("\t" => '   ')));
+		$context['entire_file'] = $pmxcFunc['htmlspecialchars'](strtr(implode('', $file_data), array("\t" => '   ')));
 	}
 	else
 	{
 		$context['sub_template'] = 'edit_file';
 
-		$context['entire_file'] = $smcFunc['htmlspecialchars'](strtr(file_get_contents($currentTheme['theme_dir'] . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+		$context['entire_file'] = $pmxcFunc['htmlspecialchars'](strtr(file_get_contents($currentTheme['theme_dir'] . '/' . $_REQUEST['filename']), array("\t" => '   ')));
 	}
 
 	// Create a special token to allow editing of multiple files.

@@ -1,4 +1,4 @@
-function smf_fileUpload(oOptions)
+function fileUpload(oOptions)
 {
 	var previewNode = document.querySelector('#au-template');
 	previewNode.id = '';
@@ -7,7 +7,7 @@ function smf_fileUpload(oOptions)
 
 	// Default values in case oOptions isn't defined.
 	var dOptions = {
-		url: smf_prepareScriptUrl(smf_scripturl) + 'action=uploadAttach;sa=add;' + smf_session_var + '=' + smf_session_id + (current_board ? ';board=' + current_board : ''),
+		url: pmx_prepareScriptUrl(pmx_scripturl) + 'action=uploadAttach;sa=add;' + pmx_session_var + '=' + pmx_session_id + (current_board ? ';board=' + current_board : ''),
 		parallelUploads : 1,
 		filesizeBase:1024,
 		paramName: 'attachment',
@@ -19,7 +19,7 @@ function smf_fileUpload(oOptions)
 		thumbnailHeight: null,
 		autoQueue: false,
 		clickable: '.fileinput-button',
-		smf_insertBBC: function(file){
+		pmx_insertBBC: function(file){
 			var bbcOptionalParams = {
 				name: typeof file.name !== "undefined" ? ('name='+ file.name) : '',
 				type: typeof file.type !== "undefined" ? ('type='+ file.type) : (typeof file.mime_type !== "undefined" ? ('type='+ file.mime_type) : '')
@@ -112,12 +112,12 @@ function smf_fileUpload(oOptions)
 
 		// If the attachment is an image and has a thumbnail, show it. Otherwise fallback to the generic thumbfile.
 		if (!file.type.match(/image.*/)) {
-			myDropzone.emit('thumbnail', file, smf_images_url +'/generic_attach.png');
+			myDropzone.emit('thumbnail', file, pmx_images_url +'/generic_attach.png');
 		}
 
 		// If the file is too small, it won't have a thumbnail, show the regular file.
 		else if (typeof file.isMock !== "undefined" && typeof file.attachID !== "undefined") {
-			myDropzone.emit('thumbnail', file, smf_prepareScriptUrl(smf_scripturl) +'action=dlattach;attach='+ (file.thumbID > 0 ? file.thumbID : file.attachID) + ';type=preview');
+			myDropzone.emit('thumbnail', file, pmx_prepareScriptUrl(pmx_scripturl) +'action=dlattach;attach='+ (file.thumbID > 0 ? file.thumbID : file.attachID) + ';type=preview');
 		}
 
 		file.name = file.name.php_to8bit().php_urlencode();
@@ -134,7 +134,7 @@ function smf_fileUpload(oOptions)
 				// Get the editor stuff.
 				var oEditor = $('#' + oEditorID).data('sceditor');
 
-				oEditor.insert(myDropzone.options.smf_insertBBC(response));
+				oEditor.insert(myDropzone.options.pmx_insertBBC(response));
 			});
 		};
 
@@ -150,13 +150,13 @@ function smf_fileUpload(oOptions)
 				$this = $(this);
 
 				// Perform the action only after receiving the confirmation.
-				if (!confirm(smf_you_sure)){
+				if (!confirm(pmx_you_sure)){
 					return;
 				}
 
 				// Let the server know you want to delete the file you just recently uploaded...
 				$.ajax({
-					url: smf_prepareScriptUrl(smf_scripturl) + 'action=uploadAttach;sa=delete;attach='+ attachmentId +';' + smf_session_var + '=' + smf_session_id + (current_board ? ';board=' + current_board : ''),
+					url: pmx_prepareScriptUrl(pmx_scripturl) + 'action=uploadAttach;sa=delete;attach='+ attachmentId +';' + pmx_session_var + '=' + pmx_session_id + (current_board ? ';board=' + current_board : ''),
 					type: 'GET',
 					dataType: 'json',
 					beforeSend: function(){
@@ -289,7 +289,7 @@ function smf_fileUpload(oOptions)
 		_thisElement.addClass('infobox').removeClass('descbox');
 
 		// Append the BBC.
-		_thisElement.find('input[name="attachBBC"]').val(myDropzone.options.smf_insertBBC(response));
+		_thisElement.find('input[name="attachBBC"]').val(myDropzone.options.pmx_insertBBC(response));
 
 		file.insertAttachment(_thisElement, response);
 
@@ -327,7 +327,7 @@ function smf_fileUpload(oOptions)
 			_thisElement.find('.start').fadeOutAndRemove('slow');
 
 			// Append the BBC.
-			_thisElement.find('input[name="attachBBC"]').val(myDropzone.options.smf_insertBBC(file));
+			_thisElement.find('input[name="attachBBC"]').val(myDropzone.options.pmx_insertBBC(file));
 
 			file.insertAttachment(_thisElement, file);
 
@@ -370,7 +370,7 @@ function smf_fileUpload(oOptions)
 	// Add an event for uploading and cancelling all files.
 	$('a#attach-cancelAll' ).on('click', function() {
 
-		if (!confirm(smf_you_sure)){
+		if (!confirm(pmx_you_sure)){
 			return;
 		}
 
@@ -380,7 +380,7 @@ function smf_fileUpload(oOptions)
 
 	$('a#attach-uploadAll' ).on('click', function() {
 
-		if (!confirm(smf_you_sure)){
+		if (!confirm(pmx_you_sure)){
 			return;
 		}
 

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -64,18 +64,18 @@ function ManageLanguages()
  */
 function AddLanguage()
 {
-	global $context, $sourcedir, $txt, $smcFunc;
+	global $context, $sourcedir, $txt, $pmxcFunc;
 
 	// Are we searching for new languages courtesy of Simple Machines?
-	if (!empty($_POST['smf_add_sub']))
+	if (!empty($_POST['pmx_add_sub']))
 	{
 		// Need fetch_web_data.
 		require_once($sourcedir . '/Subs-Package.php');
 
-		$context['smf_search_term'] = $smcFunc['htmlspecialchars'](trim($_POST['smf_add']));
+		$context['pmx_search_term'] = $pmxcFunc['htmlspecialchars'](trim($_POST['pmx_add']));
 
 		$listOptions = array(
-			'id' => 'smf_languages',
+			'id' => 'pmx_languages',
 			'get_items' => array(
 				'function' => 'list_getLanguagesList',
 			),
@@ -90,7 +90,7 @@ function AddLanguage()
 				),
 				'description' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_desc'],
+						'value' => $txt['add_language_pmx_desc'],
 					),
 					'data' => array(
 						'db' => 'description',
@@ -98,7 +98,7 @@ function AddLanguage()
 				),
 				'version' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_version'],
+						'value' => $txt['add_language_pmx_version'],
 					),
 					'data' => array(
 						'db' => 'version',
@@ -106,7 +106,7 @@ function AddLanguage()
 				),
 				'utf8' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_utf8'],
+						'value' => $txt['add_language_pmx_utf8'],
 					),
 					'data' => array(
 						'db' => 'utf8',
@@ -114,7 +114,7 @@ function AddLanguage()
 				),
 				'install_link' => array(
 					'header' => array(
-						'value' => $txt['add_language_smf_install'],
+						'value' => $txt['add_language_pmx_install'],
 						'class' => 'centercol',
 					),
 					'data' => array(
@@ -128,7 +128,7 @@ function AddLanguage()
 		require_once($sourcedir . '/Subs-List.php');
 		createList($listOptions);
 
-		$context['default_list'] = 'smf_languages';
+		$context['default_list'] = 'pmx_languages';
 	}
 
 	$context['sub_template'] = 'add_language';
@@ -142,7 +142,7 @@ function AddLanguage()
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $sourcedir, $smcFunc, $txt, $scripturl, $modSettings;
+	global $forum_version, $context, $sourcedir, $pmxcFunc, $txt, $scripturl, $modSettings;
 
 	// We're going to use this URL.
 	$url = $modSettings['pmx_docserver'] .'lang-data.xml';
@@ -153,33 +153,33 @@ function list_getLanguagesList()
 
 	// Check that the site responded and that the language exists.
 	if (!$language_list->exists('languages'))
-		$context['smf_error'] = 'no_response';
+		$context['pmx_error'] = 'no_response';
 	elseif (!$language_list->exists('languages/language'))
-		$context['smf_error'] = 'no_files';
+		$context['pmx_error'] = 'no_files';
 	else
 	{
 		$language_list = $language_list->path('languages[0]');
 		$lang_files = $language_list->set('language');
-		$smf_languages = array();
+		$pmx_languages = array();
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
-			if (!empty($context['smf_search_term']) && strpos($file->fetch('name'), $smcFunc['strtolower']($context['smf_search_term'])) === false)
+			if (!empty($context['pmx_search_term']) && strpos($file->fetch('name'), $pmxcFunc['strtolower']($context['pmx_search_term'])) === false)
 				continue;
 
-			$smf_languages[] = array(
+			$pmx_languages[] = array(
 				'id' => $file->fetch('id'),
-				'name' => $smcFunc['ucwords']($file->fetch('name')),
+				'name' => $pmxcFunc['ucwords']($file->fetch('name')),
 				'version' => $file->fetch('version'),
 				'utf8' => $file->fetch('utf8') ? $txt['yes'] : $txt['no'],
 				'description' => $file->fetch('description'),
-				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_smf_install'] . '</a>',
+				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_pmx_install'] . '</a>',
 			);
 		}
-		if (empty($smf_languages))
-			$context['smf_error'] = 'no_files';
+		if (empty($pmx_languages))
+			$context['pmx_error'] = 'no_files';
 		else
-			return $smf_languages;
+			return $pmx_languages;
 	}
 }
 
@@ -195,7 +195,7 @@ function list_getLanguagesList()
  */
 function DownloadLanguage()
 {
-	global $context, $sourcedir, $forum_version, $boarddir, $txt, $smcFunc, $scripturl, $modSettings;
+	global $context, $sourcedir, $forum_version, $boarddir, $txt, $pmxcFunc, $scripturl, $modSettings;
 
 	loadLanguage('ManageSettings');
 	require_once($sourcedir . '/Subs-Package.php');
@@ -395,7 +395,7 @@ function DownloadLanguage()
 			$value_data['params']['value_' . $k] = '%' . $index;
 		}
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_theme, value
 			FROM {db_prefix}themes
 			WHERE id_member = {int:no_member}
@@ -408,19 +408,19 @@ function DownloadLanguage()
 			))
 		);
 		$themes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			// Find the right one.
 			foreach ($indexes as $index)
 				if (strpos($row['value'], $index) !== false)
 					$themes[$row['id_theme']] = $index;
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (!empty($themes))
 		{
 			// Now we have the id_theme we can get the pretty description.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_theme, value
 				FROM {db_prefix}themes
 				WHERE id_member = {int:no_member}
@@ -432,12 +432,12 @@ function DownloadLanguage()
 					'name' => 'name',
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				// Now we have it...
 				$context['theme_names'][$themes[$row['id_theme']]] = $row['value'];
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 	}
 
@@ -714,7 +714,7 @@ function list_getNumLanguages()
  */
 function list_getLanguages()
 {
-	global $settings, $smcFunc, $language, $context, $txt;
+	global $settings, $pmxcFunc, $language, $context, $txt;
 
 	$languages = array();
 	// Keep our old entries.
@@ -745,19 +745,19 @@ function list_getLanguages()
 			'char_set' => $txt['lang_character_set'],
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => $smcFunc['ucwords'](strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
+			'name' => $pmxcFunc['ucwords'](strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
 		);
 	}
 
 	// Work out how many people are using each language.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT lngfile, COUNT(*) AS num_users
 		FROM {db_prefix}members
 		GROUP BY lngfile',
 		array(
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Default?
 		if (empty($row['lngfile']) || !isset($languages[$row['lngfile']]))
@@ -768,7 +768,7 @@ function list_getLanguages()
 		elseif (isset($languages[$row['lngfile']]))
 			$languages[$row['lngfile']]['count'] += $row['num_users'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Restore the current users language.
 	$txt = $old_txt;
@@ -846,7 +846,7 @@ function ModifyLanguageSettings($return_config = false)
  */
 function ModifyLanguage()
 {
-	global $settings, $context, $smcFunc, $txt, $modSettings, $boarddir, $sourcedir, $language;
+	global $settings, $context, $pmxcFunc, $txt, $modSettings, $boarddir, $sourcedir, $language;
 
 	loadLanguage('ManageSettings');
 
@@ -863,7 +863,7 @@ function ModifyLanguage()
 	$context['lang_id'] = $matches[1];
 
 	// Get all the theme data.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_theme != {int:default_theme}
@@ -882,9 +882,9 @@ function ModifyLanguage()
 			'theme_dir' => $settings['default_theme_dir'],
 		),
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// This will be where we look
 	$lang_dirs = array();
@@ -980,7 +980,7 @@ function ModifyLanguage()
 					deltree($curPath);
 
 		// Members can no longer use this language.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}members
 			SET lngfile = {empty}
 			WHERE lngfile = {string:current_language}',
@@ -1040,7 +1040,7 @@ function ModifyLanguage()
 	$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php');
 	// Setup the primary settings context.
 	$context['primary_settings'] = array(
-		'name' => $smcFunc['ucwords'](strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
+		'name' => $pmxcFunc['ucwords'](strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
 		'character_set' => $txt['lang_character_set'],
 		'locale' => $txt['lang_locale'],
 		'dictionary' => $txt['lang_dictionary'],
@@ -1250,7 +1250,7 @@ function ModifyLanguage()
  */
 function cleanLangString($string, $to_display = true)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// If going to display we make sure it doesn't have any HTML in it - etc.
 	$new_string = '';
@@ -1347,7 +1347,7 @@ function cleanLangString($string, $to_display = true)
 		}
 
 		// Unhtml then rehtml the whole thing!
-		$new_string = $smcFunc['htmlspecialchars'](un_htmlspecialchars($new_string));
+		$new_string = $pmxcFunc['htmlspecialchars'](un_htmlspecialchars($new_string));
 	}
 	else
 	{

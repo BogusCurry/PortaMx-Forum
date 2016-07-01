@@ -14,7 +14,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -25,7 +25,7 @@ if (!defined('SMF'))
 function Register($reg_errors = array())
 {
 	global $txt, $boarddir, $context, $modSettings, $user_info;
-	global $language, $scripturl, $smcFunc, $sourcedir, $cur_profile;
+	global $language, $scripturl, $pmxcFunc, $sourcedir, $cur_profile;
 
 	if(!checkECL_Cookie())
 		ecl_error('register');
@@ -93,7 +93,7 @@ function Register($reg_errors = array())
 
 	// Kinda need this.
 	if ($context['sub_template'] == 'registration_form')
-		loadJavascriptFile('register.js', array('defer' => false), 'smf_register');
+		loadJavascriptFile('register.js', array('defer' => false), 'pmx_register');
 
 	// Add the register chain to the link tree.
 	$context['linktree'][] = array(
@@ -171,7 +171,7 @@ function Register($reg_errors = array())
 		// We might have had some submissions on this front - go check.
 		foreach ($reg_fields as $field)
 			if (isset($_POST[$field]))
-				$cur_profile[$field] = $smcFunc['htmlspecialchars']($_POST[$field]);
+				$cur_profile[$field] = $pmxcFunc['htmlspecialchars']($_POST[$field]);
 
 		// Load all the fields in question.
 		setupProfileContext($reg_fields);
@@ -193,8 +193,8 @@ function Register($reg_errors = array())
 
 
 	$context += array(
-		'username' => isset($_POST['user']) ? $smcFunc['htmlspecialchars']($_POST['user']) : '',
-		'email' => isset($_POST['email']) ? $smcFunc['htmlspecialchars']($_POST['email']) : '',
+		'username' => isset($_POST['user']) ? $pmxcFunc['htmlspecialchars']($_POST['user']) : '',
+		'email' => isset($_POST['email']) ? $pmxcFunc['htmlspecialchars']($_POST['email']) : '',
 		'notify_announcements' => !empty($_POST['notify_announcements']) ? 1 : 0,
 	);
 
@@ -212,7 +212,7 @@ function Register($reg_errors = array())
 function Register2()
 {
 	global $txt, $modSettings, $context, $sourcedir;
-	global $smcFunc, $maintenance;
+	global $pmxcFunc, $maintenance;
 
 	checkSession();
 	validateToken('register');
@@ -320,7 +320,7 @@ function Register2()
 	if (isset($_POST['real_name']) && (allowedTo('profile_displayed_name') || allowedTo('moderate_forum')))
 	{
 		$_POST['real_name'] = trim(preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $_POST['real_name']));
-		if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && $smcFunc['strlen']($_POST['real_name']) < 60)
+		if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && $pmxcFunc['strlen']($_POST['real_name']) < 60)
 			$possible_strings[] = 'real_name';
 	}
 
@@ -367,7 +367,7 @@ function Register2()
 	// Include the additional options that might have been filled in.
 	foreach ($possible_strings as $var)
 		if (isset($_POST[$var]))
-			$regOptions['extra_register_vars'][$var] = $smcFunc['htmlspecialchars']($_POST[$var], ENT_QUOTES);
+			$regOptions['extra_register_vars'][$var] = $pmxcFunc['htmlspecialchars']($_POST[$var], ENT_QUOTES);
 	foreach ($possible_ints as $var)
 		if (isset($_POST[$var]))
 			$regOptions['extra_register_vars'][$var] = (int) $_POST[$var];
@@ -387,7 +387,7 @@ function Register2()
 	$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
 
 	// Check whether we have fields that simply MUST be displayed?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT col_name, field_name, field_type, field_length, mask, show_reg
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:is_active}
@@ -397,7 +397,7 @@ function Register2()
 		)
 	);
 	$custom_field_errors = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Don't allow overriding of the theme variables.
 		if (isset($regOptions['theme_vars'][$row['col_name']]))
@@ -414,7 +414,7 @@ function Register2()
 		if (!in_array($row['field_type'], array('check', 'select', 'radio')))
 		{
 			// Is it too long?
-			if ($row['field_length'] && $row['field_length'] < $smcFunc['strlen']($value))
+			if ($row['field_length'] && $row['field_length'] < $pmxcFunc['strlen']($value))
 				$custom_field_errors[] = array('custom_field_too_long', array($row['field_name'], $row['field_length']));
 
 			// Any masks to apply?
@@ -433,7 +433,7 @@ function Register2()
 		if (trim($value) == '' && $row['show_reg'] > 1)
 			$custom_field_errors[] = array('custom_field_empty', array($row['field_name']));
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Process any errors.
 	if (!empty($custom_field_errors))
@@ -516,7 +516,7 @@ function Register2()
  */
 function Activate()
 {
-	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc, $language, $user_info;
+	global $context, $txt, $modSettings, $scripturl, $sourcedir, $pmxcFunc, $language, $user_info;
 
 	// Logged in users should not bother to activate their accounts
 	if (!empty($user_info['id']))
@@ -540,7 +540,7 @@ function Activate()
 	}
 
 	// Get the code from the database...
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, validation_code, member_name, real_name, email_address, is_activated, passwd, lngfile
 		FROM {db_prefix}members' . (empty($_REQUEST['u']) ? '
 		WHERE member_name = {string:email_address} OR email_address = {string:email_address}' : '
@@ -553,7 +553,7 @@ function Activate()
 	);
 
 	// Does this user exist at all?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 	{
 		$context['sub_template'] = 'retry_activate';
 		$context['page_title'] = $txt['invalid_userid'];
@@ -562,8 +562,8 @@ function Activate()
 		return;
 	}
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Change their email address? (they probably tried a fake one first :P.)
 	if (isset($_POST['new_email'], $_REQUEST['passwd']) && hash_password($row['member_name'], $_REQUEST['passwd']) == $row['passwd'] && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
@@ -572,13 +572,13 @@ function Activate()
 			fatal_lang_error('no_access', false);
 
 		if (!filter_var($_POST['new_email'], FILTER_VALIDATE_EMAIL))
-			fatal_error(sprintf($txt['valid_email_needed'], $smcFunc['htmlspecialchars']($_POST['new_email'])), false);
+			fatal_error(sprintf($txt['valid_email_needed'], $pmxcFunc['htmlspecialchars']($_POST['new_email'])), false);
 
 		// Make sure their email isn't banned.
 		isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 		// Ummm... don't even dare try to take someone else's email!!
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
@@ -588,9 +588,9 @@ function Activate()
 			)
 		);
 
-		if ($smcFunc['db_num_rows']($request) != 0)
-			fatal_lang_error('email_in_use', false, array($smcFunc['htmlspecialchars']($_POST['new_email'])));
-		$smcFunc['db_free_result']($request);
+		if ($pmxcFunc['db_num_rows']($request) != 0)
+			fatal_lang_error('email_in_use', false, array($pmxcFunc['htmlspecialchars']($_POST['new_email'])));
+		$pmxcFunc['db_free_result']($request);
 
 		updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 		$row['email_address'] = $_POST['new_email'];
@@ -673,7 +673,7 @@ function Activate()
  */
 function CoppaForm()
 {
-	global $context, $modSettings, $txt, $smcFunc;
+	global $context, $modSettings, $txt, $pmxcFunc;
 
 	loadLanguage('Login');
 	loadTemplate('Register');
@@ -683,7 +683,7 @@ function CoppaForm()
 		fatal_lang_error('no_access', false);
 
 	// Get the user details...
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT member_name
 		FROM {db_prefix}members
 		WHERE id_member = {int:id_member}
@@ -693,10 +693,10 @@ function CoppaForm()
 			'is_coppa' => 5,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('no_access', false);
-	list ($username) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($username) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (isset($_GET['form']))
 	{

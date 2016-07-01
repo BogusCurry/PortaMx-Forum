@@ -15,7 +15,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -125,8 +125,8 @@ function read_tgz_data($gzfilename, $destination, $single_file = false, $overwri
 	$crc = unpack('Vcrc32/Visize', substr($data, strlen($data) - 8, 8));
 	$data = @gzinflate(substr($data, $offset, strlen($data) - 8 - $offset));
 
-	// smf_crc32 and crc32 may not return the same results, so we accept either.
-	if ($crc['crc32'] != smf_crc32($data) && $crc['crc32'] != crc32($data))
+	// pmx_crc32 and crc32 may not return the same results, so we accept either.
+	if ($crc['crc32'] != pmx_crc32($data) && $crc['crc32'] != crc32($data))
 		return false;
 
 	$blocks = strlen($data) / 512 - 1;
@@ -475,10 +475,10 @@ function url_exists($url)
  */
 function loadInstalledPackages()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// Load the packages from the database - note this is ordered by install time to ensure latest package uninstalled first.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_install, package_id, filename, name, version, time_installed
 		FROM {db_prefix}log_packages
 		WHERE install_state != {int:not_installed}
@@ -489,7 +489,7 @@ function loadInstalledPackages()
 	);
 	$installed = array();
 	$found = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Already found this? If so don't add it twice!
 		if (in_array($row['package_id'], $found))
@@ -501,14 +501,14 @@ function loadInstalledPackages()
 
 		$installed[] = array(
 			'id' => $row['id_install'],
-			'name' => $smcFunc['htmlspecialchars']($row['name']),
+			'name' => $pmxcFunc['htmlspecialchars']($row['name']),
 			'filename' => $row['filename'],
 			'package_id' => $row['package_id'],
-			'version' => $smcFunc['htmlspecialchars']($row['version']),
+			'version' => $pmxcFunc['htmlspecialchars']($row['version']),
 			'time_installed' => !empty($row['time_installed']) ? $row['time_installed'] : 0,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $installed;
 }
@@ -525,7 +525,7 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-	global $sourcedir, $packagesdir, $smcFunc;
+	global $sourcedir, $packagesdir, $pmxcFunc;
 
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (strpos($gzfilename, 'http://') !== false || strpos($gzfilename, 'https://') !== false)
@@ -635,7 +635,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 						$package_ftp->chmod($ftp_file, $perms);
 					}
 					else
-						smf_chmod($file, $perms);
+						pmx_chmod($file, $perms);
 
 					$new_permissions = @fileperms($file);
 					$result = $new_permissions == $perms ? 'success' : 'failure';
@@ -927,13 +927,13 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 
 			// This looks odd, but it's an attempt to work around PHP suExec.
 			if (!@is_writable($file))
-				smf_chmod($file, 0755);
+				pmx_chmod($file, 0755);
 			if (!@is_writable($file))
-				smf_chmod($file, 0777);
+				pmx_chmod($file, 0777);
 			if (!@is_writable(dirname($file)))
-				smf_chmod($file, 0755);
+				pmx_chmod($file, 0755);
 			if (!@is_writable(dirname($file)))
-				smf_chmod($file, 0777);
+				pmx_chmod($file, 0777);
 
 			$fp = is_dir($file) ? @opendir($file) : @fopen($file, 'rb');
 			if (@is_writable($file) && $fp)
@@ -964,13 +964,13 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 			{
 				mktree(dirname($file), 0755);
 				@touch($file);
-				smf_chmod($file, 0755);
+				pmx_chmod($file, 0755);
 			}
 
 			if (!@is_writable($file))
-				smf_chmod($file, 0777);
+				pmx_chmod($file, 0777);
 			if (!@is_writable(dirname($file)))
-				smf_chmod(dirname($file), 0777);
+				pmx_chmod(dirname($file), 0777);
 
 			if (@is_writable($file))
 				unset($files[$k]);
@@ -1118,7 +1118,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  */
 function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
 {
-	global $packagesdir, $forum_version, $context, $temp_path, $language, $smcFunc;
+	global $packagesdir, $forum_version, $context, $temp_path, $language, $pmxcFunc;
 
 	// Mayday!  That action doesn't exist!!
 	if (empty($packageXML) || !$packageXML->exists($method))
@@ -1126,7 +1126,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	// We haven't found the package script yet...
 	$script = false;
-	$the_version = strtr($forum_version, array('SMF ' => ''));
+	$the_version = strtr($forum_version, array('PortaMx Forum ' => ''));
 
 	// Emulation support...
 	if (!empty($_SESSION['version_emulate']))
@@ -1200,12 +1200,12 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 						if (isset($context[$type]['selected']) && $context[$type]['selected'] == 'default')
 							$context[$type][] = 'default';
 
-						$context[$type]['selected'] = $smcFunc['htmlspecialchars']($action->fetch('@lang'));
+						$context[$type]['selected'] = $pmxcFunc['htmlspecialchars']($action->fetch('@lang'));
 					}
 					else
 					{
 						// We don't want this now, but we'll allow the user to select to read it.
-						$context[$type][] = $smcFunc['htmlspecialchars']($action->fetch('@lang'));
+						$context[$type][] = $pmxcFunc['htmlspecialchars']($action->fetch('@lang'));
 						continue;
 					}
 				}
@@ -1783,7 +1783,7 @@ function deltree($dir, $delete_dir = true)
 			else
 			{
 				if (!is_writable($dir . '/' . $entryname))
-					smf_chmod($dir . '/' . $entryname, 0777);
+					pmx_chmod($dir . '/' . $entryname, 0777);
 				unlink($dir . '/' . $entryname);
 			}
 		}
@@ -1803,7 +1803,7 @@ function deltree($dir, $delete_dir = true)
 		else
 		{
 			if (!is_writable($dir))
-				smf_chmod($dir, 0777);
+				pmx_chmod($dir, 0777);
 			@rmdir($dir);
 		}
 	}
@@ -1828,7 +1828,7 @@ function mktree($strPath, $mode)
 			if (isset($package_ftp))
 				$package_ftp->chmod(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')), $mode);
 			else
-				smf_chmod($strPath, $mode);
+				pmx_chmod($strPath, $mode);
 		}
 
 		$test = @opendir($strPath);
@@ -1849,7 +1849,7 @@ function mktree($strPath, $mode)
 		if (isset($package_ftp))
 			$package_ftp->chmod(dirname(strtr($strPath, array($_SESSION['pack_ftp']['root'] => ''))), $mode);
 		else
-			smf_chmod(dirname($strPath), $mode);
+			pmx_chmod(dirname($strPath), $mode);
 	}
 
 	if ($mode !== false && isset($package_ftp))
@@ -2854,7 +2854,7 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 
 					mktree(dirname($chmod_file), 0755);
 					@touch($chmod_file);
-					smf_chmod($chmod_file, 0755);
+					pmx_chmod($chmod_file, 0755);
 				}
 				else
 					$file_permissions = @fileperms($chmod_file);
@@ -2862,17 +2862,17 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 
 			// This looks odd, but it's another attempt to work around PHP suExec.
 			if ($perm_state != 'writable')
-				smf_chmod($chmod_file, $perm_state == 'execute' ? 0755 : 0644);
+				pmx_chmod($chmod_file, $perm_state == 'execute' ? 0755 : 0644);
 			else
 			{
 				if (!@is_writable($chmod_file))
-					smf_chmod($chmod_file, 0755);
+					pmx_chmod($chmod_file, 0755);
 				if (!@is_writable($chmod_file))
-					smf_chmod($chmod_file, 0777);
+					pmx_chmod($chmod_file, 0777);
 				if (!@is_writable(dirname($chmod_file)))
-					smf_chmod($chmod_file, 0755);
+					pmx_chmod($chmod_file, 0755);
 				if (!@is_writable(dirname($chmod_file)))
-					smf_chmod($chmod_file, 0777);
+					pmx_chmod($chmod_file, 0777);
 			}
 
 			// The ultimate writable test.
@@ -2971,7 +2971,7 @@ function package_crypt($pass)
  */
 function package_create_backup($id = 'backup')
 {
-	global $sourcedir, $boarddir, $packagesdir, $smcFunc;
+	global $sourcedir, $boarddir, $packagesdir, $pmxcFunc;
 
 	$files = array();
 
@@ -2986,7 +2986,7 @@ function package_create_backup($id = 'backup')
 		$sourcedir => empty($_REQUEST['use_full_paths']) ? 'Sources/' : strtr($sourcedir . '/', '\\', '/')
 	);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -2996,9 +2996,9 @@ function package_create_backup($id = 'backup')
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'Themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	try
 	{
@@ -3152,7 +3152,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		{
 			fwrite($fp, 'GET ' . ($match[6] !== '/' ? str_replace(' ', '%20', $match[6]) : '') . ' HTTP/1.0' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/SMF' . "\r\n");
+			fwrite($fp, 'User-Agent: PHP/PMX' . "\r\n");
 			if ($keep_alive)
 				fwrite($fp, 'Connection: Keep-Alive' . "\r\n\r\n");
 			else
@@ -3162,7 +3162,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		{
 			fwrite($fp, 'POST ' . ($match[6] !== '/' ? $match[6] : '') . ' HTTP/1.0' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/SMF' . "\r\n");
+			fwrite($fp, 'User-Agent: PHP/PMX' . "\r\n");
 			if ($keep_alive)
 				fwrite($fp, 'Connection: Keep-Alive' . "\r\n");
 			else
@@ -3236,7 +3236,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	return $data;
 }
 
-if (!function_exists('smf_crc32'))
+if (!function_exists('pmx_crc32'))
 {
 	/**
 	 * crc32 doesn't work as expected on 64-bit functions - make our own.
@@ -3245,7 +3245,7 @@ if (!function_exists('smf_crc32'))
 	 * @param string $number
 	 * @return string The crc32
 	 */
-	function smf_crc32($number)
+	function pmx_crc32($number)
 	{
 		$crc = crc32($number);
 

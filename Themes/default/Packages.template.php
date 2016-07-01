@@ -61,7 +61,7 @@ function template_view_package()
 			<div class="windowbg2">
 				', $context['package_readme'], '
 				<span class="floatright">', $txt['package_available_readme_language'], '
-					<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = smf_prepareScriptUrl(smf_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
+					<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = pmx_prepareScriptUrl(pmx_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
 						foreach ($context['readmes'] as $a => $b)
 							echo '<option value="', $b, '"', $a === 'selected' ? ' selected' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
 			echo '
@@ -81,7 +81,7 @@ function template_view_package()
 			<div class="windowbg2">
 				', $context['package_license'], '
 				<span class="floatright">', $txt['package_available_license_language'], '
-					<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = smf_prepareScriptUrl(smf_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
+					<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = pmx_prepareScriptUrl(pmx_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
 						foreach ($context['licenses'] as $a => $b)
 							echo '<option value="', $b, '"', $a === 'selected' ? ' selected' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
 			echo '
@@ -332,7 +332,7 @@ function template_view_package()
 			foreach ($js_operations as $key => $operation)
 			{
 				echo '
-			aOperationElements[', $key, '] = new smc_Toggle({
+			aOperationElements[', $key, '] = new pmxc_Toggle({
 				bToggleEnabled: true,
 				bNoAnimate: true,
 				bCurrentlyCollapsed: ', $operation ? 'false' : 'true', ',
@@ -342,9 +342,9 @@ function template_view_package()
 				aSwapImages: [
 					{
 						sId: \'operation_img_', $key, '\',
-						srcExpanded: smf_images_url + \'/selected_open.png\',
+						srcExpanded: pmx_images_url + \'/selected_open.png\',
 						altExpanded: \'*\',
-						srcCollapsed: smf_images_url + \'/selected.png\',
+						srcCollapsed: pmx_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
 					}
 				]
@@ -533,9 +533,9 @@ function template_browse()
 			</div>
 
 			<script>
-				window.smfForum_scripturl = smf_scripturl;
-				window.smfForum_sessionid = smf_session_id;
-				window.smfForum_sessionvar = smf_session_var;';
+				window.smfForum_scripturl = pmx_scripturl;
+				window.smfForum_sessionid = pmx_session_id;
+				window.smfForum_sessionvar = pmx_session_var;';
 
 	// Make a list of already installed mods so nothing is listed twice ;).
 	echo '
@@ -544,14 +544,14 @@ function template_browse()
 			</script>
 			<div id="yourVersion" style="display:none">', $context['forum_version'], '</div>';
 
-	if (empty($modSettings['disable_smf_js']))
+	if (empty($modSettings['disable_pmx_js']))
 		echo '
-			<script src="', $scripturl, '?action=viewsmfile;filename=latest-news.js"></script>';
+			<script src="', $scripturl, '?action=viewpmxfile;filename=latest-news.js"></script>';
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
 			<script>
-				var oAdminIndex = new smf_AdminIndex({
+				var oAdminIndex = new pmx_AdminIndex({
 					sSelf: \'oAdminCenter\',
 					bLoadAnnouncements: false,
 					bLoadVersions: false,
@@ -567,7 +567,7 @@ function template_browse()
 							%message%
 						</div>
 					'), ',
-					sUpdateNotificationLink: smf_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
+					sUpdateNotificationLink: pmx_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
 				});
 			</script>';
@@ -640,7 +640,7 @@ function template_browse()
 	echo '
 	</div>
 	<script>
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: true,
 			aSwappableContainers: [
@@ -850,7 +850,7 @@ function template_package_confirm()
  */
 function template_package_list()
 {
-	global $context, $txt, $smcFunc;
+	global $context, $txt, $pmxcFunc;
 
 	echo '
 	<div id="admincenter">
@@ -920,7 +920,7 @@ function template_package_list()
 					// Show the mod type?
 					if ($package['type'] != '')
 						echo '
-							<li class="package_section">', $txt['package_type'], ':&nbsp; ', $smcFunc['ucwords']($smcFunc['strtolower']($package['type'])), '</li>';
+							<li class="package_section">', $txt['package_type'], ':&nbsp; ', $pmxcFunc['ucwords']($pmxcFunc['strtolower']($package['type'])), '</li>';
 					// Show the version number?
 					if ($package['version'] != '')
 						echo '
@@ -968,7 +968,7 @@ function template_package_list()
 			foreach ($context['package_list'] as $section => $ps)
 			{
 				echo '
-				var oPackageServerToggle_', $section, ' = new smc_Toggle({
+				var oPackageServerToggle_', $section, ' = new pmxc_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: ', count($ps['items']) == 1 || $section_count == 1 ? 'false' : 'true', ',
 					aSwappableContainers: [
@@ -987,7 +987,7 @@ function template_package_list()
 				{
 					if (!$package['is_text'] && !$package['is_line'] && !$package['is_remote'])
 						echo '
-				var oPackageToggle_', $section, '_pkg_', $id, ' = new smc_Toggle({
+				var oPackageToggle_', $section, '_pkg_', $id, ' = new pmxc_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [
@@ -1326,7 +1326,7 @@ function template_file_permissions()
 		{
 			ajax_indicator(true);
 
-			getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
+			getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
 		}
 
 		// Getting something back?

@@ -14,7 +14,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -64,7 +64,7 @@ function ManageMail()
  */
 function BrowseMailQueue()
 {
-	global $scripturl, $context, $txt, $smcFunc;
+	global $scripturl, $context, $txt, $pmxcFunc;
 	global $sourcedir, $modSettings;
 
 	// First, are we deleting something from the queue?
@@ -72,7 +72,7 @@ function BrowseMailQueue()
 	{
 		checkSession();
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}mail_queue
 			WHERE id_mail IN ({array_int:mail_ids})',
 			array(
@@ -82,14 +82,14 @@ function BrowseMailQueue()
 	}
 
 	// How many items do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*) AS queue_size, MIN(time_sent) AS oldest
 		FROM {db_prefix}mail_queue',
 		array(
 		)
 	);
-	list ($mailQueueSize, $mailOldest) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($mailQueueSize, $mailOldest) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$context['oldest_mail'] = empty($mailOldest) ? $txt['mailqueue_oldest_not_available'] : time_since(time() - $mailOldest);
 	$context['mail_queue_size'] = comma_format($mailQueueSize);
@@ -113,9 +113,9 @@ function BrowseMailQueue()
 					'value' => $txt['mailqueue_subject'],
 				),
 				'data' => array(
-					'function' => function ($rowData) use ($smcFunc)
+					'function' => function ($rowData) use ($pmxcFunc)
 					{
-						return $smcFunc['strlen']($rowData['subject']) > 50 ? sprintf('%1$s...', $smcFunc['htmlspecialchars']($smcFunc['substr']($rowData['subject'], 0, 47))) : $smcFunc['htmlspecialchars']($rowData['subject']);
+						return $pmxcFunc['strlen']($rowData['subject']) > 50 ? sprintf('%1$s...', $pmxcFunc['htmlspecialchars']($pmxcFunc['substr']($rowData['subject'], 0, 47))) : $pmxcFunc['htmlspecialchars']($rowData['subject']);
 					},
 					'class' => 'smalltext',
 				),
@@ -226,9 +226,9 @@ function BrowseMailQueue()
  */
 function list_getMailQueue($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt;
+	global $pmxcFunc, $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			id_mail, time_sent, recipient, priority, private, subject
 		FROM {db_prefix}mail_queue
@@ -241,7 +241,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 		)
 	);
 	$mails = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
 		if (!empty($row['private']))
@@ -249,7 +249,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 		$mails[] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $mails;
 }
@@ -261,17 +261,17 @@ function list_getMailQueue($start, $items_per_page, $sort)
  */
 function list_getMailQueueSize()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// How many items do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*) AS queue_size
 		FROM {db_prefix}mail_queue',
 		array(
 		)
 	);
-	list ($mailQueueSize) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($mailQueueSize) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $mailQueueSize;
 }
@@ -378,7 +378,7 @@ function ModifyMailSettings($return_config = false)
  */
 function ClearMailQueue()
 {
-	global $sourcedir, $smcFunc;
+	global $sourcedir, $pmxcFunc;
 
 	checkSession('get');
 
@@ -389,14 +389,14 @@ function ClearMailQueue()
 	if (!isset($_GET['te']))
 	{
 		// How many items do we have?
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT COUNT(*) AS queue_size
 			FROM {db_prefix}mail_queue',
 			array(
 			)
 		);
-		list ($_GET['te']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($_GET['te']) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 		$_GET['te'] = (int) $_GET['te'];

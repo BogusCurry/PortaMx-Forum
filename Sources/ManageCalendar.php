@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -199,7 +199,7 @@ function ModifyHolidays()
  */
 function EditHoliday()
 {
-	global $txt, $context, $smcFunc;
+	global $txt, $context, $pmxcFunc;
 
 	loadTemplate('ManageCalendar');
 
@@ -217,11 +217,11 @@ function EditHoliday()
 		checkSession();
 
 		// Not too long good sir?
-		$_REQUEST['title'] =  $smcFunc['substr']($_REQUEST['title'], 0, 60);
+		$_REQUEST['title'] =  $pmxcFunc['substr']($_REQUEST['title'], 0, 60);
 		$_REQUEST['holiday'] = isset($_REQUEST['holiday']) ? (int) $_REQUEST['holiday'] : 0;
 
 		if (isset($_REQUEST['delete']))
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}calendar_holidays
 				WHERE id_holiday = {int:selected_holiday}',
 				array(
@@ -232,7 +232,7 @@ function EditHoliday()
 		{
 			$date = strftime($_REQUEST['year'] <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $_REQUEST['month'], $_REQUEST['day'], $_REQUEST['year']));
 			if (isset($_REQUEST['edit']))
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}calendar_holidays
 					SET event_date = {date:holiday_date}, title = {string:holiday_title}
 					WHERE id_holiday = {int:selected_holiday}',
@@ -243,7 +243,7 @@ function EditHoliday()
 					)
 				);
 			else
-				$smcFunc['db_insert']('',
+				$pmxcFunc['db_insert']('',
 					'{db_prefix}calendar_holidays',
 					array(
 						'event_date' => 'date', 'title' => 'string-60',
@@ -275,7 +275,7 @@ function EditHoliday()
 	// If it's not new load the data.
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 			FROM {db_prefix}calendar_holidays
 			WHERE id_holiday = {int:selected_holiday}
@@ -284,7 +284,7 @@ function EditHoliday()
 				'selected_holiday' => $_REQUEST['holiday'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$context['holiday'] = array(
 				'id' => $row['id_holiday'],
 				'day' => $row['day'],
@@ -292,7 +292,7 @@ function EditHoliday()
 				'year' => $row['year'] <= 4 ? 0 : $row['year'],
 				'title' => $row['title']
 			);
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Last day for the drop down?
@@ -307,20 +307,20 @@ function EditHoliday()
  */
 function ModifyCalendarSettings($return_config = false)
 {
-	global $context, $txt, $sourcedir, $scripturl, $smcFunc, $modSettings;
+	global $context, $txt, $sourcedir, $scripturl, $pmxcFunc, $modSettings;
 
 	// Load the boards list.
 	$boards = array('');
-	$request = $smcFunc['db_query']('order_by_board_order', '
+	$request = $pmxcFunc['db_query']('order_by_board_order', '
 		SELECT b.id_board, b.name AS board_name, c.name AS cat_name
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)',
 		array(
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$boards[$row['id_board']] = $row['cat_name'] . ' - ' . $row['board_name'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	require_once($sourcedir . '/Subs-Boards.php');
 	sortBoards($boards);

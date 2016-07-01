@@ -246,7 +246,7 @@ function template_credits()
 			<h3 class="catbg">', $txt['credits_forum'],' ', $txt['credits_copyright'], '</h3>
 		</div>
 		<div class="windowbg">
-			', $context['copyrights']['smf'], '
+			', $context['copyrights']['portamx'], '
 		</div>
 	</div>';
 }

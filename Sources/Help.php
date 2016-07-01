@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -46,7 +46,7 @@ function HelpIndex()
 	global $scripturl, $context, $txt;
 
 	// Lastly, some minor template stuff.
-	$context['page_title'] = $txt['manual_smf_user_help'];
+	$context['page_title'] = $txt['manual_pmx_user_help'];
 	$context['sub_template'] = 'manual';
 }
 

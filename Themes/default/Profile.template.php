@@ -773,10 +773,10 @@ function template_editBuddies()
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 	</form>
 	<script>
-		var oAddBuddySuggest = new smc_AutoSuggest({
+		var oAddBuddySuggest = new pmxc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var,
 			sSuggestId: \'new_buddy\',
 			sControlId: \'new_buddy\',
 			sSearchType: \'member\',
@@ -871,7 +871,7 @@ function template_editIgnoreList()
 		<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit">
 	</form>
 	<script>
-		var oAddIgnoreSuggest = new smc_AutoSuggest({
+		var oAddIgnoreSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
 			sSessionId: \'', $context['session_id'], '\',
 			sSessionVar: \'', $context['session_var'], '\',

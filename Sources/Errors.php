@@ -14,7 +14,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -31,7 +31,7 @@ if (!defined('SMF'))
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
-	global $modSettings, $sc, $user_info, $smcFunc, $scripturl, $last_error, $context;
+	global $modSettings, $sc, $user_info, $pmxcFunc, $scripturl, $last_error, $context;
 	static $tried_hook = false;
 
 	// Check if error logging is actually on.
@@ -65,7 +65,10 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	$query_string = empty($_SERVER['QUERY_STRING']) ? (empty($_SERVER['REQUEST_URL']) ? '' : str_replace($scripturl, '', $_SERVER['REQUEST_URL'])) : $_SERVER['QUERY_STRING'];
 
 	// Don't log the session hash in the url twice, it's a waste.
-	$query_string = $smcFunc['htmlspecialchars']((SMF == 'SSI' || SMF == 'BACKGROUND' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string));
+	if(isset($pmxcFunc['htmlspecialchars']))
+		$query_string = $pmxcFunc['htmlspecialchars']((PMX == 'SSI' || PMX == 'BACKGROUND' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string));
+	else
+		$query_string = htmlspecialchars((PMX == 'SSI' || PMX == 'BACKGROUND' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string));
 
 	// Just so we know what board error messages are from.
 	if (isset($_POST['board']) && !isset($_GET['board']))
@@ -103,7 +106,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	if (empty($last_error) || $last_error != $error_info)
 	{
 		// Insert the error into the database.
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}log_errors',
 			array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'inet', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
 			$error_info,
@@ -206,7 +209,7 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array(), $status 
  * @param string $file The file where the error occurred
  * @param int $line The line where the error occurred
  */
-function smf_error_handler($error_level, $error_string, $file, $line)
+function pmx_error_handler($error_level, $error_string, $file, $line)
 {
 	global $settings, $modSettings, $db_show_debug;
 
@@ -293,7 +296,7 @@ function setup_fatal_error_context($error_message, $error_code = null)
 		return false;
 
 	// Maybe they came from dlattach or similar?
-	if (SMF != 'SSI' && SMF != 'BACKGROUND' && empty($context['theme_loaded']))
+	if (PMX != 'SSI' && PMX != 'BACKGROUND' && empty($context['theme_loaded']))
 		loadTheme();
 
 	// Don't bother indexing errors mate...
@@ -312,7 +315,7 @@ function setup_fatal_error_context($error_message, $error_code = null)
 	$context['sub_template'] = 'fatal_error';
 
 	// If this is SSI, what do they want us to do?
-	if (SMF == 'SSI')
+	if (PMX == 'SSI')
 	{
 		if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 			$ssi_on_error_method();
@@ -324,7 +327,7 @@ function setup_fatal_error_context($error_message, $error_code = null)
 			exit;
 	}
 	// Alternatively from the cron call?
-	elseif (SMF == 'BACKGROUND')
+	elseif (PMX == 'BACKGROUND')
 	{
 		// We can't rely on even having language files available.
 		if (defined('FROM_CLI') && FROM_CLI)
@@ -383,7 +386,7 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, $smcFunc, $sourcedir;
+	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, $pmxcFunc, $sourcedir;
 
 	require_once($sourcedir . '/Logging.php');
 	set_fatal_error_headers();
@@ -402,8 +405,8 @@ function display_db_error()
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.
-		$db_error = @$smcFunc['db_error']($db_connection);
-		@mail($webmaster_email, $mbname . ': SMF Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $smcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that SMF could not connect to the database, contact your host if this continues.');
+		$db_error = @$pmxcFunc['db_error']($db_connection);
+		@mail($webmaster_email, $mbname . ': PMX Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $pmxcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that PMX could not connect to the database, contact your host if this continues.');
 	}
 
 	// What to do?  Language files haven't and can't be loaded yet...
@@ -415,7 +418,7 @@ function display_db_error()
 	</head>
 	<body>
 		<h3>Connection Problems</h3>
-		Sorry, SMF was unable to connect to the database.  This may be caused by the server being busy.  Please try again later.
+		Sorry, PMX was unable to connect to the database.  This may be caused by the server being busy.  Please try again later.
 	</body>
 </html>';
 
@@ -477,20 +480,20 @@ function set_fatal_error_headers()
  */
 function log_error_online($error, $sprintf = array())
 {
-	global $smcFunc, $user_info, $modSettings;
+	global $pmxcFunc, $user_info, $modSettings;
 
 	// Don't bother if Who's Online is disabled.
 	if (empty($modSettings['who_enabled']))
 		return;
 
 	// Maybe they came from SSI or similar where sessions are not recorded?
-	if (SMF == 'SSI' || SMF == 'BACKGROUND')
+	if (PMX == 'SSI' || PMX == 'BACKGROUND')
 		return;
 
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
 	// First, we have to get the online log, because we need to break apart the serialized string.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT url
 		FROM {db_prefix}log_online
 		WHERE session = {string:session}',
@@ -498,16 +501,16 @@ function log_error_online($error, $sprintf = array())
 			'session' => $session_id,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
+	if ($pmxcFunc['db_num_rows']($request) != 0)
 	{
-		list ($url) = $smcFunc['db_fetch_row']($request);
-		$url = smf_json_decode($url, true);
+		list ($url) = $pmxcFunc['db_fetch_row']($request);
+		$url = pmx_json_decode($url, true);
 		$url['error'] = $error;
 
 		if (!empty($sprintf))
 			$url['error_params'] = $sprintf;
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}log_online
 			SET url = {string:url}
 			WHERE session = {string:session}',
@@ -517,7 +520,7 @@ function log_error_online($error, $sprintf = array())
 			)
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 }
 
 /**

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -29,8 +29,8 @@ function AdminMain()
 	// Load the language and templates....
 	loadLanguage('Admin');
 	loadTemplate('Admin');
-	loadJavascriptFile('admin.js', array(), 'smf_admin');
-	loadCSSFile('admin.css', array(), 'smf_admin');
+	loadJavascriptFile('admin.js', array(), 'pmx_admin');
+	loadCSSFile('admin.css', array(), 'pmx_admin');
 
 	// No indexing evil stuff.
 	$context['robot_no_index'] = true;
@@ -38,7 +38,7 @@ function AdminMain()
 	require_once($sourcedir . '/Subs-Menu.php');
 
 	// Some preferences.
-	$context['admin_preferences'] = !empty($options['admin_preferences']) ? smf_json_decode($options['admin_preferences'], true) : array();
+	$context['admin_preferences'] = !empty($options['admin_preferences']) ? pmx_json_decode($options['admin_preferences'], true) : array();
 
 	/** @var array $admin_areas Defines the menu structure for the admin center. See {@link Subs-Menu.php Subs-Menu.php} for details! */
 	$admin_areas = array(
@@ -555,7 +555,7 @@ function AdminHome()
 		);
 
 	if ($context['admin_area'] == 'admin')
-		loadJavascriptFile('admin.js', array('defer' => false), 'smf_admin');
+		loadJavascriptFile('admin.js', array('defer' => false), 'pmx_admin');
 }
 
 /**
@@ -563,7 +563,7 @@ function AdminHome()
  */
 function DisplayAdminFile()
 {
-	global $context, $modSettings, $smcFunc;
+	global $context, $modSettings, $pmxcFunc;
 
 	setMemoryLimit('32M');
 
@@ -573,7 +573,7 @@ function DisplayAdminFile()
 	// Strip off the forum cache part or we won't find it...
 	$_REQUEST['filename'] = str_replace($modSettings['browser_cache'], '', $_REQUEST['filename']);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT data, filetype
 		FROM {db_prefix}admin_info_files
 		WHERE filename = {string:current_filename}
@@ -583,11 +583,11 @@ function DisplayAdminFile()
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('admin_file_not_found', true, array($_REQUEST['filename']), 404);
 
-	list ($file_data, $filetype) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($file_data, $filetype) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// @todo Temp
 	// Figure out if sesc is still being used.
@@ -616,7 +616,7 @@ if (!(\'smfForum_sessionvar\' in window))
  */
 function AdminSearch()
 {
-	global $txt, $context, $smcFunc, $sourcedir;
+	global $txt, $context, $pmxcFunc, $sourcedir;
 
 	isAllowedTo('admin_forum');
 
@@ -628,7 +628,7 @@ function AdminSearch()
 	);
 
 	$context['search_type'] = !isset($_REQUEST['search_type']) || !isset($subActions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
-	$context['search_term'] = isset($_REQUEST['search_term']) ? $smcFunc['htmlspecialchars']($_REQUEST['search_term'], ENT_QUOTES) : '';
+	$context['search_term'] = isset($_REQUEST['search_term']) ? $pmxcFunc['htmlspecialchars']($_REQUEST['search_term'], ENT_QUOTES) : '';
 
 	$context['sub_template'] = 'admin_search_results';
 	$context['page_title'] = $txt['admin_search_results'];

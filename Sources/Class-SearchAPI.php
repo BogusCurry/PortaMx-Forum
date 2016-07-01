@@ -148,7 +148,7 @@ abstract class search_api implements search_api_interface
 	/**
 	 * @var string The minimum SMF version that this will work with
 	 */
-	public $min_smf_version = 'PMX 2.1 Beta 4';
+	public $min_pmx_version = 'PMX 2.1 Beta 4';
 
 	/**
 	 * @var bool Whether or not it's supported

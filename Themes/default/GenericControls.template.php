@@ -116,7 +116,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 		// Now for backward compatibility let's collect few infos in the good ol' style
 		echo '
-				var oEditorHandle_', $editor_id, ' = new smc_Editor({
+				var oEditorHandle_', $editor_id, ' = new pmxc_Editor({
 					sUniqueId: ', JavaScriptEscape($editor_id), ',
 					sEditWidth: ', JavaScriptEscape($editor_context['width']), ',
 					sEditHeight: ', JavaScriptEscape($editor_context['height']), ',
@@ -124,7 +124,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					oSmileyBox: null,
 					oBBCBox: null
 				});
-				smf_editorArray[smf_editorArray.length] = oEditorHandle_', $editor_id, ';
+				pmx_editorArray[pmx_editorArray.length] = oEditorHandle_', $editor_id, ';
 			</script>';
 }
 
@@ -215,7 +215,7 @@ function template_control_richedit_buttons($editor_id)
 		</span>
 		<script src="', $settings['default_theme_url'], '/scripts/drafts.js', $modSettings['browser_cache'] ,'"></script>
 		<script>
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new pmx_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_pm_draft\',
@@ -236,7 +236,7 @@ function template_control_richedit_buttons($editor_id)
 		</span>
 		<script src="', $settings['default_theme_url'], '/scripts/drafts.js', $modSettings['browser_cache'] ,'"></script>
 		<script>
-			var oDraftAutoSave = new smf_DraftAutoSave({
+			var oDraftAutoSave = new pmx_DraftAutoSave({
 				sSelf: \'oDraftAutoSave\',
 				sLastNote: \'draft_lastautosave\',
 				sLastID: \'id_draft\',

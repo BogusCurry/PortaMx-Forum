@@ -14,7 +14,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -216,7 +216,7 @@ function preparsecode(&$message, $previewing = false)
  */
 function un_preparsecode($message)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -226,9 +226,9 @@ function un_preparsecode($message)
 		// If $i is a multiple of four (0, 4, 8, ...) then it's not a code section...
 		if ($i % 4 == 0)
 		{
-			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', function ($m) use ($smcFunc)
+			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', function ($m) use ($pmxcFunc)
 			{
-				return "[html]" . strtr($smcFunc['htmlspecialchars']("$m[1]", ENT_QUOTES), array("\\&quot;" => "&quot;", "&amp;#13;" => "<br>", "&amp;#32;" => " ", "&amp;#91;" => "[", "&amp;#93;" => "]")) . "[/html]";
+				return "[html]" . strtr($pmxcFunc['htmlspecialchars']("$m[1]", ENT_QUOTES), array("\\&quot;" => "&quot;", "&amp;#13;" => "<br>", "&amp;#32;" => " ", "&amp;#91;" => "[", "&amp;#93;" => "]")) . "[/html]";
 			}, $parts[$i]);
 
 			// Attempt to un-parse the time to something less awful.
@@ -566,7 +566,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	if ($message_id !== null && empty($modSettings['mail_no_message_id']))
 		$headers .= 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $message_id . strstr(empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from'], '@') . '>' . $line_break;
-	$headers .= 'X-Mailer: SMF' . $line_break;
+	$headers .= 'X-Mailer: PMX^' . $line_break;
 
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
 	if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers)), true))
@@ -576,7 +576,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$orig_message = $message;
 
 	// The mime boundary separates the different alternative versions.
-	$mime_boundary = 'SMF-' . md5($message . time());
+	$mime_boundary = 'PMX-' . md5($message . time());
 
 	// Using mime, as it allows to send a plain unencoded alternative.
 	$headers .= 'Mime-Version: 1.0' . $line_break;
@@ -680,7 +680,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false)
 {
-	global $context, $smcFunc;
+	global $context, $pmxcFunc;
 
 	static $cur_insert = array();
 	static $cur_insert_len = 0;
@@ -695,7 +695,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 		$cur_insert_len = 0;
 
 		// Dump the data...
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}mail_queue',
 			array(
 				'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
@@ -714,7 +714,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 	{
 		$nextSendTime = time() + 10;
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}settings
 			SET value = {string:nextSendTime}
 			WHERE variable = {literal:mail_next_send}
@@ -740,7 +740,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 		if ($this_insert_len + $cur_insert_len > 1000000)
 		{
 			// Flush out what we have so far.
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}mail_queue',
 				array(
 					'time_sent' => 'int', 'recipient' => 'string-255', 'body' => 'string', 'subject' => 'string-255',
@@ -761,7 +761,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 	}
 
 	// If they are using SSI there is a good chance obExit will never be called.  So lets be nice and flush it for them.
-	if (SMF === 'SSI' || SMF === 'BACKGROUND')
+	if (PMX === 'SSI' || PMX === 'BACKGROUND')
 		return AddMailQueue(true);
 
 	return true;
@@ -782,7 +782,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 function sendpm($recipients, $subject, $message, $store_outbox = false, $from = null, $pm_head = 0)
 {
 	global $scripturl, $txt, $user_info, $language, $sourcedir;
-	global $modSettings, $smcFunc;
+	global $modSettings, $pmxcFunc;
 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
@@ -803,11 +803,11 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		);
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = $smcFunc['htmlspecialchars']($message, ENT_QUOTES);
+	$htmlmessage = $pmxcFunc['htmlspecialchars']($message, ENT_QUOTES);
 	preparsecode($htmlmessage);
-	$htmlsubject = strtr($smcFunc['htmlspecialchars']($subject), array("\r" => '', "\n" => '', "\t" => ''));
-	if ($smcFunc['strlen']($htmlsubject) > 100)
-		$htmlsubject = $smcFunc['substr']($htmlsubject, 0, 100);
+	$htmlsubject = strtr($pmxcFunc['htmlspecialchars']($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	if ($pmxcFunc['strlen']($htmlsubject) > 100)
+		$htmlsubject = $pmxcFunc['substr']($htmlsubject, 0, 100);
 
 	// Make sure is an array
 	if (!is_array($recipients))
@@ -824,25 +824,25 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		{
 			if (!is_numeric($recipients[$rec_type][$id]))
 			{
-				$recipients[$rec_type][$id] = $smcFunc['strtolower'](trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
+				$recipients[$rec_type][$id] = $pmxcFunc['strtolower'](trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
 				$usernames[$recipients[$rec_type][$id]] = 0;
 			}
 		}
 	}
 	if (!empty($usernames))
 	{
-		$request = $smcFunc['db_query']('pm_find_username', '
+		$request = $pmxcFunc['db_query']('pm_find_username', '
 			SELECT id_member, member_name
 			FROM {db_prefix}members
-			WHERE ' . ($smcFunc['db_case_sensitive'] ? 'LOWER(member_name)' : 'member_name') . ' IN ({array_string:usernames})',
+			WHERE ' . ($pmxcFunc['db_case_sensitive'] ? 'LOWER(member_name)' : 'member_name') . ' IN ({array_string:usernames})',
 			array(
 				'usernames' => array_keys($usernames),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			if (isset($usernames[$smcFunc['strtolower']($row['member_name'])]))
-				$usernames[$smcFunc['strtolower']($row['member_name'])] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
+			if (isset($usernames[$pmxcFunc['strtolower']($row['member_name'])]))
+				$usernames[$pmxcFunc['strtolower']($row['member_name'])] = $row['id_member'];
+		$pmxcFunc['db_free_result']($request);
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.
 		foreach ($recipients as $rec_type => $rec)
@@ -871,7 +871,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	$all_to = array_merge($recipients['to'], $recipients['bcc']);
 
 	// Check no-one will want it deleted right away!
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			id_member, criteria, is_or
 		FROM {db_prefix}pm_rules
@@ -884,9 +884,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	);
 	$deletes = array();
 	// Check whether we have to apply anything...
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
-		$criteria = smf_json_decode($row['criteria'], true);
+		$criteria = pmx_json_decode($row['criteria'], true);
 		// Note we don't check the buddy status, cause deletion from buddy = madness!
 		$delete = false;
 		foreach ($criteria as $criterium)
@@ -904,22 +904,22 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		if ($delete)
 			$deletes[$row['id_member']] = 1;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Load the membergrounp message limits.
 	// @todo Consider caching this?
 	static $message_limit_cache = array();
 	if (!allowedTo('moderate_forum') && empty($message_limit_cache))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_group, max_messages
 			FROM {db_prefix}membergroups',
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$message_limit_cache[$row['id_group']] = $row['max_messages'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Load the groups that are allowed to read PMs.
@@ -933,7 +933,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	require_once($sourcedir . '/Subs-Notify.php');
 	$notifyPrefs = getNotifyPrefs($all_to, array('pm_new', 'pm_reply', 'pm_notify'), true);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			member_name, real_name, id_member, email_address, lngfile
 			instant_messages,' . (allowedTo('moderate_forum') ? ' 0' : '
@@ -956,7 +956,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		)
 	);
 	$notifications = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Don't do anything for members to be deleted!
 		if (isset($deletes[$row['id_member']]))
@@ -1027,14 +1027,14 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 
 		$log['sent'][$row['id_member']] = sprintf(isset($txt['pm_successfully_sent']) ? $txt['pm_successfully_sent'] : '', $row['real_name']);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Only 'send' the message if there are any recipients left.
 	if (empty($all_to))
 		return $log;
 
 	// Insert the message itself and then grab the last insert id.
-	$smcFunc['db_insert']('',
+	$pmxcFunc['db_insert']('',
 		'{db_prefix}personal_messages',
 		array(
 			'id_pm_head' => 'int', 'id_member_from' => 'int', 'deleted_by_sender' => 'int',
@@ -1046,14 +1046,14 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		),
 		array('id_pm')
 	);
-	$id_pm = $smcFunc['db_insert_id']('{db_prefix}personal_messages', 'id_pm');
+	$id_pm = $pmxcFunc['db_insert_id']('{db_prefix}personal_messages', 'id_pm');
 
 	// Add the recipients.
 	if (!empty($id_pm))
 	{
 		// If this is new we need to set it part of it's own conversation.
 		if (empty($pm_head))
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}personal_messages
 				SET id_pm_head = {int:id_pm_head}
 				WHERE id_pm = {int:id_pm_head}',
@@ -1063,7 +1063,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 			);
 
 		// Some people think manually deleting personal_messages is fun... it's not. We protect against it though :)
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}pm_recipients
 			WHERE id_pm = {int:id_pm}',
 			array(
@@ -1080,7 +1080,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 				$to_list[] = $to;
 		}
 
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}pm_recipients',
 			array(
 				'id_pm' => 'int', 'id_member' => 'int', 'bcc' => 'int', 'deleted' => 'int', 'is_new' => 'int'
@@ -1094,7 +1094,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	if (empty($modSettings['disallow_sendBody']))
 	{
 		censorText($message);
-		$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($smcFunc['htmlspecialchars']($message), false), array('<br>' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+		$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($pmxcFunc['htmlspecialchars']($message), false), array('<br>' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
 	}
 	else
 		$message = '';
@@ -1102,7 +1102,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	$to_names = array();
 	if (count($to_list) > 1)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT real_name
 			FROM {db_prefix}members
 			WHERE id_member IN ({array_int:to_members})',
@@ -1110,9 +1110,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 				'to_members' => $to_list,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$to_names[] = un_htmlspecialchars($row['real_name']);
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	$replacements = array(
 		'SUBJECT' => $subject,
@@ -1427,10 +1427,10 @@ function server_parse($message, $socket, $response)
  */
 function SpellCheck()
 {
-	global $txt, $context, $smcFunc;
+	global $txt, $context, $pmxcFunc;
 
 	// A list of "words" we know about but pspell doesn't.
-	$known_words = array('smf', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'smfisawesome', 'grandia', 'terranigma', 'rpgs');
+	$known_words = array('portamx', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'smfisawesome', 'grandia', 'terranigma', 'rpgs');
 
 	loadLanguage('Post');
 	loadTemplate('Post');
@@ -1457,7 +1457,7 @@ function SpellCheck()
 		$check_word = explode('|', $alphas[$i]);
 
 		// If the word is a known word, or spelled right...
-		if (in_array($smcFunc['strtolower']($check_word[0]), $known_words) || spell_check($dict, $check_word[0]) || !isset($check_word[2]))
+		if (in_array($pmxcFunc['strtolower']($check_word[0]), $known_words) || spell_check($dict, $check_word[0]) || !isset($check_word[2]))
 			continue;
 
 		// Find the word, and move up the "last occurrence" to here.
@@ -1517,7 +1517,7 @@ function SpellCheck()
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array())
 {
-	global $user_info, $smcFunc;
+	global $user_info, $pmxcFunc;
 
 	// Can't do it if there's no topics.
 	if (empty($topics))
@@ -1527,7 +1527,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$topics = array($topics);
 
 	// Get the subject and body...
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board,
 			COALESCE(mem.real_name, ml.poster_name) AS poster_name, mf.id_msg
 		FROM {db_prefix}topics AS t
@@ -1541,7 +1541,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		)
 	);
 	$task_rows = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $pmxcFunc['db_fetch_assoc']($result))
 	{
 		// Clean it up.
 		censorText($row['subject']);
@@ -1570,10 +1570,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			)), 0
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	if (!empty($task_rows))
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}background_tasks',
 			array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 			$task_rows,
@@ -1595,7 +1595,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $txt, $modSettings, $pmxcFunc, $sourcedir;
 
 	require_once($sourcedir . '/Mentions.php');
 
@@ -1621,7 +1621,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT approved
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:id_topic}
@@ -1630,8 +1630,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_topic' => $topicOptions['id'],
 			)
 		);
-		list ($topicOptions['is_approved']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($topicOptions['is_approved']) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// If nothing was filled in as name/e-mail address, try the member table.
@@ -1645,7 +1645,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 		elseif ($posterOptions['id'] != $user_info['id'])
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT member_name, email_address
 				FROM {db_prefix}members
 				WHERE id_member = {int:id_member}
@@ -1655,7 +1655,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				)
 			);
 			// Couldn't find the current poster?
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($pmxcFunc['db_num_rows']($request) == 0)
 			{
 				trigger_error('createPost(): Invalid member id ' . $posterOptions['id'], E_USER_NOTICE);
 				$posterOptions['id'] = 0;
@@ -1663,8 +1663,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				$posterOptions['email'] = '';
 			}
 			else
-				list ($posterOptions['name'], $posterOptions['email']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+				list ($posterOptions['name'], $posterOptions['email']) = $pmxcFunc['db_fetch_row']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 		else
 		{
@@ -1701,13 +1701,13 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	call_integration_hook('integrate_create_post', array(&$msgOptions, &$topicOptions, &$posterOptions, &$message_columns, &$message_parameters));
 
 	// Insert the post.
-	$smcFunc['db_insert']('',
+	$pmxcFunc['db_insert']('',
 		'{db_prefix}messages',
 		$message_columns,
 		$message_parameters,
 		array('id_msg')
 	);
-	$msgOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}messages', 'id_msg');
+	$msgOptions['id'] = $pmxcFunc['db_insert_id']('{db_prefix}messages', 'id_msg');
 
 	// Something went wrong creating the message...
 	if (empty($msgOptions['id']))
@@ -1715,7 +1715,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Fix the attachments.
 	if (!empty($msgOptions['attachments']))
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}attachments
 			SET id_msg = {int:id_msg}
 			WHERE id_attach IN ({array_int:attachment_list})',
@@ -1746,19 +1746,19 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		call_integration_hook('integrate_before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));
 
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}topics',
 			$topic_columns,
 			$topic_parameters,
 			array('id_topic')
 		);
-		$topicOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
+		$topicOptions['id'] = $pmxcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
 
 		// The topic couldn't be created for some reason.
 		if (empty($topicOptions['id']))
 		{
 			// We should delete the post that did work, though...
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}messages
 				WHERE id_msg = {int:id_msg}',
 				array(
@@ -1770,7 +1770,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 
 		// Fix the message with the topic.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}messages
 			SET id_topic = {int:id_topic}
 			WHERE id_msg = {int:id_msg}',
@@ -1819,7 +1819,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		call_integration_hook('integrate_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
 		// Update the number of replies and the lock/sticky status.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET
 				' . implode(', ', $topics_columns) . '
@@ -1833,7 +1833,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Creating is modifying...in a way.
 	// @todo Why not set id_msg_modified on the insert?
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}messages
 		SET id_msg_modified = {int:id_msg}
 		WHERE id_msg = {int:id_msg}',
@@ -1844,7 +1844,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Increase the number of posts and topics on the board.
 	if ($msgOptions['approved'])
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}boards
 			SET num_posts = num_posts + 1' . ($new_topic ? ', num_topics = num_topics + 1' : '') . '
 			WHERE id_board = {int:id_board}',
@@ -1854,7 +1854,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 	else
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}boards
 			SET unapproved_posts = unapproved_posts + 1' . ($new_topic ? ', unapproved_topics = unapproved_topics + 1' : '') . '
 			WHERE id_board = {int:id_board}',
@@ -1864,7 +1864,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 
 		// Add to the approval queue too.
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}approval_queue',
 			array(
 				'id_msg' => 'int',
@@ -1875,7 +1875,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			array()
 		);
 
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}background_tasks',
 			array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 			array(
@@ -1896,7 +1896,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// Since it's likely they *read* it before replying, let's try an UPDATE first.
 		if (!$new_topic)
 		{
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}log_topics
 				SET id_msg = {int:id_msg}
 				WHERE id_member = {int:current_member}
@@ -1908,12 +1908,12 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				)
 			);
 
-			$flag = $smcFunc['db_affected_rows']() != 0;
+			$flag = $pmxcFunc['db_affected_rows']() != 0;
 		}
 
 		if (empty($flag))
 		{
-			$smcFunc['db_insert']('ignore',
+			$pmxcFunc['db_insert']('ignore',
 				'{db_prefix}log_topics',
 				array('id_topic' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
 				array($topicOptions['id'], $posterOptions['id'], $msgOptions['id']),
@@ -1923,7 +1923,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	if ($msgOptions['approved'] && empty($topicOptions['is_approved']))
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}background_tasks',
 			array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 			array(
@@ -1967,7 +1967,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Queue createPost background notification
 	if ($msgOptions['send_notifications'] && $msgOptions['approved'])
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}background_tasks',
 			array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 			array('$sourcedir/tasks/CreatePost-Notify.php', 'CreatePost_Notify_Background', json_encode(array(
@@ -1996,7 +1996,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $modSettings, $pmxcFunc, $sourcedir;
 
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
 	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
@@ -2019,7 +2019,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// using a custom search index, then lets get the old message so we can update our index as needed
 		if (!empty($modSettings['search_custom_index_config']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT body
 				FROM {db_prefix}messages
 				WHERE id_msg = {int:id_msg}',
@@ -2027,8 +2027,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 					'id_msg' => $msgOptions['id'],
 				)
 			);
-			list ($msgOptions['old_body']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($msgOptions['old_body']) = $pmxcFunc['db_fetch_row']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 	}
 	if (!empty($msgOptions['modify_time']))
@@ -2058,7 +2058,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$msgOptions['mentioned_members'] = $mentions;
 
 			// Queue this for notification
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}background_tasks',
 				array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 				array('$sourcedir/tasks/CreatePost-Notify.php', 'CreatePost_Notify_Background', json_encode(array(
@@ -2085,7 +2085,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		return true;
 
 	// Change the post.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}messages
 		SET ' . implode(', ', $messages_columns) . '
 		WHERE id_msg = {int:id_msg}',
@@ -2095,7 +2095,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Lock and or sticky the post.
 	if ($topicOptions['sticky_mode'] !== null || $topicOptions['lock_mode'] !== null || $topicOptions['poll'] !== null)
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET
 				is_sticky = {raw:is_sticky},
@@ -2115,7 +2115,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (!empty($topicOptions['mark_as_read']) && !$user_info['is_guest'])
 	{
 		// Since it's likely they *read* it before editing, let's try an UPDATE first.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}log_topics
 			SET id_msg = {int:id_msg}
 			WHERE id_member = {int:current_member}
@@ -2127,11 +2127,11 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			)
 		);
 
-		$flag = $smcFunc['db_affected_rows']() != 0;
+		$flag = $pmxcFunc['db_affected_rows']() != 0;
 
 		if (empty($flag))
 		{
-			$smcFunc['db_insert']('ignore',
+			$pmxcFunc['db_insert']('ignore',
 				'{db_prefix}log_topics',
 				array('id_topic' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
 				array($topicOptions['id'], $user_info['id'], $modSettings['maxMsgID']),
@@ -2149,7 +2149,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (isset($msgOptions['subject']))
 	{
 		// Only update the subject if this was the first message in the topic.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_topic
 			FROM {db_prefix}topics
 			WHERE id_first_msg = {int:id_first_msg}
@@ -2158,9 +2158,9 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_first_msg' => $msgOptions['id'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 1)
+		if ($pmxcFunc['db_num_rows']($request) == 1)
 			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Finally, if we are setting the approved state we need to do much more work :(
@@ -2180,7 +2180,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true, $notify = true)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (!is_array($msgs))
 		$msgs = array($msgs);
@@ -2189,7 +2189,7 @@ function approvePosts($msgs, $approve = true, $notify = true)
 		return false;
 
 	// May as well start at the beginning, working out *what* we need to change.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
 			m.body, m.subject, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.id_member,
 			t.approved AS topic_approved, b.count_posts
@@ -2211,7 +2211,7 @@ function approvePosts($msgs, $approve = true, $notify = true)
 	$notification_topics = array();
 	$notification_posts = array();
 	$member_post_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Easy...
 		$msgs[] = $row['id_msg'];
@@ -2288,13 +2288,13 @@ function approvePosts($msgs, $approve = true, $notify = true)
 		if ($row['id_member'] && empty($row['count_posts']))
 			$member_post_changes[$row['id_member']] = isset($member_post_changes[$row['id_member']]) ? $member_post_changes[$row['id_member']] + 1 : 1;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (empty($msgs))
 		return;
 
 	// Now we have the differences make the changes, first the easy one.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}messages
 		SET approved = {int:approved_state}
 		WHERE id_msg IN ({array_int:message_list})',
@@ -2307,7 +2307,7 @@ function approvePosts($msgs, $approve = true, $notify = true)
 	// If we were unapproving find the last msg in the topics...
 	if (!$approve)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_topic, MAX(id_msg) AS id_last_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topic_list})
@@ -2318,14 +2318,14 @@ function approvePosts($msgs, $approve = true, $notify = true)
 				'approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_last_msg'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// ... next the topics...
 	foreach ($topic_changes as $id => $changes)
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET approved = {int:approved}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
 				num_replies = num_replies + {int:num_replies}, id_last_msg = {int:id_last_msg}
@@ -2341,7 +2341,7 @@ function approvePosts($msgs, $approve = true, $notify = true)
 
 	// ... finally the boards...
 	foreach ($board_changes as $id => $changes)
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}boards
 			SET num_posts = num_posts + {int:num_posts}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
 				num_topics = num_topics + {int:num_topics}, unapproved_topics = unapproved_topics + {int:unapproved_topics}
@@ -2380,14 +2380,14 @@ function approvePosts($msgs, $approve = true, $notify = true)
 			);
 
 		if ($notify)
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}background_tasks',
 				array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 				$task_rows,
 				array('id_task')
 			);
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}approval_queue
 			WHERE id_msg IN ({array_int:message_list})
 				AND id_attach = {int:id_attach}',
@@ -2404,7 +2404,7 @@ function approvePosts($msgs, $approve = true, $notify = true)
 		foreach ($msgs as $msg)
 			$msgInserts[] = array($msg);
 
-		$smcFunc['db_insert']('ignore',
+		$pmxcFunc['db_insert']('ignore',
 			'{db_prefix}approval_queue',
 			array('id_msg' => 'int'),
 			$msgInserts,
@@ -2433,7 +2433,7 @@ function approvePosts($msgs, $approve = true, $notify = true)
  */
 function approveTopics($topics, $approve = true)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (!is_array($topics))
 		$topics = array($topics);
@@ -2444,7 +2444,7 @@ function approveTopics($topics, $approve = true)
 	$approve_type = $approve ? 0 : 1;
 
 	// Just get the messages to be approved and pass through...
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topic_list})
@@ -2455,9 +2455,9 @@ function approveTopics($topics, $approve = true)
 		)
 	);
 	$msgs = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$msgs[] = $row['id_msg'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return approvePosts($msgs, $approve);
 }
@@ -2476,7 +2476,7 @@ function approveTopics($topics, $approve = true)
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
-	global $board_info, $board, $smcFunc;
+	global $board_info, $board, $pmxcFunc;
 
 	// Please - let's be sane.
 	if (empty($setboards))
@@ -2489,7 +2489,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	if (!$id_msg)
 	{
 		// Find the latest message on this board (highest id_msg.)
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_board, MAX(id_last_msg) AS id_msg
 			FROM {db_prefix}topics
 			WHERE id_board IN ({array_int:board_list})
@@ -2501,9 +2501,9 @@ function updateLastMessages($setboards, $id_msg = 0)
 			)
 		);
 		$lastMsg = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$lastMsg[$row['id_board']] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 	{
@@ -2574,7 +2574,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	// Now commit the changes!
 	foreach ($parent_updates as $id_msg => $boards)
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}boards
 			SET id_msg_updated = {int:id_msg_updated}
 			WHERE id_board IN ({array_int:board_list})
@@ -2587,7 +2587,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	}
 	foreach ($board_updates as $board_data)
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}boards
 			SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
 			WHERE id_board IN ({array_int:board_list})',
@@ -2614,12 +2614,12 @@ function updateLastMessages($setboards, $id_msg = 0)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if ($member_name == null)
 	{
 		// Get the new user's name....
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT real_name
 			FROM {db_prefix}members
 			WHERE id_member = {int:id_member}
@@ -2628,12 +2628,12 @@ function adminNotify($type, $memberID, $member_name = null)
 				'id_member' => $memberID,
 			)
 		);
-		list ($member_name) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($member_name) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// This is really just a wrapper for making a new background task to deal with all the fun.
-	$smcFunc['db_insert']('insert',
+	$pmxcFunc['db_insert']('insert',
 		'{db_prefix}background_tasks',
 		array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 		array('$sourcedir/tasks/Register-Notify.php', 'Register_Notify_Background', json_encode(array(

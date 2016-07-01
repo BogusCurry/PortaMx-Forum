@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -22,7 +22,7 @@ if (!defined('SMF'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $db_connection, $_PHPA, $smcFunc, $memcached, $modSettings;
+	global $txt, $db_connection, $_PHPA, $pmxcFunc, $memcached, $modSettings;
 
 	loadLanguage('Admin');
 
@@ -64,11 +64,11 @@ function getServerVersions($checkFor)
 			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
 		else
 		{
-			$versions['db_engine'] = array('title' => sprintf($txt['support_versions_db_engine'], $smcFunc['db_title']), 'version' => '');
-			$versions['db_engine']['version'] = $smcFunc['db_get_engine']();
+			$versions['db_engine'] = array('title' => sprintf($txt['support_versions_db_engine'], $pmxcFunc['db_title']), 'version' => '');
+			$versions['db_engine']['version'] = $pmxcFunc['db_get_engine']();
 
-			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $smcFunc['db_title']), 'version' => '');
-			$versions['db_server']['version'] = $smcFunc['db_get_version']();
+			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $pmxcFunc['db_title']), 'version' => '');
+			$versions['db_server']['version'] = $pmxcFunc['db_get_version']();
 		}
 	}
 
@@ -450,7 +450,7 @@ function updateDbLastError($time)
  */
 function updateAdminPreferences()
 {
-	global $options, $context, $smcFunc, $settings, $user_info;
+	global $options, $context, $pmxcFunc, $settings, $user_info;
 
 	// This must exist!
 	if (!isset($context['admin_preferences']))
@@ -460,7 +460,7 @@ function updateAdminPreferences()
 	$options['admin_preferences'] = json_encode($context['admin_preferences']);
 
 	// Just check we haven't ended up with something theme exclusive somehow.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme != {int:default_theme}
 		AND variable = {string:admin_preferences}',
@@ -471,7 +471,7 @@ function updateAdminPreferences()
 	);
 
 	// Update the themes table.
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}themes',
 		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 		array($user_info['id'], 1, 'admin_preferences', $options['admin_preferences']),
@@ -494,7 +494,7 @@ function updateAdminPreferences()
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
-	global $smcFunc, $sourcedir, $language, $modSettings;
+	global $pmxcFunc, $sourcedir, $language, $modSettings;
 
 	// We certainly want this.
 	require_once($sourcedir . '/Subs-Post.php');
@@ -507,7 +507,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 	require_once($sourcedir . '/Subs-Notify.php');
 	$prefs = getNotifyPrefs($members, 'announcements', true);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE id_member IN({array_int:members})',
@@ -516,7 +516,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		)
 	);
 	$emails_sent = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if (empty($prefs[$row['id_member']]['announcements']))
 			continue;
@@ -535,7 +535,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		// Track who we emailed so we don't do it twice.
 		$emails_sent[] = $row['email_address'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Any additional users we must email this to?
 	if (!empty($additional_recipients))

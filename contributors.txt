@@ -1,4 +1,4 @@
-PortaMx and Simple Machines wants to thank everyone who helped make SMF 2.1 what it is today!
+PortaMx and Simple Machines wants to thank everyone who helped make SMF/PortaMx Forum what it is today!
 Those who contributed their time and effort in the form of code submissions, and in SMF's various teams including;
 Project Management, Support Specialists, Customizers, Doc Writers, Localizers, Marketing, Site Team and Server Team.
 

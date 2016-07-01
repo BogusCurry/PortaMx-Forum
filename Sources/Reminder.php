@@ -11,7 +11,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -50,7 +50,7 @@ function RemindMe()
  */
 function RemindPick()
 {
-	global $context, $txt, $scripturl, $sourcedir, $user_info, $webmaster_email, $smcFunc, $language, $modSettings;
+	global $context, $txt, $scripturl, $sourcedir, $user_info, $webmaster_email, $pmxcFunc, $language, $modSettings;
 
 	checkSession();
 	validateToken('remind');
@@ -81,7 +81,7 @@ function RemindPick()
 	}
 
 	// Find the user!
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, secret_question
 		FROM {db_prefix}members
 		WHERE ' . $where . '
@@ -89,23 +89,23 @@ function RemindPick()
 		$where_params
 	);
 	// Maybe email?
-	if ($smcFunc['db_num_rows']($request) == 0 && empty($_REQUEST['uid']))
+	if ($pmxcFunc['db_num_rows']($request) == 0 && empty($_REQUEST['uid']))
 	{
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, secret_question
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
 			LIMIT 1',
 			$where_params
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($pmxcFunc['db_num_rows']($request) == 0)
 			fatal_lang_error('no_user_with_email', false);
 	}
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// If the user isn't activated/approved, give them some feedback on what to do next.
 	if ($row['is_activated'] != 1)
@@ -186,7 +186,7 @@ function setPassword()
 		'memID' => (int) $_REQUEST['u']
 	);
 
-	loadJavascriptFile('register.js', array('defer' => false), 'smf_register');
+	loadJavascriptFile('register.js', array('defer' => false), 'pmx_register');
 
 	// Tokens!
 	createToken('remind-sp');
@@ -197,7 +197,7 @@ function setPassword()
  */
 function setPassword2()
 {
-	global $context, $txt, $smcFunc, $sourcedir;
+	global $context, $txt, $pmxcFunc, $sourcedir;
 
 	checkSession();
 	validateToken('remind-sp');
@@ -216,7 +216,7 @@ function setPassword2()
 	loadLanguage('Login');
 
 	// Get the code as it should be from the database.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT validation_code, member_name, email_address, passwd_flood
 		FROM {db_prefix}members
 		WHERE id_member = {int:id_member}
@@ -231,11 +231,11 @@ function setPassword2()
 	);
 
 	// Does this user exist at all?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('invalid_userid', false);
 
-	list ($realCode, $username, $email, $flood_value) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($realCode, $username, $email, $flood_value) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Is the password actually valid?
 	require_once($sourcedir . '/Subs-Auth.php');
@@ -282,7 +282,7 @@ function setPassword2()
  */
 function SecretAnswerInput()
 {
-	global $context, $smcFunc;
+	global $context, $pmxcFunc;
 
 	checkSession();
 
@@ -294,7 +294,7 @@ function SecretAnswerInput()
 		fatal_lang_error('username_no_exist', false);
 
 	// Get the stuff....
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name, member_name, secret_question
 		FROM {db_prefix}members
 		WHERE id_member = {int:id_member}
@@ -303,11 +303,11 @@ function SecretAnswerInput()
 			'id_member' => (int) $_REQUEST['uid'],
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('username_no_exist', false);
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// If there is NO secret question - then throw an error.
 	if (trim($row['secret_question']) == '')
@@ -320,7 +320,7 @@ function SecretAnswerInput()
 
 	$context['sub_template'] = 'ask';
 	createToken('remind-sai');
-	loadJavascriptFile('register.js', array('defer' => false), 'smf_register');
+	loadJavascriptFile('register.js', array('defer' => false), 'pmx_register');
 }
 
 /**
@@ -328,7 +328,7 @@ function SecretAnswerInput()
  */
 function SecretAnswer2()
 {
-	global $txt, $context, $smcFunc, $sourcedir;
+	global $txt, $context, $pmxcFunc, $sourcedir;
 
 	checkSession();
 	validateToken('remind-sai');
@@ -340,7 +340,7 @@ function SecretAnswer2()
 	loadLanguage('Login');
 
 	// Get the information from the database.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name, member_name, secret_answer, secret_question, email_address
 		FROM {db_prefix}members
 		WHERE id_member = {int:id_member}
@@ -349,11 +349,11 @@ function SecretAnswer2()
 			'id_member' => $_REQUEST['uid'],
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('username_no_exist', false);
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Check if the secret answer is correct.
 	if ($row['secret_question'] == '' || $row['secret_answer'] == '' || md5($_POST['secret_answer']) != $row['secret_answer'])

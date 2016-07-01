@@ -26,7 +26,7 @@ function template_eclmain_above()
 				'. $txt['ecl_needAccept'] . $txt['ecl_device'][$modSettings['isMobile']] .'
 			</div>
 			<div class="ecl_accept">
-				<input type="button" name="accept" value="'. $txt['ecl_button'] .'" onclick="smfCookie(\'set\', \'eclauth\', \'\', \'ecl\');window.location.href=smf_scripturl;" />&nbsp;
+				<input type="button" name="accept" value="'. $txt['ecl_button'] .'" onclick="smfCookie(\'set\', \'eclauth\', \'\', \'ecl\');window.location.href=pmx_scripturl;" />&nbsp;
 				<input id="privbut" class="eclbutclose" type="button" name="accept" value="'. $txt['ecl_privacy'] .'" title="'. $txt['ecl_privacy_ttlopen'] .'" onclick="show_eclprivacy()" />';
 
 	if(empty($modSettings['ecl_nomodal']) || (!empty($modSettings['isMobile']) && empty($modSettings['ecl_nomodal_mobile'])))
@@ -36,6 +36,9 @@ function template_eclmain_above()
 	echo '
 			</div>
 			<div id="ecl_privacy" style="display:none">';
+
+	if(!isset($context['languages']))
+		getLanguages();
 
 	$privacyfile = substr($context['languages'][$language]['location'], 0, strrpos($context['languages'][$language]['location'], '/')) .'/EclPrivacynotice.'. $context['languages'][$language]['filename'] .'.php';
 	if(file_exists($privacyfile))

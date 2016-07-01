@@ -15,7 +15,7 @@
 /**
  * Class Birthday_Notify_Background
  */
-class Birthday_Notify_Background extends SMF_BackgroundTask
+class Birthday_Notify_Background extends PMX_BackgroundTask
 {
     /**
      * This executes the task. It loads up the birthdays, figures out the greeting, etc.
@@ -23,7 +23,7 @@ class Birthday_Notify_Background extends SMF_BackgroundTask
      */
 	public function execute()
  	{
-		global $txt, $smcFunc, $txtBirthdayEmails, $language, $modSettings, $sourcedir;
+		global $txt, $pmxcFunc, $txtBirthdayEmails, $language, $modSettings, $sourcedir;
 
 		$greeting = isset($modSettings['birthday_email']) ? $modSettings['birthday_email'] : 'happy_birthday';
 
@@ -32,7 +32,7 @@ class Birthday_Notify_Background extends SMF_BackgroundTask
 		$day = date('j'); // Day without leading zeros.
 
 		// So who are the lucky ones?  Don't include those who are banned and those who don't want them.
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT id_member, real_name, lngfile, email_address
 			FROM {db_prefix}members
 			WHERE is_activated < 10
@@ -48,7 +48,7 @@ class Birthday_Notify_Background extends SMF_BackgroundTask
 
 		// Group them by languages.
 		$birthdays = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 		{
 			if (!isset($birthdays[$row['lngfile']]))
 				$birthdays[$row['lngfile']] = array();
@@ -57,7 +57,7 @@ class Birthday_Notify_Background extends SMF_BackgroundTask
 				'email' => $row['email_address']
 			);
 		}
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 
 		if (!empty($birthdays))
 		{
@@ -117,7 +117,7 @@ class Birthday_Notify_Background extends SMF_BackgroundTask
 
 			// Insert the alerts if any
 			if (!empty($alert_rows))
-				$smcFunc['db_insert']('',
+				$pmxcFunc['db_insert']('',
 					'{db_prefix}user_alerts',
 					array(
 						'alert_time' => 'int', 'id_member' => 'int', 'content_type' => 'string',

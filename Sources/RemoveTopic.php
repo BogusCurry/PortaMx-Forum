@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /*	The contents of this file handle the deletion of topics, posts, and related
@@ -27,7 +27,7 @@ if (!defined('SMF'))
  */
 function RemoveTopic2()
 {
-	global $user_info, $topic, $board, $sourcedir, $smcFunc, $modSettings;
+	global $user_info, $topic, $board, $sourcedir, $pmxcFunc, $modSettings;
 
 	// Make sure they aren't being lead around by someone. (:@)
 	checkSession('get');
@@ -41,7 +41,7 @@ function RemoveTopic2()
 
 	removeDeleteConcurrence();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT t.id_member_started, ms.subject, t.approved, t.locked
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
@@ -51,8 +51,8 @@ function RemoveTopic2()
 			'current_topic' => $topic,
 		)
 	);
-	list ($starter, $subject, $approved, $locked) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($starter, $subject, $approved, $locked) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if ($starter == $user_info['id'] && !allowedTo('remove_any'))
 		isAllowedTo('remove_own');
@@ -88,7 +88,7 @@ function RemoveTopic2()
  */
 function DeleteMessage()
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc;
+	global $user_info, $topic, $board, $modSettings, $pmxcFunc;
 
 	checkSession('get');
 
@@ -100,7 +100,7 @@ function DeleteMessage()
 
 	removeDeleteConcurrence();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT t.id_member_started, m.id_member, m.subject, m.poster_time, m.approved
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = {int:id_msg} AND m.id_topic = {int:current_topic})
@@ -111,8 +111,8 @@ function DeleteMessage()
 			'id_msg' => $_REQUEST['msg'],
 		)
 	);
-	list ($starter, $poster, $subject, $post_time, $approved) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($starter, $poster, $subject, $post_time, $approved) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Verify they can see this!
 	if ($modSettings['postmod_active'] && !$approved && !empty($poster) && $poster != $user_info['id'])
@@ -160,7 +160,7 @@ function DeleteMessage()
  */
 function RemoveOldTopics2()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	isAllowedTo('admin_forum');
 	checkSession('post', 'admin');
@@ -211,7 +211,7 @@ function RemoveOldTopics2()
 	}
 
 	// All we're gonna do here is grab the id_topic's and send them to removeTopics().
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT t.id_topic
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_last_msg)
@@ -221,9 +221,9 @@ function RemoveOldTopics2()
 		$condition_params
 	);
 	$topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$topics[] = $row['id_topic'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	removeTopics($topics, false, true);
 
@@ -243,7 +243,7 @@ function RemoveOldTopics2()
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false, $updateBoardCount = true)
 {
-	global $sourcedir, $modSettings, $smcFunc;
+	global $sourcedir, $modSettings, $pmxcFunc;
 
 	// Nothing to do?
 	if (empty($topics))
@@ -257,7 +257,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Decrease the post counts.
 	if ($decreasePostCount)
 	{
-		$requestMembers = $smcFunc['db_query']('', '
+		$requestMembers = $pmxcFunc['db_query']('', '
 			SELECT m.id_member, COUNT(*) AS posts
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -273,18 +273,18 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'is_approved' => 1,
 			)
 		);
-		if ($smcFunc['db_num_rows']($requestMembers) > 0)
+		if ($pmxcFunc['db_num_rows']($requestMembers) > 0)
 		{
-			while ($rowMembers = $smcFunc['db_fetch_assoc']($requestMembers))
+			while ($rowMembers = $pmxcFunc['db_fetch_assoc']($requestMembers))
 				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
 		}
-		$smcFunc['db_free_result']($requestMembers);
+		$pmxcFunc['db_free_result']($requestMembers);
 	}
 
 	// Recycle topics that aren't in the recycle board...
 	if (!empty($recycle_board) && !$ignoreRecycling)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_topic, id_board, unapproved_posts, approved
 			FROM {db_prefix}topics
 			WHERE id_topic IN ({array_int:topics})
@@ -296,11 +296,11 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'limit' => count($topics),
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if ($pmxcFunc['db_num_rows']($request) > 0)
 		{
 			// Get topics that will be recycled.
 			$recycleTopics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if (function_exists('apache_reset_timeout'))
 					@apache_reset_timeout();
@@ -308,7 +308,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				$recycleTopics[] = $row['id_topic'];
 
 				// Set the id_previous_board for this topic - and make it not sticky.
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}topics
 					SET id_previous_board = {int:id_previous_board}, is_sticky = {int:not_sticky}
 					WHERE id_topic = {int:id_topic}',
@@ -319,7 +319,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 					)
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Move the topics to the recycle board.
 			require_once($sourcedir . '/MoveTopic.php');
@@ -328,7 +328,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			// Close reports that are being recycled.
 			require_once($sourcedir . '/ModerationCenter.php');
 
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}log_reported
 				SET closed = {int:is_closed}
 				WHERE id_topic IN ({array_int:recycle_topics})',
@@ -347,7 +347,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			$topics = array_diff($topics, $recycleTopics);
 		}
 		else
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 	}
 
 	// Still topics left to delete?
@@ -363,7 +363,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	$adjustBoards = array();
 
 	// Find out how many posts we are deleting.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_board, approved, COUNT(*) AS num_topics, SUM(unapproved_posts) AS unapproved_posts,
 			SUM(num_replies) AS num_replies
 		FROM {db_prefix}topics
@@ -373,7 +373,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if (!isset($adjustBoards[$row['id_board']]['num_posts']))
 		{
@@ -395,7 +395,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		else
 			$adjustBoards[$row['id_board']]['unapproved_topics'] += $row['num_topics'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if($updateBoardCount)
 	{
@@ -405,7 +405,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
 
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}boards
 				SET
 					num_posts = CASE WHEN {int:num_posts} > num_posts THEN 0 ELSE num_posts - {int:num_posts} END,
@@ -424,7 +424,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		}
 	}
 	// Remove Polls.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_poll
 		FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})
@@ -437,27 +437,27 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		)
 	);
 	$polls = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$polls[] = $row['id_poll'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!empty($polls))
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}polls
 			WHERE id_poll IN ({array_int:polls})',
 			array(
 				'polls' => $polls,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}poll_choices
 			WHERE id_poll IN ({array_int:polls})',
 			array(
 				'polls' => $polls,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_polls
 			WHERE id_poll IN ({array_int:polls})',
 			array(
@@ -477,11 +477,11 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Delete possible search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
-		$customIndexSettings = smf_json_decode($modSettings['search_custom_index_config'], true);
+		$customIndexSettings = pmx_json_decode($modSettings['search_custom_index_config'], true);
 
 		$words = array();
 		$messages = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_msg, body
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})',
@@ -489,7 +489,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'topics' => $topics,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
@@ -497,11 +497,11 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
 			$messages[] = $row['id_msg'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 		$words = array_unique($words);
 
 		if (!empty($words) && !empty($messages))
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}log_search_words
 				WHERE id_word IN ({array_int:word_list})
 					AND id_msg IN ({array_int:message_list})',
@@ -513,42 +513,42 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Delete anything related to the topic.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}calendar
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_notify
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})',
 		array(
 			'topics' => $topics,
 		)
 	);
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_search_subjects
 		WHERE id_topic IN ({array_int:topics})',
 		array(
@@ -586,14 +586,14 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $sourcedir, $modSettings, $user_info, $smcFunc;
+	global $board, $sourcedir, $modSettings, $user_info, $pmxcFunc;
 
 	if (empty($message) || !is_numeric($message))
 		return false;
 
 	$recycle_board = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) ? (int) $modSettings['recycle_board'] : 0;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT
 			m.id_member, m.icon, m.poster_time, m.subject,' . (empty($modSettings['search_custom_index_config']) ? '' : ' m.body,') . '
 			m.approved, t.id_topic, t.id_first_msg, t.id_last_msg, t.num_replies, t.id_board,
@@ -608,10 +608,10 @@ function removeMessage($message, $decreasePostCount = true)
 			'id_msg' => $message,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		return false;
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (empty($board) || $row['id_board'] != $board)
 	{
@@ -723,7 +723,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if ($row['id_last_msg'] == $message)
 	{
 		// Find the last message, set it, and decrease the post count.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_msg, id_member
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:id_topic}
@@ -735,10 +735,10 @@ function removeMessage($message, $decreasePostCount = true)
 				'id_msg' => $message,
 			)
 		);
-		$row2 = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$row2 = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET
 				id_last_msg = {int:id_last_msg},
@@ -757,7 +757,7 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 	// Only decrease post counts.
 	else
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET ' . ($row['approved'] ? '
 				num_replies = CASE WHEN num_replies = {int:no_replies} THEN 0 ELSE num_replies - 1 END' : '
@@ -778,7 +778,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if (!empty($modSettings['recycle_enable']) && $row['id_board'] != $modSettings['recycle_board'] && $row['icon'] != 'recycled')
 	{
 		// Check if the recycle board exists and if so get the read status.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT (COALESCE(lb.id_msg, 0) >= b.id_msg_updated) AS is_seen, id_last_msg
 			FROM {db_prefix}boards AS b
 				LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
@@ -788,13 +788,13 @@ function removeMessage($message, $decreasePostCount = true)
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($pmxcFunc['db_num_rows']($request) == 0)
 			fatal_lang_error('recycle_no_valid_board');
-		list ($isRead, $last_board_msg) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($isRead, $last_board_msg) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Is there an existing topic in the recycle board to group this post with?
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_topic, id_first_msg, id_last_msg
 			FROM {db_prefix}topics
 			WHERE id_previous_topic = {int:id_previous_topic}
@@ -804,12 +804,12 @@ function removeMessage($message, $decreasePostCount = true)
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Insert a new topic in the recycle board if $id_recycle_topic is empty.
 		if (empty($id_recycle_topic))
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}topics',
 				array(
 					'id_board' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int', 'id_first_msg' => 'int',
@@ -823,12 +823,12 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 
 		// Capture the ID of the new topic...
-		$topicID = empty($id_recycle_topic) ? $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
+		$topicID = empty($id_recycle_topic) ? $pmxcFunc['db_insert_id']('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
 
 		// If the topic creation went successful, move the message.
 		if ($topicID > 0)
 		{
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}messages
 				SET
 					id_topic = {int:id_topic},
@@ -844,7 +844,7 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 
 			// Take any reported posts with us...
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}log_reported
 				SET
 					id_topic = {int:id_topic},
@@ -859,7 +859,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Mark recycled topic as read.
 			if (!$user_info['is_guest'])
-				$smcFunc['db_insert']('replace',
+				$pmxcFunc['db_insert']('replace',
 					'{db_prefix}log_topics',
 					array('id_topic' => 'int', 'id_member' => 'int', 'id_msg' => 'int', 'unwatched' => 'int'),
 					array($topicID, $user_info['id'], $modSettings['maxMsgID'], 0),
@@ -868,7 +868,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Mark recycle board as seen, if it was marked as seen before.
 			if (!empty($isRead) && !$user_info['is_guest'])
-				$smcFunc['db_insert']('replace',
+				$pmxcFunc['db_insert']('replace',
 					'{db_prefix}log_boards',
 					array('id_board' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
 					array($modSettings['recycle_board'], $user_info['id'], $modSettings['maxMsgID']),
@@ -876,7 +876,7 @@ function removeMessage($message, $decreasePostCount = true)
 				);
 
 			// Add one topic and post to the recycle bin board.
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}boards
 				SET
 					num_topics = num_topics + {int:num_topics_inc},
@@ -892,7 +892,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Lets increase the num_replies, and the first/last message ID as appropriate.
 			if (!empty($id_recycle_topic))
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					UPDATE {db_prefix}topics
 					SET num_replies = num_replies + 1' .
 						($message > $last_topic_msg ? ', id_last_msg = {int:id_merged_msg}' : '') .
@@ -913,7 +913,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 		// If it wasn't approved don't keep it in the queue.
 		if (!$row['approved'])
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}approval_queue
 				WHERE id_msg = {int:id_msg}
 					AND id_attach = {int:id_attach}',
@@ -924,7 +924,7 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 	}
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}boards
 		SET ' . ($row['approved'] ? '
 			num_posts = CASE WHEN num_posts = {int:no_posts} THEN 0 ELSE num_posts - 1 END' : '
@@ -952,7 +952,7 @@ function removeMessage($message, $decreasePostCount = true)
 			$searchAPI->postRemoved($message);
 
 		// Remove the message!
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}messages
 			WHERE id_msg = {int:id_msg}',
 			array(
@@ -962,10 +962,10 @@ function removeMessage($message, $decreasePostCount = true)
 
 		if (!empty($modSettings['search_custom_index_config']))
 		{
-			$customIndexSettings = smf_json_decode($modSettings['search_custom_index_config'], true);
+			$customIndexSettings = pmx_json_decode($modSettings['search_custom_index_config'], true);
 			$words = text2words($row['body'], $customIndexSettings['bytes_per_word'], true);
 			if (!empty($words))
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}log_search_words
 					WHERE id_word IN ({array_int:word_list})
 						AND id_msg = {int:id_msg}',
@@ -1003,7 +1003,7 @@ function removeMessage($message, $decreasePostCount = true)
 		updateLastMessages($row['id_board']);
 
 	// Close any moderation reports for this message.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}log_reported
 		SET closed = {int:is_closed}
 		WHERE id_msg = {int:id_msg}',
@@ -1012,7 +1012,7 @@ function removeMessage($message, $decreasePostCount = true)
 			'id_msg' => $message,
 		)
 	);
-	if ($smcFunc['db_affected_rows']() != 0)
+	if ($pmxcFunc['db_affected_rows']() != 0)
 	{
 		require_once($sourcedir . '/ModerationCenter.php');
 		updateSettings(array('last_mod_report_action' => time()));
@@ -1028,7 +1028,7 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function RestoreTopic()
 {
-	global $smcFunc, $modSettings, $sourcedir;
+	global $pmxcFunc, $modSettings, $sourcedir;
 
 	// Check session.
 	checkSession('get');
@@ -1054,7 +1054,7 @@ function RestoreTopic()
 			$msgs[$k] = (int) $msg;
 
 		// Get the id_previous_board and id_previous_topic.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT m.id_topic, m.id_msg, m.id_board, m.subject, m.id_member, t.id_previous_board, t.id_previous_topic,
 				t.id_first_msg, b.count_posts, COALESCE(pt.id_board, 0) AS possible_prev_board
 			FROM {db_prefix}messages AS m
@@ -1069,7 +1069,7 @@ function RestoreTopic()
 
 		$actioned_messages = array();
 		$previous_topics = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			// Restoring the first post means topic.
 			if ($row['id_msg'] == $row['id_first_msg'] && $row['id_previous_topic'] == $row['id_topic'])
@@ -1101,7 +1101,7 @@ function RestoreTopic()
 			if ($row['id_member'])
 				$actioned_messages[$row['id_previous_topic']]['members'][] = $row['id_member'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Check for topics we are going to fully restore.
 		foreach ($actioned_messages as $topic => $data)
@@ -1111,7 +1111,7 @@ function RestoreTopic()
 		// Load any previous topics to check they exist.
 		if (!empty($previous_topics))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT t.id_topic, t.id_board, m.subject
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -1121,12 +1121,12 @@ function RestoreTopic()
 				)
 			);
 			$previous_topics = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				$previous_topics[$row['id_topic']] = array(
 					'board' => $row['id_board'],
 					'subject' => $row['subject'],
 				);
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 
 		// Restore each topic.
@@ -1167,7 +1167,7 @@ function RestoreTopic()
 	if (!empty($topics_to_restore))
 	{
 		// Lets get the data for these topics.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT t.id_topic, t.id_previous_board, t.id_board, t.id_first_msg, m.subject
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -1176,7 +1176,7 @@ function RestoreTopic()
 				'topics' => $topics_to_restore,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			// We can only restore if the previous board is set.
 			if (empty($row['id_previous_board']))
@@ -1189,7 +1189,7 @@ function RestoreTopic()
 			moveTopics($row['id_topic'], $row['id_previous_board']);
 
 			// Lets see if the board that we are returning to has post count enabled.
-			$request2 = $smcFunc['db_query']('', '
+			$request2 = $pmxcFunc['db_query']('', '
 				SELECT count_posts
 				FROM {db_prefix}boards
 				WHERE id_board = {int:board}',
@@ -1197,13 +1197,13 @@ function RestoreTopic()
 					'board' => $row['id_previous_board'],
 				)
 			);
-			list ($count_posts) = $smcFunc['db_fetch_row']($request2);
-			$smcFunc['db_free_result']($request2);
+			list ($count_posts) = $pmxcFunc['db_fetch_row']($request2);
+			$pmxcFunc['db_free_result']($request2);
 
 			if (empty($count_posts))
 			{
 				// Lets get the members that need their post count restored.
-				$request2 = $smcFunc['db_query']('', '
+				$request2 = $pmxcFunc['db_query']('', '
 					SELECT id_member, COUNT(id_msg) AS post_count
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:topic}
@@ -1215,15 +1215,15 @@ function RestoreTopic()
 					)
 				);
 
-				while ($member = $smcFunc['db_fetch_assoc']($request2))
+				while ($member = $pmxcFunc['db_fetch_assoc']($request2))
 					updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
-				$smcFunc['db_free_result']($request2);
+				$pmxcFunc['db_free_result']($request2);
 			}
 
 			// Log it.
 			logAction('restore_topic', array('topic' => $row['id_topic'], 'board' => $row['id_board'], 'board_to' => $row['id_previous_board']));
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Didn't find some things?
@@ -1245,7 +1245,7 @@ function RestoreTopic()
  */
 function mergePosts($msgs, $from_topic, $target_topic)
 {
-	global $smcFunc, $sourcedir;
+	global $pmxcFunc, $sourcedir;
 
 	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 
@@ -1258,7 +1258,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 		$msgs[$key] = (int) $msg;
 
 	// Get the source information.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT t.id_board, t.id_first_msg, t.num_replies, t.unapproved_posts
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -1267,11 +1267,11 @@ function mergePosts($msgs, $from_topic, $target_topic)
 			'from_topic' => $from_topic,
 		)
 	);
-	list ($from_board, $from_first_msg, $from_replies, $from_unapproved_posts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($from_board, $from_first_msg, $from_replies, $from_unapproved_posts) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Get some target topic and board stats.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT t.id_board, t.id_first_msg, t.num_replies, t.unapproved_posts, b.count_posts
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -1280,14 +1280,14 @@ function mergePosts($msgs, $from_topic, $target_topic)
 			'target_topic' => $target_topic,
 		)
 	);
-	list ($target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($target_board, $target_first_msg, $target_replies, $target_unapproved_posts, $count_posts) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Lets see if the board that we are returning to has post count enabled.
 	if (empty($count_posts))
 	{
 		// Lets get the members that need their post count restored.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:messages})
@@ -1298,12 +1298,12 @@ function mergePosts($msgs, $from_topic, $target_topic)
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			updateMemberData($row['id_member'], array('posts' => '+'));
 	}
 
 	// Time to move the messages.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}messages
 		SET
 			id_topic = {int:target_topic},
@@ -1322,7 +1322,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 		'unapproved_posts' => 0,
 		'id_first_msg' => 9999999999,
 	);
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT MIN(id_msg) AS id_first_msg, MAX(id_msg) AS id_last_msg, COUNT(*) AS message_count, approved
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:target_topic}
@@ -1333,7 +1333,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 			'target_topic' => $target_topic,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if ($row['id_first_msg'] < $target_topic_data['id_first_msg'])
 			$target_topic_data['id_first_msg'] = $row['id_first_msg'];
@@ -1343,10 +1343,10 @@ function mergePosts($msgs, $from_topic, $target_topic)
 		else
 			$target_topic_data['num_replies'] = max(0, $row['message_count'] - 1);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// We have a new post count for the board.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}boards
 		SET
 			num_posts = num_posts + {int:diff_replies},
@@ -1360,7 +1360,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 	);
 
 	// In some cases we merged the only post in a topic so the topic data is left behind in the topic table.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_topic
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:from_topic}',
@@ -1371,12 +1371,12 @@ function mergePosts($msgs, $from_topic, $target_topic)
 
 	// Remove the topic if it doesn't have any messages.
 	$topic_exists = true;
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 	{
 		removeTopics($from_topic, false, true);
 		$topic_exists = false;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Recycled topic.
 	if ($topic_exists == true)
@@ -1387,7 +1387,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 			'unapproved_posts' => 0,
 			'id_first_msg' => 9999999999,
 		);
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT MIN(id_msg) AS id_first_msg, MAX(id_msg) AS id_last_msg, COUNT(*) AS message_count, approved, subject
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:from_topic}
@@ -1398,7 +1398,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 				'from_topic' => $from_topic,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['id_first_msg'] < $source_topic_data['id_first_msg'])
 				$source_topic_data['id_first_msg'] = $row['id_first_msg'];
@@ -1408,10 +1408,10 @@ function mergePosts($msgs, $from_topic, $target_topic)
 			else
 				$source_topic_data['num_replies'] = max(0, $row['message_count'] - 1);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Update the topic details for the source topic.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET
 				id_first_msg = {int:id_first_msg},
@@ -1429,7 +1429,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 		);
 
 		// We have a new post count for the source board.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}boards
 			SET
 				num_posts = num_posts + {int:diff_replies},
@@ -1444,7 +1444,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 	}
 
 	// Finally get around to updating the destination topic, now all indexes etc on the source are fixed.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}topics
 		SET
 			id_first_msg = {int:id_first_msg},
@@ -1477,7 +1477,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 
 	if (!empty($cache_updates))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_topic, subject
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:first_messages})',
@@ -1485,9 +1485,9 @@ function mergePosts($msgs, $from_topic, $target_topic)
 				'first_messages' => $cache_updates,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			updateStats('subject', $row['id_topic'], $row['subject']);
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	updateLastMessages(array($from_board, $target_board));

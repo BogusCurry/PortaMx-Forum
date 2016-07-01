@@ -194,7 +194,7 @@ function template_permission_index()
 		// Javascript for the advanced stuff.
 		echo '
 	<script>
-		var oPermissionsPanelToggle = new smc_Toggle({
+		var oPermissionsPanelToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['show_advanced_options']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -217,8 +217,8 @@ function template_permission_index()
 			oThemeOptions: {
 				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: pmx_session_var,
+				sSessionId: pmx_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=app\'
 			}
@@ -467,11 +467,11 @@ function template_modify_group()
 	{
 		echo '
 		<script>
-			window.smf_usedDeny = false;
+			window.pmx_usedDeny = false;
 
 			function warnAboutDeny()
 			{
-				if (window.smf_usedDeny)
+				if (window.pmx_usedDeny)
 					return confirm("', $txt['permissions_deny_dangerous'], '");
 				else
 					return true;

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -80,7 +80,7 @@ function ManageBoards()
  */
 function ManageBoardsMain()
 {
-	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $sourcedir, $smcFunc;
+	global $txt, $context, $cat_tree, $boards, $boardList, $scripturl, $sourcedir, $pmxcFunc;
 
 	loadTemplate('ManageBoards');
 
@@ -137,7 +137,7 @@ function ManageBoardsMain()
 	{
 		createToken('admin-bm-' . $context['move_board'], 'request');
 
-		$context['move_title'] = sprintf($txt['mboards_select_destination'], $smcFunc['htmlspecialchars']($boards[$context['move_board']]['name']));
+		$context['move_title'] = sprintf($txt['mboards_select_destination'], $pmxcFunc['htmlspecialchars']($boards[$context['move_board']]['name']));
 		foreach ($cat_tree as $catid => $tree)
 		{
 			$prev_child_level = 0;
@@ -150,7 +150,7 @@ function ManageBoardsMain()
 				if (!isset($context['categories'][$catid]['move_link']))
 					$context['categories'][$catid]['move_link'] = array(
 						'child_level' => 0,
-						'label' => $txt['mboards_order_before'] . ' \'' . $smcFunc['htmlspecialchars']($boards[$boardid]['name']) . '\'',
+						'label' => $txt['mboards_order_before'] . ' \'' . $pmxcFunc['htmlspecialchars']($boards[$boardid]['name']) . '\'',
 						'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=before;' . $security,
 					);
 
@@ -158,13 +158,13 @@ function ManageBoardsMain()
 				$context['categories'][$catid]['boards'][$boardid]['move_links'] = array(
 					array(
 						'child_level' => $boards[$boardid]['level'],
-						'label' => $txt['mboards_order_after'] . '\'' . $smcFunc['htmlspecialchars']($boards[$boardid]['name']) . '\'',
+						'label' => $txt['mboards_order_after'] . '\'' . $pmxcFunc['htmlspecialchars']($boards[$boardid]['name']) . '\'',
 						'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=after;' . $security,
 						'class' => $boards[$boardid]['level'] > 0 ? 'above' : 'below',
 					),
 					array(
 						'child_level' => $boards[$boardid]['level'] + 1,
-						'label' => $txt['mboards_order_child_of'] . ' \'' . $smcFunc['htmlspecialchars']($boards[$boardid]['name']) . '\'',
+						'label' => $txt['mboards_order_child_of'] . ' \'' . $pmxcFunc['htmlspecialchars']($boards[$boardid]['name']) . '\'',
 						'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=child;' . $security,
 						'class' => 'here',
 					),
@@ -194,7 +194,7 @@ function ManageBoardsMain()
 			if (empty($boardList[$catid]))
 				$context['categories'][$catid]['move_link'] = array(
 					'child_level' => 0,
-					'label' => $txt['mboards_order_before'] . ' \'' . $smcFunc['htmlspecialchars']($tree['node']['name']) . '\'',
+					'label' => $txt['mboards_order_before'] . ' \'' . $pmxcFunc['htmlspecialchars']($tree['node']['name']) . '\'',
 					'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_cat=' . $catid . ';move_to=top;' . $security,
 				);
 		}
@@ -218,7 +218,7 @@ function ManageBoardsMain()
  */
 function EditCategory()
 {
-	global $txt, $context, $cat_tree, $boardList, $boards, $smcFunc, $sourcedir;
+	global $txt, $context, $cat_tree, $boardList, $boards, $pmxcFunc, $sourcedir;
 
 	loadTemplate('ManageBoards');
 	require_once($sourcedir . '/Subs-Boards.php');
@@ -244,7 +244,7 @@ function EditCategory()
 		$context['category'] = array(
 			'id' => 0,
 			'name' => $txt['mboards_new_cat_name'],
-			'editable_name' => $smcFunc['htmlspecialchars']($txt['mboards_new_cat_name']),
+			'editable_name' => $pmxcFunc['htmlspecialchars']($txt['mboards_new_cat_name']),
 			'description' => '',
 			'can_collapse' => true,
 			'is_new' => true,
@@ -312,7 +312,7 @@ function EditCategory()
  */
 function EditCategory2()
 {
-	global $sourcedir, $smcFunc, $context;
+	global $sourcedir, $pmxcFunc, $context;
 
 	checkSession();
 	validateToken('admin-bc-' . $_REQUEST['cat']);
@@ -330,8 +330,8 @@ function EditCategory2()
 			$catOptions['move_after'] = (int) $_POST['cat_order'];
 
 		// Change "This & That" to "This &amp; That" but don't change "&cent" to "&amp;cent;"...
-		$catOptions['cat_name'] = parse_bbc($smcFunc['htmlspecialchars']($_POST['cat_name']), false, '', $context['description_allowed_tags']);
-		$catOptions['cat_desc'] = parse_bbc($smcFunc['htmlspecialchars']($_POST['cat_desc']), false, '', $context['description_allowed_tags']);
+		$catOptions['cat_name'] = parse_bbc($pmxcFunc['htmlspecialchars']($_POST['cat_name']), false, '', $context['description_allowed_tags']);
+		$catOptions['cat_desc'] = parse_bbc($pmxcFunc['htmlspecialchars']($_POST['cat_desc']), false, '', $context['description_allowed_tags']);
 
 		$catOptions['is_collapsible'] = isset($_POST['collapse']);
 
@@ -375,7 +375,7 @@ function EditCategory2()
 function EditBoard()
 {
 	global $txt, $context, $cat_tree, $boards, $boardList;
-	global $sourcedir, $smcFunc, $modSettings;
+	global $sourcedir, $pmxcFunc, $modSettings;
 
 	loadTemplate('ManageBoards');
 	require_once($sourcedir . '/Subs-Boards.php');
@@ -465,7 +465,7 @@ function EditBoard()
 	);
 
 	// Load membergroups.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE id_group > {int:moderator_group} OR id_group = {int:global_moderator}
@@ -475,7 +475,7 @@ function EditBoard()
 			'global_moderator' => 2,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if ($_REQUEST['sa'] == 'newboard' && $row['min_posts'] == -1)
 			$curBoard['member_groups'][] = $row['id_group'];
@@ -488,7 +488,7 @@ function EditBoard()
 			'is_post_group' => $row['min_posts'] != -1,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Category doesn't exist, man... sorry.
 	if (!isset($boardList[$curBoard['category']]))
@@ -538,7 +538,7 @@ function EditBoard()
 			'selected' => $catID == $curBoard['category']
 		);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT mem.id_member, mem.real_name
 		FROM {db_prefix}moderators AS mods
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
@@ -548,9 +548,9 @@ function EditBoard()
 		)
 	);
 	$context['board']['moderators'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$context['board']['moderators'][$row['id_member']] = $row['real_name'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$context['board']['moderator_list'] = empty($context['board']['moderators']) ? '' : '&quot;' . implode('&quot;, &quot;', $context['board']['moderators']) . '&quot;';
 
@@ -558,7 +558,7 @@ function EditBoard()
 		list ($context['board']['last_moderator_id']) = array_slice(array_keys($context['board']['moderators']), -1);
 
 	// Get all the groups assigned as moderators
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_group
 		FROM {db_prefix}moderator_groups
 		WHERE id_board = {int:current_board}',
@@ -567,9 +567,9 @@ function EditBoard()
 		)
 	);
 	$context['board']['moderator_groups'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$context['board']['moderator_groups'][$row['id_group']] = $context['groups'][$row['id_group']]['name'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$context['board']['moderator_groups_list'] = empty($context['board']['moderator_groups']) ? '' : '&quot;' . implode('&quot;, &qout;', $context['board']['moderator_groups']) . '&quot;';
 
@@ -577,7 +577,7 @@ function EditBoard()
 		list ($context['board']['last_moderator_group_id']) = array_slice(array_keys($context['board']['moderator_groups']), -1);
 
 	// Get all the themes...
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_theme AS id, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}',
@@ -586,15 +586,15 @@ function EditBoard()
 		)
 	);
 	$context['themes'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$context['themes'][] = $row;
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	if (!isset($_REQUEST['delete']))
 	{
 		$context['sub_template'] = 'modify_board';
 		$context['page_title'] = $txt['boardsEdit'];
-		loadJavascriptFile('suggest.js', array('defer' => false), 'smf_suggest');
+		loadJavascriptFile('suggest.js', array('defer' => false), 'pmx_suggest');
 	}
 	else
 	{
@@ -618,7 +618,7 @@ function EditBoard()
  */
 function EditBoard2()
 {
-	global $sourcedir, $smcFunc, $context;
+	global $sourcedir, $pmxcFunc, $context;
 
 	$_POST['boardid'] = (int) $_POST['boardid'];
 	checkSession();
@@ -676,8 +676,8 @@ function EditBoard2()
 			fatal_lang_error('too_many_groups', false);
 
 		// Do not allow HTML tags. Parse the string.
-		$boardOptions['board_name'] = parse_bbc($smcFunc['htmlspecialchars']($_POST['board_name']), false, '', $context['description_allowed_tags']);
-		$boardOptions['board_description'] = parse_bbc($smcFunc['htmlspecialchars']($_POST['desc']), false, '', $context['description_allowed_tags']);
+		$boardOptions['board_name'] = parse_bbc($pmxcFunc['htmlspecialchars']($_POST['board_name']), false, '', $context['description_allowed_tags']);
+		$boardOptions['board_description'] = parse_bbc($pmxcFunc['htmlspecialchars']($_POST['desc']), false, '', $context['description_allowed_tags']);
 
 		$boardOptions['moderator_string'] = $_POST['moderators'];
 
@@ -709,7 +709,7 @@ function EditBoard2()
 		// We need to know what used to be case in terms of redirection.
 		if (!empty($_POST['boardid']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT redirect, num_posts
 				FROM {db_prefix}boards
 				WHERE id_board = {int:current_board}',
@@ -717,8 +717,8 @@ function EditBoard2()
 					'current_board' => $_POST['boardid'],
 				)
 			);
-			list ($oldRedirect, $numPosts) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($oldRedirect, $numPosts) = $pmxcFunc['db_fetch_row']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
 			if ($boardOptions['redirect'] && empty($oldRedirect) && $numPosts)
@@ -777,7 +777,7 @@ function EditBoard2()
  */
 function ModifyCat()
 {
-	global $boards, $sourcedir, $smcFunc;
+	global $boards, $sourcedir, $pmxcFunc;
 
 	// Get some information about the boards and the cats.
 	require_once($sourcedir . '/Subs-Boards.php');
@@ -791,7 +791,7 @@ function ModifyCat()
 	$_POST['id'] = substr($_POST['id'][1], 0, 3);
 
 	// Select the stuff we need from the DB.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT CONCAT({string:post_id}, {string:feline_clause}, {string:subact})
 		FROM {db_prefix}categories
 		LIMIT 1',
@@ -801,10 +801,10 @@ function ModifyCat()
 			'subact' => $allowed_sa[2] . 'e, ',
 		)
 	);
-	list ($cat) = $smcFunc['db_fetch_row']($request);
+	list ($cat) = $pmxcFunc['db_fetch_row']($request);
 
 	// Free resources.
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// This would probably never happen, but just to be sure.
 	if ($cat .= $allowed_sa[1])
@@ -822,10 +822,10 @@ function ModifyCat()
  */
 function EditBoardSettings($return_config = false)
 {
-	global $context, $txt, $sourcedir, $scripturl, $smcFunc;
+	global $context, $txt, $sourcedir, $scripturl, $pmxcFunc;
 
 	// Load the boards list - for the recycle bin!
-	$request = $smcFunc['db_query']('order_by_board_order', '
+	$request = $pmxcFunc['db_query']('order_by_board_order', '
 		SELECT b.id_board, b.name AS board_name, c.name AS cat_name
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
@@ -834,9 +834,9 @@ function EditBoardSettings($return_config = false)
 			'empty_string' => '',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$recycle_boards[$row['id_board']] = $row['cat_name'] . ' - ' . $row['board_name'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	require_once($sourcedir . '/Subs-Boards.php');
 	sortBoards($recycle_boards);

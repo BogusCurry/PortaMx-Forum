@@ -15,7 +15,7 @@
 /**
  * Class MemberReport_Notify_Background
  */
-class MemberReport_Notify_Background extends SMF_BackgroundTask
+class MemberReport_Notify_Background extends PMX_BackgroundTask
 {
 	/**
      * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
@@ -23,7 +23,7 @@ class MemberReport_Notify_Background extends SMF_BackgroundTask
 	 */
 	public function execute()
 	{
-		global $smcFunc, $sourcedir, $modSettings, $language, $scripturl;
+		global $pmxcFunc, $sourcedir, $modSettings, $language, $scripturl;
 
 		// Anyone with moderate_forum can see this report
 		require_once($sourcedir . '/Subs-Members.php');
@@ -75,7 +75,7 @@ class MemberReport_Notify_Background extends SMF_BackgroundTask
 				);
 			}
 
-			$smcFunc['db_insert']('insert',
+			$pmxcFunc['db_insert']('insert',
 				'{db_prefix}user_alerts',
 				array('alert_time' => 'int', 'id_member' => 'int', 'id_member_started' => 'int',
 					'member_name' => 'string', 'content_type' => 'string', 'content_id' => 'int',
@@ -98,7 +98,7 @@ class MemberReport_Notify_Background extends SMF_BackgroundTask
 
 			// First, get everyone's language and details.
 			$emails = array();
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member, lngfile, email_address
 				FROM {db_prefix}members
 				WHERE id_member IN ({array_int:members})',
@@ -106,13 +106,13 @@ class MemberReport_Notify_Background extends SMF_BackgroundTask
 					'members' => $notifies['email'],
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				if (empty($row['lngfile']))
 					$row['lngfile'] = $language;
 				$emails[$row['lngfile']][$row['id_member']] = $row['email_address'];
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Iterate through each language, load the relevant templates and set up sending.
 			foreach ($emails as $this_lang => $recipients)

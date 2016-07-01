@@ -11,7 +11,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -82,20 +82,20 @@ class fulltext_search extends search_api
 	 */
 	protected function _getMinWordLength()
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
 		// Try to determine the minimum number of letters for a fulltext search.
-		$request = $smcFunc['db_search_query']('max_fulltext_length', '
+		$request = $pmxcFunc['db_search_query']('max_fulltext_length', '
 			SHOW VARIABLES
 			LIKE {string:fulltext_minimum_word_length}',
 			array(
 				'fulltext_minimum_word_length' => 'ft_min_word_len',
 			)
 		);
-		if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+		if ($request !== false && $pmxcFunc['db_num_rows']($request) == 1)
 		{
-			list (, $min_word_length) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list (, $min_word_length) = $pmxcFunc['db_fetch_row']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 		// 4 is the MySQL default...
 		else
@@ -109,10 +109,10 @@ class fulltext_search extends search_api
 	 */
 	public function searchSort($a, $b)
 	{
-		global $excludedWords, $smcFunc;
+		global $excludedWords, $pmxcFunc;
 
-		$x = $smcFunc['strlen']($a) - (in_array($a, $excludedWords) ? 1000 : 0);
-		$y = $smcFunc['strlen']($b) - (in_array($b, $excludedWords) ? 1000 : 0);
+		$x = $pmxcFunc['strlen']($a) - (in_array($a, $excludedWords) ? 1000 : 0);
+		$y = $pmxcFunc['strlen']($b) - (in_array($b, $excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
 	}
@@ -122,7 +122,7 @@ class fulltext_search extends search_api
 	 */
 	public function prepareIndexes($word, array &$wordsSearch, array &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, $pmxcFunc;
 
 		$subwords = text2words($word, null, false);
 
@@ -133,13 +133,13 @@ class fulltext_search extends search_api
 			if (count($subwords) > 1 && preg_match('~[.:@$]~', $word))
 			{
 				// using special characters that a full index would ignore and the remaining words are short which would also be ignored
-				if (($smcFunc['strlen'](current($subwords)) < $this->min_word_length) && ($smcFunc['strlen'](next($subwords)) < $this->min_word_length))
+				if (($pmxcFunc['strlen'](current($subwords)) < $this->min_word_length) && ($pmxcFunc['strlen'](next($subwords)) < $this->min_word_length))
 				{
 					$wordsSearch['words'][] = trim($word, "/*- ");
 					$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 				}
 			}
-			elseif ($smcFunc['strlen'](trim($word, "/*- ")) < $this->min_word_length)
+			elseif ($pmxcFunc['strlen'](trim($word, "/*- ")) < $this->min_word_length)
 			{
 				// short words have feelings too
 				$wordsSearch['words'][] = trim($word, "/*- ");
@@ -158,7 +158,7 @@ class fulltext_search extends search_api
 	 */
 	public function indexedWordQuery(array $words, array $search_data)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, $pmxcFunc;
 
 		$query_select = array(
 			'id_msg' => 'm.id_msg',
@@ -206,19 +206,19 @@ class fulltext_search extends search_api
 
 		if (!empty($modSettings['search_simple_fulltext']))
 		{
-			if($smcFunc['db_title'] == "PostgreSQL")
+			if($pmxcFunc['db_title'] == "PostgreSQL")
 			{
 				//we use the default language "default_text_search_config", otherwise we had to assgine the language here
 				//to_tsvector(body) -> to_tsvector($language,body) to_tsquery(...) -> to_tsquery($language,...)
 				$language_ftx = 'english';
-				$request = $smcFunc['db_query']('','
+				$request = $pmxcFunc['db_query']('','
 					SHOW default_text_search_config',
 					array()
 				);
 
-				if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+				if ($request !== false && $pmxcFunc['db_num_rows']($request) == 1)
 				{
-					$row = $smcFunc['db_fetch_assoc']($request);
+					$row = $pmxcFunc['db_fetch_assoc']($request);
 					$language_ftx = $row['default_text_search_config'];
 				}
 				$query_where[] = 'to_tsvector({string:language_ftx},body) @@ to_tsquery({string:language_ftx},{string:body_match})';
@@ -235,7 +235,7 @@ class fulltext_search extends search_api
 			// remove any indexed words that are used in the complex body search terms
 			$words['indexed_words'] = array_diff($words['indexed_words'], $words['complex_words']);
 
-			if($smcFunc['db_title'] == "PostgreSQL"){
+			if($pmxcFunc['db_title'] == "PostgreSQL"){
 				$row = 0;
 				foreach ($words['indexed_words'] as $fulltextWord) {
 					$query_params['boolean_match'] .= ($row <> 0 ? '&' : '');
@@ -251,19 +251,19 @@ class fulltext_search extends search_api
 
 			// if we have bool terms to search, add them in
 			if ($query_params['boolean_match']) {
-				if($smcFunc['db_title'] == "PostgreSQL")
+				if($pmxcFunc['db_title'] == "PostgreSQL")
 				{
 					//we use the default language "default_text_search_config", otherwise we had to assgine the language here
 					//to_tsvector(body) -> to_tsvector($language,body) to_tsquery(...) -> to_tsquery($language,...)
 					$language_ftx = 'english';
-					$request = $smcFunc['db_query']('','
+					$request = $pmxcFunc['db_query']('','
 						SHOW default_text_search_config',
 						array()
 					);
 
-					if ($request !== false && $smcFunc['db_num_rows']($request) == 1)
+					if ($request !== false && $pmxcFunc['db_num_rows']($request) == 1)
 					{
-						$row = $smcFunc['db_fetch_assoc']($request);
+						$row = $pmxcFunc['db_fetch_assoc']($request);
 						$language_ftx = $row['default_text_search_config'];
 					}
 					$query_where[] = 'to_tsvector({string:language_ftx},body) @@ to_tsquery({string:language_ftx},{string:boolean_match})';
@@ -275,7 +275,7 @@ class fulltext_search extends search_api
 
 		}
 
-		$ignoreRequest = $smcFunc['db_search_query']('insert_into_log_messages_fulltext', ($smcFunc['db_support_ignore'] ? ( '
+		$ignoreRequest = $pmxcFunc['db_search_query']('insert_into_log_messages_fulltext', ($pmxcFunc['db_support_ignore'] ? ( '
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '

@@ -14,7 +14,7 @@
 /**
  * Class CreatePost_Notify_Background
  */
-class CreatePost_Notify_Background extends SMF_BackgroundTask
+class CreatePost_Notify_Background extends PMX_BackgroundTask
 {
 	/**
      * This handles notifications when a new post is created - new topic, reply, quotes and mentions.
@@ -22,7 +22,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 	 */
 	public function execute()
 	{
-		global $smcFunc, $sourcedir, $scripturl, $language, $modSettings;
+		global $pmxcFunc, $sourcedir, $scripturl, $language, $modSettings;
 
 		require_once($sourcedir . '/Subs-Post.php');
 		require_once($sourcedir . '/Mentions.php');
@@ -52,7 +52,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 		}
 
 		// Find the people interested in receiving notifications for this topic
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT mem.id_member, ln.id_topic, ln.id_board, ln.sent, mem.email_address, b.member_groups,
 				mem.id_group, mem.id_post_group, mem.additional_groups, t.id_member_started
 			FROM {db_prefix}log_notify AS ln
@@ -68,7 +68,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 		);
 
 		$watched = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			$groups = array_merge(array($row['id_group'], $row['id_post_group']), (empty($row['additional_groups']) ? array() : explode(',', $row['additional_groups'])));
 			if (!in_array(1, $groups) && count(array_intersect($groups, explode(',', $row['member_groups']))) == 0)
@@ -78,7 +78,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 			$watched[$row['id_member']] = $row;
 		}
 
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (empty($members))
 			return true;
@@ -182,7 +182,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 				updateMemberData($member, array('alerts' => '+'));
 			}
 
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}log_notify
 				SET sent = {int:is_sent}
 				WHERE (id_topic = {int:topic} OR id_board = {int:board})
@@ -197,7 +197,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 		}
 
 		// Insert it into the digest for daily/weekly notifications
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}log_digest',
 			array(
 				'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -208,7 +208,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 
 		// Insert the alerts if any
 		if (!empty($alert_rows))
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}user_alerts',
 				array('alert_time' => 'int', 'id_member' => 'int', 'id_member_started' => 'int', 'member_name' => 'string',
 					'content_type' => 'string', 'content_id' => 'int', 'content_action' => 'string', 'is_read' => 'int', 'extra' => 'string'),
@@ -267,7 +267,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 
 	protected static function getQuotedMembers($msgOptions, $posterOptions)
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
 		$blocks = preg_split('/(\[quote.*?\]|\[\/quote\])/i', $msgOptions['body'], -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
@@ -306,7 +306,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 			return array();
 
 		// Get the messages
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT m.id_member, mem.email_address, mem.lngfile, mem.real_name
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -319,7 +319,7 @@ class CreatePost_Notify_Background extends SMF_BackgroundTask
 		);
 
 		$members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if ($posterOptions['id'] == $row['id_member'])
 				continue;

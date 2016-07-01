@@ -349,10 +349,10 @@ function template_edit_group()
 		</form>
 	</div>
 		<script>
-			var oModeratorSuggest = new smc_AutoSuggest({
+			var oModeratorSuggest = new pmxc_AutoSuggest({
 				sSelf: \'oModeratorSuggest\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: pmx_session_id,
+				sSessionVar: pmx_session_var,
 				sSuggestId: \'group_moderators\',
 				sControlId: \'group_moderators\',
 				sSearchType: \'member\',
@@ -680,7 +680,7 @@ function template_group_members()
 	if (!empty($context['group']['assignable']))
 		echo '
 		<script>
-			var oAddMemberSuggest = new smc_AutoSuggest({
+			var oAddMemberSuggest = new pmxc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
 				sSessionId: \'', $context['session_id'], '\',
 				sSessionVar: \'', $context['session_var'], '\',

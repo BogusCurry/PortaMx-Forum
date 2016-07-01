@@ -11,7 +11,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -57,7 +57,7 @@ class custom_search extends search_api
 		if (empty($modSettings['search_custom_index_config']))
 			return;
 
-		$this->indexSettings = smf_json_decode($modSettings['search_custom_index_config'], true);
+		$this->indexSettings = pmx_json_decode($modSettings['search_custom_index_config'], true);
 
 		$this->bannedWords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 		$this->min_word_length = $this->indexSettings['bytes_per_word'];
@@ -114,7 +114,7 @@ class custom_search extends search_api
 	 */
 	public function prepareIndexes($word, array &$wordsSearch, array &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, $pmxcFunc;
 
 		$subwords = text2words($word, $this->min_word_length, true);
 
@@ -128,7 +128,7 @@ class custom_search extends search_api
 		{
 			foreach ($subwords as $subword)
 			{
-				if ($smcFunc['strlen']($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
+				if ($pmxcFunc['strlen']($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
 				{
 					$wordsSearch['indexed_words'][] = $subword;
 					if ($isExcluded)
@@ -143,7 +143,7 @@ class custom_search extends search_api
 	 */
 	public function indexedWordQuery(array $words, array $search_data)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, $pmxcFunc;
 
 		$query_select = array(
 			'id_msg' => 'm.id_msg',
@@ -208,7 +208,7 @@ class custom_search extends search_api
 			}
 		}
 
-		$ignoreRequest = $smcFunc['db_search_query']('insert_into_log_messages_fulltext', ($smcFunc['db_support_ignore'] ? ( '
+		$ignoreRequest = $pmxcFunc['db_search_query']('insert_into_log_messages_fulltext', ($pmxcFunc['db_support_ignore'] ? ( '
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '
@@ -231,16 +231,16 @@ class custom_search extends search_api
 	 */
 	public function postCreated(array &$msgOptions, array &$topicOptions, array &$posterOptions)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, $pmxcFunc;
 
-		$customIndexSettings = smf_json_decode($modSettings['search_custom_index_config'], true);
+		$customIndexSettings = pmx_json_decode($modSettings['search_custom_index_config'], true);
 
 		$inserts = array();
 		foreach (text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true) as $word)
 			$inserts[] = array($word, $msgOptions['id']);
 
 		if (!empty($inserts))
-			$smcFunc['db_insert']('ignore',
+			$pmxcFunc['db_insert']('ignore',
 				'{db_prefix}log_search_words',
 				array('id_word' => 'int', 'id_msg' => 'int'),
 				$inserts,
@@ -253,11 +253,11 @@ class custom_search extends search_api
 	 */
 	public function postModified(array &$msgOptions, array &$topicOptions, array &$posterOptions)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings, $pmxcFunc;
 
 		if (isset($msgOptions['body']))
 		{
-			$customIndexSettings = smf_json_decode($modSettings['search_custom_index_config'], true);
+			$customIndexSettings = pmx_json_decode($modSettings['search_custom_index_config'], true);
 			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
 
@@ -273,7 +273,7 @@ class custom_search extends search_api
 			if (!empty($removed_words))
 			{
 				$removed_words = array_merge($removed_words, $inserted_words);
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}log_search_words
 					WHERE id_msg = {int:id_msg}
 						AND id_word IN ({array_int:removed_words})',
@@ -290,7 +290,7 @@ class custom_search extends search_api
 				$inserts = array();
 				foreach ($inserted_words as $word)
 					$inserts[] = array($word, $msgOptions['id']);
-				$smcFunc['db_insert']('insert',
+				$pmxcFunc['db_insert']('insert',
 					'{db_prefix}log_search_words',
 					array('id_word' => 'string', 'id_msg' => 'int'),
 					$inserts,

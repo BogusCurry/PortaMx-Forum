@@ -55,7 +55,7 @@ function template_registration_form()
 		<script>
 			function verifyAgree()
 			{
-				if (currentAuthMethod == \'passwd\' && document.forms.registration.smf_autov_pwmain.value != document.forms.registration.smf_autov_pwverify.value)
+				if (currentAuthMethod == \'passwd\' && document.forms.registration.pmx_autov_pwmain.value != document.forms.registration.pmx_autov_pwverify.value)
 				{
 					alert("', $txt['register_passwords_differ_js'], '");
 					return false;
@@ -96,35 +96,35 @@ function template_registration_form()
 			<div class="roundframe">
 				<fieldset>
 					<dl class="register_form">
-						<dt><strong><label for="smf_autov_username">', $txt['username'], ':</label></strong></dt>
+						<dt><strong><label for="pmx_autov_username">', $txt['username'], ':</label></strong></dt>
 						<dd>
-							<input type="text" name="user" id="smf_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text">
-							<span id="smf_autov_username_div" style="display: none;">
-								<a id="smf_autov_username_link" href="#">
-									<span id="smf_autov_username_img" class="generic_icons check"></span>
+							<input type="text" name="user" id="pmx_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text">
+							<span id="pmx_autov_username_div" style="display: none;">
+								<a id="pmx_autov_username_link" href="#">
+									<span id="pmx_autov_username_img" class="generic_icons check"></span>
 								</a>
 							</span>
 						</dd>
-						<dt><strong><label for="smf_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
+						<dt><strong><label for="pmx_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
 						<dd>
-							<input type="text" name="email" id="smf_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text">
+							<input type="text" name="email" id="pmx_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text">
 						</dd>
 					</dl>
 					<dl class="register_form" id="password1_group">
-						<dt><strong><label for="smf_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
+						<dt><strong><label for="pmx_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd1" id="smf_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password">
-							<span id="smf_autov_pwmain_div" style="display: none;">
-								<span id="smf_autov_pwmain_img" class="generic_icons invalid"></span>
+							<input type="password" name="passwrd1" id="pmx_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password">
+							<span id="pmx_autov_pwmain_div" style="display: none;">
+								<span id="pmx_autov_pwmain_img" class="generic_icons invalid"></span>
 							</span>
 						</dd>
 					</dl>
 					<dl class="register_form" id="password2_group">
-						<dt><strong><label for="smf_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
+						<dt><strong><label for="pmx_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd2" id="smf_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password">
-							<span id="smf_autov_pwverify_div" style="display: none;">
-								<span id="smf_autov_pwverify_img" class="generic_icons valid"></span>
+							<input type="password" name="passwrd2" id="pmx_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password">
+							<span id="pmx_autov_pwverify_div" style="display: none;">
+								<span id="pmx_autov_pwverify_img" class="generic_icons valid"></span>
 							</span>
 						</dd>
 					</dl>

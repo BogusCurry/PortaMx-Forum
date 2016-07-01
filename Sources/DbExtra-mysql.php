@@ -12,25 +12,25 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
- * Add the functions implemented in this file to the $smcFunc array.
+ * Add the functions implemented in this file to the $pmxcFunc array.
  */
 function db_extra_init()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	if (!isset($smcFunc['db_backup_table']) || $smcFunc['db_backup_table'] != 'smf_db_backup_table')
-		$smcFunc += array(
-			'db_backup_table' => 'smf_db_backup_table',
-			'db_optimize_table' => 'smf_db_optimize_table',
-			'db_insert_sql' => 'smf_db_insert_sql',
-			'db_table_sql' => 'smf_db_table_sql',
-			'db_list_tables' => 'smf_db_list_tables',
-			'db_get_version' => 'smf_db_get_version',
-			'db_get_engine' => 'smf_db_get_engine',
+	if (!isset($pmxcFunc['db_backup_table']) || $pmxcFunc['db_backup_table'] != 'pmx_db_backup_table')
+		$pmxcFunc += array(
+			'db_backup_table' => 'pmx_db_backup_table',
+			'db_optimize_table' => 'pmx_db_optimize_table',
+			'db_insert_sql' => 'pmx_db_insert_sql',
+			'db_table_sql' => 'pmx_db_table_sql',
+			'db_list_tables' => 'pmx_db_list_tables',
+			'db_get_version' => 'pmx_db_get_version',
+			'db_get_engine' => 'pmx_db_get_engine',
 		);
 }
 
@@ -40,14 +40,14 @@ function db_extra_init()
  * @param string $backup_table The name of the backup table for this table
  * @return resource -the request handle to the table creation query
  */
-function smf_db_backup_table($table, $backup_table)
+function pmx_db_backup_table($table, $backup_table)
 {
-	global $smcFunc, $db_prefix;
+	global $pmxcFunc, $db_prefix;
 
 	$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 	// First, get rid of the old table.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DROP TABLE IF EXISTS {raw:backup_table}',
 		array(
 			'backup_table' => $backup_table,
@@ -55,7 +55,7 @@ function smf_db_backup_table($table, $backup_table)
 	);
 
 	// Can we do this the quick way?
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		CREATE TABLE {raw:backup_table} LIKE {raw:table}',
 		array(
 			'backup_table' => $backup_table,
@@ -64,7 +64,7 @@ function smf_db_backup_table($table, $backup_table)
 	// If this failed, we go old school.
 	if ($result)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			INSERT INTO {raw:backup_table}
 			SELECT *
 			FROM {raw:table}',
@@ -79,14 +79,14 @@ function smf_db_backup_table($table, $backup_table)
 	}
 
 	// At this point, the quick method failed.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SHOW CREATE TABLE {raw:table}',
 		array(
 			'table' => $table,
 		)
 	);
-	list (, $create) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list (, $create) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	$create = preg_split('/[\n\r]/', $create);
 
@@ -133,7 +133,7 @@ function smf_db_backup_table($table, $backup_table)
 	else
 		$create = '';
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		CREATE TABLE {raw:backup_table} {raw:create}
 		ENGINE={raw:engine}' . (empty($charset) ? '' : ' CHARACTER SET {raw:charset}' . (empty($collate) ? '' : ' COLLATE {raw:collate}')) . '
 		SELECT *
@@ -153,7 +153,7 @@ function smf_db_backup_table($table, $backup_table)
 		if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) == ',')
 			$auto_inc = substr($auto_inc, 0, -1);
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			ALTER TABLE {raw:backup_table}
 			CHANGE COLUMN {raw:column_detail} {raw:auto_inc}',
 			array(
@@ -172,24 +172,24 @@ function smf_db_backup_table($table, $backup_table)
  * @param string $table The table to be optimized
  * @return int How much space was gained
  */
-function smf_db_optimize_table($table)
+function pmx_db_optimize_table($table)
 {
-	global $smcFunc, $db_prefix;
+	global $pmxcFunc, $db_prefix;
 
 	$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 	// Get how much overhead there is.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 			SHOW TABLE STATUS LIKE {string:table_name}',
 			array(
 				'table_name' => str_replace('_', '\_', $table),
 			)
 		);
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 			OPTIMIZE TABLE `{raw:table}`',
 			array(
 				'table' => $table,
@@ -199,14 +199,14 @@ function smf_db_optimize_table($table)
 		return -1;
 
 	// How much left?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 			SHOW TABLE STATUS LIKE {string:table}',
 			array(
 				'table' => str_replace('_', '\_', $table),
 			)
 		);
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
 
@@ -221,15 +221,15 @@ function smf_db_optimize_table($table)
  * @param string|boolean $filter String to filter by or false to list all tables
  * @return array An array of table names
  */
-function smf_db_list_tables($db = false, $filter = false)
+function pmx_db_list_tables($db = false, $filter = false)
 {
-	global $db_name, $smcFunc;
+	global $db_name, $pmxcFunc;
 
 	$db = $db == false ? $db_name : $db;
 	$db = trim($db);
 	$filter = $filter == false ? '' : ' LIKE \'' . $filter . '\'';
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SHOW TABLES
 		FROM `{raw:db}`
 		{raw:filter}',
@@ -239,9 +239,9 @@ function smf_db_list_tables($db = false, $filter = false)
 		)
 	);
 	$tables = array();
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $pmxcFunc['db_fetch_row']($request))
 		$tables[] = $row[0];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $tables;
 }
@@ -254,9 +254,9 @@ function smf_db_list_tables($db = false, $filter = false)
  * @param boolean $new_table Whether or not this is a new table (resets $start and $limit)
  * @return string The query to insert the data back in, or an empty string if the table was empty.
  */
-function smf_db_insert_sql($tableName, $new_table = false)
+function pmx_db_insert_sql($tableName, $new_table = false)
 {
-	global $smcFunc, $db_prefix;
+	global $pmxcFunc, $db_prefix;
 	static $start = 0, $num_rows, $fields, $limit;
 
 	if ($new_table)
@@ -271,7 +271,7 @@ function smf_db_insert_sql($tableName, $new_table = false)
 	// This will be handy...
 	$crlf = "\r\n";
 
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT /*!40001 SQL_NO_CACHE */ *
 		FROM `' . $tableName . '`
 		LIMIT ' . $start . ', ' . $limit,
@@ -281,22 +281,22 @@ function smf_db_insert_sql($tableName, $new_table = false)
 	);
 
 	// The number of rows, just for record keeping and breaking INSERTs up.
-	$num_rows = $smcFunc['db_num_rows']($result);
+	$num_rows = $pmxcFunc['db_num_rows']($result);
 
 	if ($num_rows == 0)
 		return '';
 
 	if ($new_table)
 	{
-		$fields = array_keys($smcFunc['db_fetch_assoc']($result));
-		$smcFunc['db_data_seek']($result, 0);
+		$fields = array_keys($pmxcFunc['db_fetch_assoc']($result));
+		$pmxcFunc['db_data_seek']($result, 0);
 	}
 
 	// Start it off with the basic INSERT INTO.
 	$data = 'INSERT INTO `' . $tableName . '`' . $crlf . "\t" . '(`' . implode('`, `', $fields) . '`)' . $crlf . 'VALUES ';
 
 	// Loop through each row.
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $pmxcFunc['db_fetch_assoc']($result))
 	{
 		// Get the fields in this row...
 		$field_list = array();
@@ -309,13 +309,13 @@ function smf_db_insert_sql($tableName, $new_table = false)
 			elseif (is_numeric($item) && (int) $item == $item)
 				$field_list[] = $item;
 			else
-				$field_list[] = '\'' . $smcFunc['db_escape_string']($item) . '\'';
+				$field_list[] = '\'' . $pmxcFunc['db_escape_string']($item) . '\'';
 		}
 
 		$data .= '(' . implode(', ', $field_list) . ')' . ',' . $crlf . "\t";
 	}
 
-	$smcFunc['db_free_result']($result);
+	$pmxcFunc['db_free_result']($result);
 	$data = substr(trim($data), 0, -1) . ';' . $crlf . $crlf;
 
 	$start += $limit;
@@ -329,9 +329,9 @@ function smf_db_insert_sql($tableName, $new_table = false)
  * @param string $tableName The name of the table
  * @return string The "CREATE TABLE" SQL string for this table
  */
-function smf_db_table_sql($tableName)
+function pmx_db_table_sql($tableName)
 {
-	global $smcFunc, $db_prefix;
+	global $pmxcFunc, $db_prefix;
 
 	$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
@@ -345,14 +345,14 @@ function smf_db_table_sql($tableName)
 	$schema_create .= 'CREATE TABLE `' . $tableName . '` (' . $crlf;
 
 	// Find all the fields.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SHOW FIELDS
 		FROM `{raw:table}`',
 		array(
 			'table' => $tableName,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $pmxcFunc['db_fetch_assoc']($result))
 	{
 		// Make the CREATE for this column.
 		$schema_create .= ' `' . $row['Field'] . '` ' . $row['Type'] . ($row['Null'] != 'YES' ? ' NOT NULL' : '');
@@ -370,20 +370,20 @@ function smf_db_table_sql($tableName)
 				$type = strtolower($row['Type']);
 				$isNumericColumn = strpos($type, 'int') !== false || strpos($type, 'bool') !== false || strpos($type, 'bit') !== false || strpos($type, 'float') !== false || strpos($type, 'double') !== false || strpos($type, 'decimal') !== false;
 
-				$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $smcFunc['db_escape_string']($row['Default']) . '\'');
+				$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $pmxcFunc['db_escape_string']($row['Default']) . '\'');
 			}
 		}
 
 		// And now any extra information. (such as auto_increment.)
 		$schema_create .= ($row['Extra'] != '' ? ' ' . $row['Extra'] : '') . ',' . $crlf;
 	}
-	$smcFunc['db_free_result']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// Take off the last comma.
 	$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
 	// Find the keys.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SHOW KEYS
 		FROM `{raw:table}`',
 		array(
@@ -391,7 +391,7 @@ function smf_db_table_sql($tableName)
 		)
 	);
 	$indexes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $pmxcFunc['db_fetch_assoc']($result))
 	{
 		// IS this a primary key, unique index, or regular index?
 		$row['Key_name'] = $row['Key_name'] == 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
@@ -406,7 +406,7 @@ function smf_db_table_sql($tableName)
 		else
 			$indexes[$row['Key_name']][$row['Seq_in_index']] = '`' . $row['Column_name'] . '`';
 	}
-	$smcFunc['db_free_result']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// Build the CREATEs for the keys.
 	foreach ($indexes as $keyname => $columns)
@@ -418,15 +418,15 @@ function smf_db_table_sql($tableName)
 	}
 
 	// Now just get the comment and engine... (MyISAM, etc.)
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SHOW TABLE STATUS
 		LIKE {string:table}',
 		array(
 			'table' => strtr($tableName, array('_' => '\\_', '%' => '\\%')),
 		)
 	);
-	$row = $smcFunc['db_fetch_assoc']($result);
-	$smcFunc['db_free_result']($result);
+	$row = $pmxcFunc['db_fetch_assoc']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// Probably MyISAM.... and it might have a comment.
 	$schema_create .= $crlf . ') ENGINE=' . $row['Engine'] . ($row['Comment'] != '' ? ' COMMENT="' . $row['Comment'] . '"' : '');
@@ -438,22 +438,22 @@ function smf_db_table_sql($tableName)
  *  Get the version number.
  *  @return string The version
  */
-function smf_db_get_version()
+function pmx_db_get_version()
 {
 	static $ver;
 
 	if(!empty($ver))
 		return $ver;
 
-	global $smcFunc;
+	global $pmxcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT VERSION()',
 		array(
 		)
 	);
-	list ($ver) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($ver) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $ver;
 }
@@ -463,17 +463,17 @@ function smf_db_get_version()
  *
  * @return string The database engine we are using
 */
-function smf_db_get_engine()
+function pmx_db_get_engine()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 	static $db_type;
 
 	if (!empty($db_type))
 		return $db_type;
 
-	$request = $smcFunc['db_query']('', 'SELECT @@version_comment');
-	list ($comment) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	$request = $pmxcFunc['db_query']('', 'SELECT @@version_comment');
+	list ($comment) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Skip these if we don't have a comment.
 	if (!empty($comment))

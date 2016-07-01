@@ -203,10 +203,10 @@ function template_ban_edit()
 	// Auto suggest only needed for adding new bans, not editing
 	if ($context['ban']['is_new'] && empty($_REQUEST['u']))
 		echo '
-			var oAddMemberSuggest = new smc_AutoSuggest({
+			var oAddMemberSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var,
 			sSuggestId: \'user\',
 			sControlId: \'user\',
 			sSearchType: \'member\',
@@ -303,10 +303,10 @@ function template_ban_edit_trigger()
 		</form>
 	</div>
 	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var,
 			sSuggestId: \'username\',
 			sControlId: \'user\',
 			sSearchType: \'member\',

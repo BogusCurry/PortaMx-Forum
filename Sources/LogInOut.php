@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -81,7 +81,7 @@ function Login()
  */
 function Login2()
 {
-	global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
+	global $txt, $scripturl, $user_info, $user_settings, $pmxcFunc;
 	global $cookiename, $modSettings, $context, $sourcedir, $maintenance;
 
 	// Check to ensure we're forcing SSL for authentication
@@ -101,7 +101,7 @@ function Login2()
 	{
 		if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,7};i:1;s:(0|128):"([a-fA-F0-9]{128})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
 		{
-			list (, , $timeout) = smf_json_decode($_COOKIE[$cookiename], true);
+			list (, , $timeout) = pmx_json_decode($_COOKIE[$cookiename], true);
 
 			// That didn't work... Maybe it's using serialize?
 			if (is_null($timeout))
@@ -109,7 +109,7 @@ function Login2()
 		}
 		elseif (isset($_SESSION['login_' . $cookiename]))
 		{
-			list (, , $timeout) = smf_json_decode($_SESSION['login_' . $cookiename]);
+			list (, , $timeout) = pmx_json_decode($_SESSION['login_' . $cookiename]);
 
 			// Try for old format
 			if (is_null($timeout))
@@ -124,7 +124,7 @@ function Login2()
 		// Preserve the 2FA cookie?
 		if (!empty($modSettings['tfa_mode']) && !empty($_COOKIE[$cookiename . '_tfa']))
 		{
-			$tfadata = smf_json_decode($_COOKIE[$cookiename . '_tfa'], true);
+			$tfadata = pmx_json_decode($_COOKIE[$cookiename . '_tfa'], true);
 
 			// If that didn't work, try unserialize instead...
 			if (is_null($tfadata))
@@ -204,7 +204,7 @@ function Login2()
 	$context['sub_template'] = 'login';
 
 	// Set up the default/fallback stuff.
-	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($_POST['user'])) : '';
+	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $pmxcFunc['htmlspecialchars']($_POST['user'])) : '';
 	$context['default_password'] = '';
 	$context['never_expire'] = $modSettings['cookieTime'] == 525600 || $modSettings['cookieTime'] == 3153600;
 	$context['login_errors'] = array($txt['error_occured']);
@@ -238,29 +238,29 @@ function Login2()
 	}
 
 	// And if it's too long, trim it back.
-	if ($smcFunc['strlen']($_POST['user']) > 80)
+	if ($pmxcFunc['strlen']($_POST['user']) > 80)
 	{
-		$_POST['user'] = $smcFunc['substr']($_POST['user'], 0, 79);
-		$context['default_username'] = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $smcFunc['htmlspecialchars']($_POST['user']));
+		$_POST['user'] = $pmxcFunc['substr']($_POST['user'], 0, 79);
+		$context['default_username'] = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', $pmxcFunc['htmlspecialchars']($_POST['user']));
 	}
 
 	// Load the data up!
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 			passwd_flood, tfa_secret
 		FROM {db_prefix}members
-		WHERE ' . ($smcFunc['db_case_sensitive'] ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
+		WHERE ' . ($pmxcFunc['db_case_sensitive'] ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
 		LIMIT 1',
 		array(
-			'user_name' => $smcFunc['db_case_sensitive'] ? strtolower($_POST['user']) : $_POST['user'],
+			'user_name' => $pmxcFunc['db_case_sensitive'] ? strtolower($_POST['user']) : $_POST['user'],
 		)
 	);
 	// Probably mistyped or their email, try it as an email address. (member_name first, though!)
-	if ($smcFunc['db_num_rows']($request) == 0 && strpos($_POST['user'], '@') !== false)
+	if ($pmxcFunc['db_num_rows']($request) == 0 && strpos($_POST['user'], '@') !== false)
 	{
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 			passwd_flood, tfa_secret
 			FROM {db_prefix}members
@@ -273,14 +273,14 @@ function Login2()
 	}
 
 	// Let them try again, it didn't match anything...
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 	{
 		$context['login_errors'] = array($txt['username_no_exist']);
 		return;
 	}
 
-	$user_settings = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$user_settings = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Bad password!  Thought you could fool the database?!
 	if (!hash_verify_password($user_settings['member_name'], un_htmlspecialchars($_POST['passwrd']), $user_settings['passwd']))
@@ -357,7 +357,7 @@ function Login2()
 		if (stripos(PHP_OS, 'win') !== 0 && strlen($user_settings['passwd']) < hash_length())
 		{
 			require_once($sourcedir . '/Subs-Compat.php');
-			$other_passwords[] = sha1_smf(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+			$other_passwords[] = sha1_pmx(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
 		}
 
 		// Allows mods to easily extend the $other_passwords array
@@ -555,7 +555,7 @@ function checkActivation()
  */
 function DoLogin()
 {
-	global $user_info, $user_settings, $smcFunc;
+	global $user_info, $user_settings, $pmxcFunc;
 	global $maintenance, $modSettings, $context, $sourcedir;
 
 	// ecl handling
@@ -592,7 +592,7 @@ function DoLogin()
 	unset($_SESSION['language'], $_SESSION['id_theme']);
 
 	// First login?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT last_login
 		FROM {db_prefix}members
 		WHERE id_member = {int:id_member}
@@ -601,11 +601,11 @@ function DoLogin()
 			'id_member' => $user_info['id'],
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 1)
+	if ($pmxcFunc['db_num_rows']($request) == 1)
 		$_SESSION['first_login'] = true;
 	else
 		unset($_SESSION['first_login']);
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// You've logged in, haven't you?
 	$update = array('member_ip' => $user_info['ip'], 'member_ip2' => $_SERVER['BAN_CHECK_IP']);
@@ -614,7 +614,7 @@ function DoLogin()
 	updateMemberData($user_info['id'], $update);
 
 	// Get rid of the online entry for that old guest....
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE session = {string:session}',
 		array(
@@ -625,7 +625,7 @@ function DoLogin()
 
 	// Log this entry, only if we have it enabled.
 	if (!empty($modSettings['loginHistoryDays']))
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}member_logins',
 			array(
 				'id_member' => 'int', 'time' => 'int', 'ip' => 'inet', 'ip2' => 'inet',
@@ -656,7 +656,7 @@ function DoLogin()
  */
 function Logout($internal = false, $redirect = true)
 {
-	global $sourcedir, $user_info, $user_settings, $context, $smcFunc, $cookiename, $modSettings;
+	global $sourcedir, $user_info, $user_settings, $context, $pmxcFunc, $cookiename, $modSettings;
 
 	// Make sure they aren't being auto-logged out.
 	if (!$internal)
@@ -677,7 +677,7 @@ function Logout($internal = false, $redirect = true)
 		call_integration_hook('integrate_logout', array($user_settings['member_name']));
 
 		// If you log out, you aren't online anymore :P.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_online
 			WHERE id_member = {int:current_member}',
 			array(
@@ -698,7 +698,7 @@ function Logout($internal = false, $redirect = true)
 
 	if (!empty($modSettings['tfa_mode']) && !empty($user_info['id']) && !empty($_COOKIE[$cookiename . '_tfa']))
 	{
-		$tfadata = smf_json_decode($_COOKIE[$cookiename . '_tfa'], true);
+		$tfadata = pmx_json_decode($_COOKIE[$cookiename . '_tfa'], true);
 
 		// If that failed, try the old method
 		if (is_null($tfadata))

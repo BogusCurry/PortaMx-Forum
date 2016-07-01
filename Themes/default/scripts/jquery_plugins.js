@@ -24,10 +24,10 @@
 			hoverIntent: {sensitivity: 10, interval: 300, timeout: 50},
 			positionTop: 12,
 			positionLeft: 12,
-			tooltipID: 'smf_tooltip', // ID used on the outer div
-			tooltipTextID: 'smf_tooltipText', // as above but on the inner div holding the text
+			tooltipID: 'pmx_tooltip', // ID used on the outer div
+			tooltipTextID: 'pmx_tooltipText', // as above but on the inner div holding the text
 			tooltipClass: 'tooltip', // The class applied to the outer div (that displays on hover), use this in your css
-			tooltipSwapClass: 'smf_swaptip', // a class only used internally, change only if you have a conflict
+			tooltipSwapClass: 'pmx_swaptip', // a class only used internally, change only if you have a conflict
 			tooltipContent: 'html' // display captured title text as html or text
 		};
 
@@ -121,19 +121,19 @@
 				$(this).hoverIntent({
 					sensitivity: oSettings.hoverIntent.sensitivity,
 					interval: oSettings.hoverIntent.interval,
-					over: smf_tooltip_on,
+					over: pmx_tooltip_on,
 					timeout: oSettings.hoverIntent.timeout,
-					out: smf_tooltip_off
+					out: pmx_tooltip_off
 				});
 			}
 			else
 			{
 				// plain old hover it is
-				$(this).hover(smf_tooltip_on, smf_tooltip_off);
+				$(this).hover(pmx_tooltip_on, pmx_tooltip_off);
 			}
 
 			// create the on tip action
-			function smf_tooltip_on(event)
+			function pmx_tooltip_on(event)
 			{
 				// If we have text in the hidden span element we created on page load
 				if ($(this).children('.' + oSettings.tooltipSwapClass).text())
@@ -162,7 +162,7 @@
 			};
 
 			// create the Bye bye tip
-			function smf_tooltip_off(event)
+			function pmx_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;
@@ -709,11 +709,11 @@
 
 /* Takes every category header available and adds a collapse option */
 $(function() {
-	if (smf_member_id > 0)
+	if (pmx_member_id > 0)
 		$('div.boardindex_table div.cat_bar').each(function(index, el)
 		{
 			var catid = el.id.replace('category_', '');
-			new smc_Toggle({
+			new pmxc_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: $('#category_' + catid + '_upshrink').data('collapsed'),
 				aSwappableContainers: [
@@ -729,8 +729,8 @@ $(function() {
 				oThemeOptions: {
 					bUseThemeSettings: true,
 					sOptionName: 'collapse_category_' + catid,
-					sSessionVar: smf_session_var,
-					sSessionId: smf_session_id
+					sSessionVar: pmx_session_var,
+					sSessionId: pmx_session_id
 				}
 			});
 		});

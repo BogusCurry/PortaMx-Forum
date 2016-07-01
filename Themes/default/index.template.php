@@ -71,7 +71,7 @@ function template_init()
 	);
 
 	// Allow css/js files to be disable for this specific theme.
-	// Add the identifier as an array key. IE array('smf_script'); Some external files might not add identifiers, on those cases SMF uses its filename as reference.
+	// Add the identifier as an array key. IE array('pmx_script'); Some external files might not add identifiers, on those cases SMF uses its filename as reference.
 	if (!isset($settings['disable_files']))
 		$settings['disable_files'] = array();
 }

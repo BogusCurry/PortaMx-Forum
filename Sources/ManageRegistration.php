@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -87,7 +87,7 @@ function RegCenter()
  */
 function AdminRegister()
 {
-	global $txt, $context, $sourcedir, $scripturl, $smcFunc;
+	global $txt, $context, $sourcedir, $scripturl, $pmxcFunc;
 
 	// Are there any custom profile fields required during registration?
 	require_once($sourcedir . '/Profile.php');
@@ -141,7 +141,7 @@ function AdminRegister()
 	// Load the assignable member groups.
 	if (allowedTo('manage_membergroups'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT group_name, id_group
 			FROM {db_prefix}membergroups
 			WHERE id_group != {int:moderator_group}
@@ -160,9 +160,9 @@ function AdminRegister()
 			)
 		);
 		$context['member_groups'] = array(0 => $txt['admin_register_group_none']);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$context['member_groups'][$row['id_group']] = $row['group_name'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 		$context['member_groups'] = array();
@@ -171,7 +171,7 @@ function AdminRegister()
 	$context['sub_template'] = 'admin_register';
 	$context['page_title'] = $txt['registration_center'];
 	createToken('admin-regc');
-	loadJavascriptFile('register.js', array('defer' => false), 'smf_register');
+	loadJavascriptFile('register.js', array('defer' => false), 'pmx_register');
 }
 
 /**
@@ -186,7 +186,7 @@ function AdminRegister()
 function EditAgreement()
 {
 	// I hereby agree not to be a lazy bum.
-	global $txt, $boarddir, $context, $modSettings, $smcFunc;
+	global $txt, $boarddir, $context, $modSettings, $pmxcFunc;
 
 	// By default we look at agreement.txt.
 	$context['current_agreement'] = '';
@@ -228,7 +228,7 @@ function EditAgreement()
 			$context['could_not_save'] = true;
 	}
 
-	$context['agreement'] = file_exists($boarddir . '/agreement' . $context['current_agreement'] . '.txt') ? $smcFunc['htmlspecialchars'](file_get_contents($boarddir . '/agreement' . $context['current_agreement'] . '.txt')) : '';
+	$context['agreement'] = file_exists($boarddir . '/agreement' . $context['current_agreement'] . '.txt') ? $pmxcFunc['htmlspecialchars'](file_get_contents($boarddir . '/agreement' . $context['current_agreement'] . '.txt')) : '';
 	$context['warning'] = is_writable($boarddir . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
 	$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 

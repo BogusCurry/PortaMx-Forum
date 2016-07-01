@@ -3,7 +3,7 @@
  * This, as you have probably guessed, is the crux on which SMF functions.
  * Everything should start here, so all the setup and security is done
  * properly.  The most interesting part of this file is the action array in
- * the smf_main() function.  It is formatted as so:
+ * the pmx_main() function.  It is formatted as so:
  * 	'action-in-url' => array('Source-File.php', 'FunctionToCall'),
  *
  * Then, you can access the FunctionToCall() function from Source-File.php
@@ -22,7 +22,7 @@ $forum_version = 'PortaMx-Forum 2.1 Beta 4';
 $software_year = '2016';
 
 // Get everything started up...
-define('SMF', 1);
+define('PMX', 1);
 if (function_exists('set_magic_quotes_runtime') && strnatcmp(phpversion(),'5.3.0') < 0)
 	@set_magic_quotes_runtime(0);
 error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
@@ -54,8 +54,8 @@ require_once($sourcedir . '/Load.php');
 if (!empty($maintenance) && $maintenance == 2)
 	display_maintenance_message();
 
-// Create a variable to store some SMF specific functions in.
-$smcFunc = array();
+// Create a variable to store some PMX specific functions in.
+$pmxcFunc = array();
 
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
@@ -68,7 +68,7 @@ cleanRequest();
 
 // Seed the random generator.
 if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
-	smf_seed_generator();
+	pmx_seed_generator();
 
 // Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
@@ -98,13 +98,13 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 }
 
 // Register an error handler.
-set_error_handler('smf_error_handler');
+set_error_handler('pmx_error_handler');
 
 // Start the session. (assuming it hasn't already been.)
 loadSession();
 
 // What function shall we execute? (done like this for memory's sake.)
-call_user_func(smf_main());
+call_user_func(pmx_main());
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);
@@ -114,7 +114,7 @@ obExit(null, null, true);
  * This delegates to each area.
  * @return array|string|void An array containing the file to include and name of function to call, the name of a function to call or dies with a fatal_lang_error if we couldn't find anything to do.
  */
-function smf_main()
+function pmx_main()
 {
 	global $modSettings, $settings, $user_info, $board, $topic;
 	global $board_info, $maintenance, $sourcedir;
@@ -138,9 +138,6 @@ function smf_main()
 	// Load the current user's permissions.
 	loadPermissions();
 
-	// handle Javascript cookie requests
-	jsCookieHandling();    
-
 	// Attachments don't require the entire theme to be loaded.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach')
 		detectBrowser();
@@ -148,18 +145,17 @@ function smf_main()
 	else
 		loadTheme();
 
+	// handle Javascript cookie requests
+	jsCookieHandling();    
+
 	// Check if the user should be disallowed access.
 	is_not_banned();
-
-	// handle Javascript cookie requests
-//	if(isset($_REQUEST['jscook']))
-//		jsCookieHandling();    
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
 		fatal_lang_error('not_a_topic', false);
 
-	$no_stat_actions = array('clock', 'dlattach', 'findmember', 'jsoption', 'likes', 'loadeditorlocale', 'modifycat', 'requestmembers', 'smstats', 'suggest', 'about:unknown', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewsmfile');
+	$no_stat_actions = array('clock', 'dlattach', 'findmember', 'jsoption', 'likes', 'loadeditorlocale', 'modifycat', 'requestmembers', 'smstats', 'suggest', 'about:unknown', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewpmxfile');
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions))
@@ -320,7 +316,7 @@ function smf_main()
 		'viewprofile' => array('Profile.php', 'ModifyProfile'),
 		'vote' => array('Poll.php', 'Vote'),
 		'viewquery' => array('ViewQuery.php', 'ViewQuery'),
-		'viewsmfile' => array('Admin.php', 'DisplayAdminFile'),
+		'viewpmxfile' => array('Admin.php', 'DisplayAdminFile'),
 		'who' => array('Who.php', 'Who'),
 		'.xml' => array('News.php', 'ShowXmlFeed'),
 		'xmlhttp' => array('Xml.php', 'XMLhttpMain'),

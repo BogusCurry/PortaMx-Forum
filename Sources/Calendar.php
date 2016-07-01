@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -29,7 +29,7 @@ if (!defined('SMF'))
  */
 function CalendarMain()
 {
-	global $txt, $context, $modSettings, $scripturl, $options, $sourcedir, $user_info, $smcFunc;
+	global $txt, $context, $modSettings, $scripturl, $options, $sourcedir, $user_info, $pmxcFunc;
 
 	// Permissions, permissions, permissions.
 	isAllowedTo('calendar_view');
@@ -55,7 +55,7 @@ function CalendarMain()
 
 	// This is gonna be needed...
 	loadTemplate('Calendar');
-	loadCSSFile('calendar.css', array('force_current' => false, 'validate' => true, 'rtl' => 'calendar.rtl.css'), 'smf_calendar');
+	loadCSSFile('calendar.css', array('force_current' => false, 'validate' => true, 'rtl' => 'calendar.rtl.css'), 'pmx_calendar');
 
 	// Did the specify an individual event ID? If so, let's splice the year/month in to what we would otherwise be doing.
 	if (isset($_GET['event']))
@@ -63,7 +63,7 @@ function CalendarMain()
 		$evid = (int) $_GET['event'];
 		if ($evid > 0)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT start_date
 				FROM {db_prefix}calendar
 				WHERE id_event = {int:event_id}',
@@ -71,7 +71,7 @@ function CalendarMain()
 					'event_id' => $evid,
 				)
 			);
-			if ($row = $smcFunc['db_fetch_assoc']($request))
+			if ($row = $pmxcFunc['db_fetch_assoc']($request))
 			{
 				// We know the format is going to be in yyyy-mm-dd from the database, so let's run with that.
 				list($_REQUEST['year'], $_REQUEST['month']) = explode('-', $row['start_date']);
@@ -84,7 +84,7 @@ function CalendarMain()
 				// We might use this later.
 				$context['selected_event'] = $evid;
 			}
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 		unset ($_GET['event']);
 	}
@@ -218,7 +218,7 @@ function CalendarMain()
 function CalendarPost()
 {
 	global $context, $txt, $user_info, $sourcedir, $scripturl;
-	global $modSettings, $topic, $smcFunc;
+	global $modSettings, $topic, $pmxcFunc;
 
 	// Well - can they?
 	isAllowedTo('calendar_post');
@@ -256,7 +256,7 @@ function CalendarPost()
 			$eventOptions = array(
 				'board' => 0,
 				'topic' => 0,
-				'title' => $smcFunc['substr']($_REQUEST['evtitle'], 0, 100),
+				'title' => $pmxcFunc['substr']($_REQUEST['evtitle'], 0, 100),
 				'member' => $user_info['id'],
 				'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
 				'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
@@ -272,7 +272,7 @@ function CalendarPost()
 		else
 		{
 			$eventOptions = array(
-				'title' => $smcFunc['substr']($_REQUEST['evtitle'], 0, 100),
+				'title' => $pmxcFunc['substr']($_REQUEST['evtitle'], 0, 100),
 				'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
 				'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
 			);
@@ -378,7 +378,7 @@ function CalendarPost()
  */
 function iCalDownload()
 {
-	global $smcFunc, $sourcedir, $forum_version, $modSettings, $webmaster_email, $mbname;
+	global $pmxcFunc, $sourcedir, $forum_version, $modSettings, $webmaster_email, $mbname;
 
 	// You can't export if the calendar export feature is off.
 	if (empty($modSettings['cal_export']))
@@ -461,7 +461,7 @@ function iCalDownload()
 	header('Connection: close');
 	header('Content-Disposition: attachment; filename="' . $event['title'] . '.ics"');
 	if (empty($modSettings['enableCompressedOutput']))
-		header('Content-Length: ' . $smcFunc['strlen']($filecontents));
+		header('Content-Length: ' . $pmxcFunc['strlen']($filecontents));
 
 	// This is a calendar item!
 	header('Content-Type: text/calendar');

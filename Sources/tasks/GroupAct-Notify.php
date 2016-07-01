@@ -16,7 +16,7 @@
 /**
  * Class GroupAct_Notify_Background
  */
-class GroupAct_Notify_Background extends SMF_BackgroundTask
+class GroupAct_Notify_Background extends PMX_BackgroundTask
 {
     /**
      * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
@@ -24,10 +24,10 @@ class GroupAct_Notify_Background extends SMF_BackgroundTask
      */
 	public function execute()
 	{
-		global $sourcedir, $smcFunc, $language, $modSettings;
+		global $sourcedir, $pmxcFunc, $language, $modSettings;
 
 		// Get the details of all the members concerned...
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address,
 				mem.lngfile, mem.member_name,  mg.group_name
 			FROM {db_prefix}log_group_requests AS lgr
@@ -43,7 +43,7 @@ class GroupAct_Notify_Background extends SMF_BackgroundTask
 		$members = array();
 		$alert_rows = array();
 		$group_changes = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			$members[] = $row['id_member'];
 			$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -74,7 +74,7 @@ class GroupAct_Notify_Background extends SMF_BackgroundTask
 				'language' => $row['lngfile'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Ensure everyone who is online gets their changes right away.
 		updateSettings(array('settings_updated' => time()));
@@ -142,7 +142,7 @@ class GroupAct_Notify_Background extends SMF_BackgroundTask
 
 			// Insert the alerts if any
 			if (!empty($alert_rows))
-				$smcFunc['db_insert']('',
+				$pmxcFunc['db_insert']('',
 					'{db_prefix}user_alerts',
 					array(
 						'alert_time' => 'int', 'id_member' => 'int', 'content_type' => 'string',

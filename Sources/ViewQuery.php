@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -26,7 +26,7 @@ if (!defined('SMF'))
  */
 function ViewQuery()
 {
-	global $scripturl, $settings, $context, $db_connection, $boarddir, $smcFunc, $txt, $db_show_debug;
+	global $scripturl, $settings, $context, $db_connection, $boarddir, $pmxcFunc, $txt, $db_show_debug;
 
 	// We should have debug mode enabled, as well as something to display!
 	if (!isset($db_show_debug) || $db_show_debug !== true || !isset($_SESSION['debug']))
@@ -120,7 +120,7 @@ function ViewQuery()
 		echo '
 		<div id="qq', $q, '" style="margin-bottom: 2ex;">
 			<a', $is_select_query ? ' href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '"' : '', ' style="font-weight: bold; text-decoration: none;">
-				', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', $smcFunc['htmlspecialchars']($query_data['q']))), '
+				', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', $pmxcFunc['htmlspecialchars']($query_data['q']))), '
 			</a><br>';
 
 		if (!empty($query_data['f']) && !empty($query_data['l']))
@@ -137,8 +137,8 @@ function ViewQuery()
 		// Explain the query.
 		if ($query_id == $q && $is_select_query)
 		{
-			$result = $smcFunc['db_query']('', '
-				EXPLAIN '.($smcFunc['db_title'] == 'PostgreSQL' ? 'ANALYZE ':'') . $select,
+			$result = $pmxcFunc['db_query']('', '
+				EXPLAIN '.($pmxcFunc['db_title'] == 'PostgreSQL' ? 'ANALYZE ':'') . $select,
 				array(
 				)
 			);
@@ -146,7 +146,7 @@ function ViewQuery()
 			{
 				echo '
 		<table>
-			<tr><td>', $smcFunc['db_error']($db_connection), '</td></tr>
+			<tr><td>', $pmxcFunc['db_error']($db_connection), '</td></tr>
 		</table>';
 				continue;
 			}
@@ -154,7 +154,7 @@ function ViewQuery()
 			echo '
 		<table>';
 
-			$row = $smcFunc['db_fetch_assoc']($result);
+			$row = $pmxcFunc['db_fetch_assoc']($result);
 
 			echo '
 			<tr>
@@ -162,8 +162,8 @@ function ViewQuery()
 				<th>', array_keys($row)) . '</th>
 			</tr>';
 
-			$smcFunc['db_data_seek']($result, 0);
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			$pmxcFunc['db_data_seek']($result, 0);
+			while ($row = $pmxcFunc['db_fetch_assoc']($result))
 			{
 				echo '
 			<tr>
@@ -171,7 +171,7 @@ function ViewQuery()
 				<td>', $row) . '</td>
 			</tr>';
 			}
-			$smcFunc['db_free_result']($result);
+			$pmxcFunc['db_free_result']($result);
 
 			echo '
 		</table>';

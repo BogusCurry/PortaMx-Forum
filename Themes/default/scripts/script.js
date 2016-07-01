@@ -1,6 +1,6 @@
-var smf_formSubmitted = false;
+var pmx_formSubmitted = false;
 var lastKeepAliveCheck = new Date().getTime();
-var smf_editorArray = new Array();
+var pmx_editorArray = new Array();
 
 // Some very basic browser detection - from Mozilla's sniffer page.
 var ua = navigator.userAgent.toLowerCase();
@@ -114,7 +114,7 @@ String.prototype.oCharsetConversion = {
 // Convert a string to an 8 bit representation (like in PHP).
 String.prototype.php_to8bit = function ()
 {
-	if (smf_charset == 'UTF-8')
+	if (pmx_charset == 'UTF-8')
 	{
 		var n, sReturn = '';
 
@@ -136,7 +136,7 @@ String.prototype.php_to8bit = function ()
 
 	else if (this.oCharsetConversion.from.length == 0)
 	{
-		switch (smf_charset)
+		switch (pmx_charset)
 		{
 			case 'ISO-8859-1':
 				this.oCharsetConversion = {
@@ -246,7 +246,7 @@ String.prototype.php_strtr = function (sFrom, sTo)
 // Simulate PHP's strtolower (in SOME cases PHP uses ISO-8859-1 case folding).
 String.prototype.php_strtolower = function ()
 {
-	return typeof(smf_iso_case_folding) == 'boolean' && smf_iso_case_folding == true ? this.php_strtr(
+	return typeof(pmx_iso_case_folding) == 'boolean' && pmx_iso_case_folding == true ? this.php_strtr(
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZ\x8a\x8c\x8e\x9f\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde',
 		'abcdefghijklmnopqrstuvwxyz\x9a\x9c\x9e\xff\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe'
 	) : this.php_strtr('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
@@ -319,12 +319,12 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 	var eclcook = smfCookie('test', 'eclauth', '', 'ecl');
 
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><img src="' + smf_images_url + '/loading_sm.gif"></div>';
-	var sIcon = smf_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
+	var sAjax_indicator = '<div class="centertext"><img src="' + pmx_images_url + '/loading_sm.gif"></div>';
+	var sIcon = pmx_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
 	var sHeader = typeof(sHeader) == 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
-	var oContainer = new smc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon});
+	var oContainer = new pmxc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon});
 	var oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
 
 	// Load the help page content (we just want the text to show)
@@ -346,13 +346,13 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 }
 
 // Create the popup menus for the top level/user menu area.
-function smc_PopupMenu(oOptions)
+function pmxc_PopupMenu(oOptions)
 {
 	this.opt = (typeof oOptions == 'object') ? oOptions : {};
 	this.opt.menus = {};
 }
 
-smc_PopupMenu.prototype.add = function (sItem, sUrl)
+pmxc_PopupMenu.prototype.add = function (sItem, sUrl)
 {
 	var $menu = $('#' + sItem + '_menu'), $item = $('#' + sItem + '_menu_top');
 	if ($item.length == 0)
@@ -367,7 +367,7 @@ smc_PopupMenu.prototype.add = function (sItem, sUrl)
 	});
 }
 
-smc_PopupMenu.prototype.toggle = function (sItem)
+pmxc_PopupMenu.prototype.toggle = function (sItem)
 {
 	if (!!this.opt.menus[sItem].open)
 		this.close(sItem);
@@ -375,7 +375,7 @@ smc_PopupMenu.prototype.toggle = function (sItem)
 		this.open(sItem);
 }
 
-smc_PopupMenu.prototype.open = function (sItem)
+pmxc_PopupMenu.prototype.open = function (sItem)
 {
 	this.closeAll();
 
@@ -406,7 +406,7 @@ smc_PopupMenu.prototype.open = function (sItem)
 	});
 }
 
-smc_PopupMenu.prototype.close = function (sItem)
+pmxc_PopupMenu.prototype.close = function (sItem)
 {
 	this.opt.menus[sItem].menuObj.removeClass('visible');
 	this.opt.menus[sItem].itemObj.removeClass('open');
@@ -414,22 +414,22 @@ smc_PopupMenu.prototype.close = function (sItem)
 	$(document).off('click.menu');
 }
 
-smc_PopupMenu.prototype.closeAll = function ()
+pmxc_PopupMenu.prototype.closeAll = function ()
 {
 	for (var prop in this.opt.menus)
 		if (!!this.opt.menus[prop].open)
 			this.close(prop);
 }
 
-// *** smc_Popup class.
-function smc_Popup(oOptions)
+// *** pmxc_Popup class.
+function pmxc_Popup(oOptions)
 {
 	this.opt = oOptions;
-	this.popup_id = this.opt.custom_id ? this.opt.custom_id : 'smf_popup';
+	this.popup_id = this.opt.custom_id ? this.opt.custom_id : 'pmx_popup';
 	this.show();
 }
 
-smc_Popup.prototype.show = function ()
+pmxc_Popup.prototype.show = function ()
 {
 	popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
 	if (this.opt.icon_class)
@@ -458,7 +458,7 @@ smc_Popup.prototype.show = function ()
 	return false;
 }
 
-smc_Popup.prototype.hide = function ()
+pmxc_Popup.prototype.hide = function ()
 {
 	$('#' + this.popup_id).fadeOut(300, function(){ $(this).remove(); });
 
@@ -583,11 +583,11 @@ function isEmptyText(theField)
 // Only allow form submission ONCE.
 function submitonce(theform)
 {
-	smf_formSubmitted = true;
+	pmx_formSubmitted = true;
 
 	// If there are any editors warn them submit is coming!
-	for (var i = 0; i < smf_editorArray.length; i++)
-		smf_editorArray[i].doSubmit();
+	for (var i = 0; i < pmx_editorArray.length; i++)
+		pmx_editorArray[i].doSubmit();
 }
 function submitThisOnce(oControl)
 {
@@ -598,7 +598,7 @@ function submitThisOnce(oControl)
 	for (var i = 0, n = aTextareas.length; i < n; i++)
 		aTextareas[i].readOnly = true;
 
-	return !smf_formSubmitted;
+	return !pmx_formSubmitted;
 }
 
 // Deprecated, as innerHTML is supported everywhere.
@@ -680,28 +680,28 @@ function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 
 // Keep the session alive - always!
 var lastKeepAliveCheck = new Date().getTime();
-function smf_sessionKeepAlive()
+function pmx_sessionKeepAlive()
 {
 	var curTime = new Date().getTime();
 
 	// Prevent a Firefox bug from hammering the server.
-	if (smf_scripturl && curTime - lastKeepAliveCheck > 900000)
+	if (pmx_scripturl && curTime - lastKeepAliveCheck > 900000)
 	{
 		var tempImage = new Image();
-		tempImage.src = smf_prepareScriptUrl(smf_scripturl) + 'action=keepalive;time=' + curTime;
+		tempImage.src = pmx_prepareScriptUrl(pmx_scripturl) + 'action=keepalive;time=' + curTime;
 		lastKeepAliveCheck = curTime;
 	}
 
-	window.setTimeout('smf_sessionKeepAlive();', 1200000);
+	window.setTimeout('pmx_sessionKeepAlive();', 1200000);
 }
-window.setTimeout('smf_sessionKeepAlive();', 1200000);
+window.setTimeout('pmx_sessionKeepAlive();', 1200000);
 
 // Set a theme option through javascript.
-function smf_setThemeOption(theme_var, theme_value, theme_id, theme_cur_session_id, theme_cur_session_var, theme_additional_vars)
+function pmx_setThemeOption(theme_var, theme_value, theme_id, theme_cur_session_id, theme_cur_session_var, theme_additional_vars)
 {
 	// Compatibility.
 	if (theme_cur_session_id == null)
-		theme_cur_session_id = smf_session_id;
+		theme_cur_session_id = pmx_session_id;
 	if (typeof(theme_cur_session_var) == 'undefined')
 		theme_cur_session_var = 'sesc';
 
@@ -709,7 +709,7 @@ function smf_setThemeOption(theme_var, theme_value, theme_id, theme_cur_session_
 		theme_additional_vars = '';
 
 	var tempImage = new Image();
-	tempImage.src = smf_prepareScriptUrl(smf_scripturl) + 'action=jsoption;var=' + theme_var + ';val=' + theme_value + ';' + theme_cur_session_var + '=' + theme_cur_session_id + theme_additional_vars + (theme_id == null ? '' : '&th=' + theme_id) + ';time=' + (new Date().getTime());
+	tempImage.src = pmx_prepareScriptUrl(pmx_scripturl) + 'action=jsoption;var=' + theme_var + ';val=' + theme_value + ';' + theme_cur_session_var + '=' + theme_cur_session_id + theme_additional_vars + (theme_id == null ? '' : '&th=' + theme_id) + ';time=' + (new Date().getTime());
 }
 
 // Shows the page numbers by clicking the dots (in compact view).
@@ -742,20 +742,20 @@ function expandPages(spanNode, baseLink, firstPage, lastPage, perPage)
 		$(spanNode).remove();
 }
 
-function smc_preCacheImage(sSrc)
+function pmxc_preCacheImage(sSrc)
 {
-	if (!('smc_aCachedImages' in window))
-		window.smc_aCachedImages = [];
+	if (!('pmxc_aCachedImages' in window))
+		window.pmxc_aCachedImages = [];
 
-	if (!in_array(sSrc, window.smc_aCachedImages))
+	if (!in_array(sSrc, window.pmxc_aCachedImages))
 	{
 		var oImage = new Image();
 		oImage.src = sSrc;
 	}
 }
 
-// *** smc_Toggle class.
-function smc_Toggle(oOptions)
+// *** pmxc_Toggle class.
+function pmxc_Toggle(oOptions)
 {
 	this.opt = oOptions;
 	this.bCollapsed = false;
@@ -763,7 +763,7 @@ function smc_Toggle(oOptions)
 	this.init();
 }
 
-smc_Toggle.prototype.init = function ()
+pmxc_Toggle.prototype.init = function ()
 {
 	// The master switch can disable this toggle fully.
 	if ('bToggleEnabled' in this.opt && !this.opt.bToggleEnabled)
@@ -793,7 +793,7 @@ smc_Toggle.prototype.init = function ()
 			else
 			{
 				// Preload the collapsed image.
-				smc_preCacheImage(this.opt.aSwapImages[i].srcCollapsed);
+				pmxc_preCacheImage(this.opt.aSwapImages[i].srcCollapsed);
 			}
 
 			// Display the image in case it was hidden.
@@ -839,7 +839,7 @@ smc_Toggle.prototype.init = function ()
 }
 
 // Collapse or expand the section.
-smc_Toggle.prototype.changeState = function(bCollapse, bInit)
+pmxc_Toggle.prototype.changeState = function(bCollapse, bInit)
 {
 	// Default bInit to false.
 	bInit = typeof(bInit) == 'undefined' ? false : true;
@@ -927,10 +927,10 @@ smc_Toggle.prototype.changeState = function(bCollapse, bInit)
 		smfCookie('set', this.opt.oCookieOptions.sCookieName, this.bCollapsed | 0);
 
 	if (!bInit && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
-		smf_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed | 0, 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, smf_session_id, smf_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
+		pmx_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed | 0, 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, pmx_session_id, pmx_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
 }
 
-smc_Toggle.prototype.toggle = function()
+pmxc_Toggle.prototype.toggle = function()
 {
 	// Change the state by reversing the current state.
 	this.changeState(!this.bCollapsed);
@@ -997,7 +997,7 @@ function createEventListener(oTarget)
 // This function will retrieve the contents needed for the jump to boxes.
 function grabJumpToContent(elem)
 {
-	var oXMLDoc = getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=jumpto;xml');
+	var oXMLDoc = getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + 'action=xmlhttp;sa=jumpto;xml');
 	var aBoardsAndCategories = new Array();
 	var bIE5x = !('implementation' in document);
 
@@ -1049,7 +1049,7 @@ JumpTo.prototype.showSelect = function ()
 	var sChildLevelPrefix = '';
 	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
-	setInnerHTML(document.getElementById(this.opt.sContainerId), this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled == true ? 'disabled ' : '') + (this.opt.sClassName != undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName != undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect != undefined && this.opt.bNoRedirect == true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel != undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + smf_prepareScriptUrl(smf_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';">' : '')));
+	setInnerHTML(document.getElementById(this.opt.sContainerId), this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled == true ? 'disabled ' : '') + (this.opt.sClassName != undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName != undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect != undefined && this.opt.bNoRedirect == true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel != undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + pmx_prepareScriptUrl(pmx_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';">' : '')));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 }
 
@@ -1118,7 +1118,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	if (!this.opt.bNoRedirect)
 		this.dropdownList.onchange = function() {
 			if (this.selectedIndex > 0 && this.options[this.selectedIndex].value)
-				window.location.href = smf_scripturl + this.options[this.selectedIndex].value.substr(smf_scripturl.indexOf('?') == -1 || this.options[this.selectedIndex].value.substr(0, 1) != '?' ? 0 : 1);
+				window.location.href = pmx_scripturl + this.options[this.selectedIndex].value.substr(pmx_scripturl.indexOf('?') == -1 || this.options[this.selectedIndex].value.substr(0, 1) != '?' ? 0 : 1);
 		}
 }
 
@@ -1182,13 +1182,13 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 
 		// Start to fetch its contents.
 		ajax_indicator(true);
-		sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=messageicons;board=' + this.opt.iBoardId + ';xml', '', this.onIconsReceived);
+		sendXMLDocument.call(this, pmx_prepareScriptUrl(pmx_scripturl) + 'action=xmlhttp;sa=messageicons;board=' + this.opt.iBoardId + ';xml', '', this.onIconsReceived);
 
 		createEventListener(document.body);
 	}
 
 	// Set the position of the container.
-	var aPos = smf_itemPos(oDiv);
+	var aPos = pmx_itemPos(oDiv);
 
 	this.oContainerDiv.style.top = (aPos[1] + oDiv.offsetHeight) + 'px';
 	this.oContainerDiv.style.left = (aPos[0] - 1) + 'px';
@@ -1239,7 +1239,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 	{
 		ajax_indicator(true);
 		this.tmpMethod = getXMLDocument;
-		var oXMLDoc = this.tmpMethod(smf_prepareScriptUrl(smf_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + smf_session_var + '=' + smf_session_id + ';icon=' + sNewIcon + ';xml');
+		var oXMLDoc = this.tmpMethod(pmx_prepareScriptUrl(pmx_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + pmx_session_var + '=' + pmx_session_id + ';icon=' + sNewIcon + ';xml');
 		delete this.tmpMethod;
 		ajax_indicator(false);
 
@@ -1274,7 +1274,7 @@ IconList.prototype.collapseList = function()
 }
 
 // Handy shortcuts for getting the mouse position on the screen - only used for IE at the moment.
-function smf_mousePose(oEvent)
+function pmx_mousePose(oEvent)
 {
 	var x = 0;
 	var y = 0;
@@ -1294,7 +1294,7 @@ function smf_mousePose(oEvent)
 }
 
 // Short function for finding the actual position of an item.
-function smf_itemPos(itemHandle)
+function pmx_itemPos(itemHandle)
 {
 	var itemX = 0;
 	var itemY = 0;
@@ -1320,7 +1320,7 @@ function smf_itemPos(itemHandle)
 }
 
 // This function takes the script URL and prepares it to allow the query string to be appended to it.
-function smf_prepareScriptUrl(sUrl)
+function pmx_prepareScriptUrl(sUrl)
 {
 	return sUrl.indexOf('?') == -1 ? sUrl + '?' : sUrl + (sUrl.charAt(sUrl.length - 1) == '?' || sUrl.charAt(sUrl.length - 1) == '&' || sUrl.charAt(sUrl.length - 1) == ';' ? '' : ';');
 }
@@ -1355,7 +1355,7 @@ function addLoadEvent(fNewOnload)
 
 function smfFooterHighlight(element, value)
 {
-	element.src = smf_images_url + '/' + (value ? 'h_' : '') + element.id + '.png';
+	element.src = pmx_images_url + '/' + (value ? 'h_' : '') + element.id + '.png';
 }
 
 // Get the text in a code tag.
@@ -1401,7 +1401,7 @@ function smfSelectText(oCurElement, bActOnElement)
 }
 
 // A function needed to discern HTML entities from non-western characters.
-function smc_saveEntities(sFormName, aElementNames, sMask)
+function pmxc_saveEntities(sFormName, aElementNames, sMask)
 {
 	if (typeof(sMask) == 'string')
 	{
@@ -1587,11 +1587,11 @@ $(function()
 	{
 		var custom_message = $(this).attr('data-confirm');
 
-		return confirm(custom_message ? custom_message.replace(/-n-/g, "\n") : smf_you_sure);
+		return confirm(custom_message ? custom_message.replace(/-n-/g, "\n") : pmx_you_sure);
 	});
 
 	// Generic event for smfSelectText()
-	$('.smf_select_text').on('click', function(e) {
+	$('.pmx_select_text').on('click', function(e) {
 
 		e.preventDefault();
 
@@ -1616,6 +1616,6 @@ function smfCookie(sMode, sName, sValue, sType)
 	sType = sType == undefined ? '' : sType;
 	sValue = sValue == undefined ? '' : sValue;
 	var sResult = '';
-	$.ajax({type: 'GET', async:false, url:smf_scripturl +'?jscook', data:{mode:sMode, name:sName, value:sValue, type:sType}, success:function(data){sResult = data;}});
+	$.ajax({type: 'GET', async:false, url:pmx_scripturl +'?jscook', data:{mode:sMode, name:sName, value:sValue, type:sType}, success:function(data){sResult = data;}});
 	return sResult;
 }

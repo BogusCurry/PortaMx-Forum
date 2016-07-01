@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 class Attachments
@@ -49,7 +49,7 @@ class Attachments
 		$this->_currentAttachmentUploadDir = $modSettings['currentAttachmentUploadDir'];
 
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$this->_attachmentUploadDir = smf_json_decode($modSettings['attachmentUploadDir'], true);
+			$this->_attachmentUploadDir = pmx_json_decode($modSettings['attachmentUploadDir'], true);
 
 		$this->_attchDir = $context['attach_dir'] = $this->_attachmentUploadDir[$modSettings['currentAttachmentUploadDir']];
 
@@ -58,14 +58,14 @@ class Attachments
 
 	public function call()
 	{
-		global $smcFunc, $sourcedir;
+		global $pmxcFunc, $sourcedir;
 
 		require_once($sourcedir . '/Subs-Attachments.php');
 
 		// Guest aren't welcome, sorry.
 		is_not_guest();
 
-		$this->_sa = !empty($_REQUEST['sa']) ? $smcFunc['htmlspecialchars']($smcFunc['htmltrim']($_REQUEST['sa'])) : false;
+		$this->_sa = !empty($_REQUEST['sa']) ? $pmxcFunc['htmlspecialchars']($pmxcFunc['htmltrim']($_REQUEST['sa'])) : false;
 
 		if ($this->_canPostAttachment && $this->_sa && in_array($this->_sa, $this->_subActions))
 			$this->{$this->_sa}();
@@ -141,7 +141,7 @@ class Attachments
 	 */
 	protected function processAttachments()
 	{
-		global $context, $modSettings, $smcFunc, $user_info, $txt;
+		global $context, $modSettings, $pmxcFunc, $user_info, $txt;
 
 		if (!isset($_FILES['attachment']['name']))
 			$_FILES['attachment']['tmp_name'] = array();
@@ -185,7 +185,7 @@ class Attachments
 		if (empty($this->_generalErrors) && $this->_msg)
 		{
 			$context['attachments'] = array();
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT COUNT(*), SUM(size)
 				FROM {db_prefix}attachments
 				WHERE id_msg = {int:id_msg}
@@ -195,8 +195,8 @@ class Attachments
 					'attachment_type' => 0,
 				)
 			);
-			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = $pmxcFunc['db_fetch_row']($request);
+			$pmxcFunc['db_free_result']($request);
 		}
 
 		else
@@ -254,7 +254,7 @@ class Attachments
 			if (empty($errors))
 			{
 				$_SESSION['temp_attachments'][$attachID] = array(
-					'name' => $smcFunc['htmlspecialchars'](basename($_FILES['attachment']['name'][$n])),
+					'name' => $pmxcFunc['htmlspecialchars'](basename($_FILES['attachment']['name'][$n])),
 					'tmp_name' => $destName,
 					'size' => $_FILES['attachment']['size'][$n],
 					'type' => $_FILES['attachment']['type'][$n],
@@ -264,7 +264,7 @@ class Attachments
 
 				// Move the file to the attachments folder with a temp name for now.
 				if (@move_uploaded_file($_FILES['attachment']['tmp_name'][$n], $destName))
-					smf_chmod($destName, 0644);
+					pmx_chmod($destName, 0644);
 
 				// This is madness!!
 				else
@@ -280,7 +280,7 @@ class Attachments
 			else
 			{
 				$_SESSION['temp_attachments'][$attachID] = array(
-					'name' => $smcFunc['htmlspecialchars'](basename($_FILES['attachment']['name'][$n])),
+					'name' => $pmxcFunc['htmlspecialchars'](basename($_FILES['attachment']['name'][$n])),
 					'tmp_name' => $destName,
 					'errors' => $errors,
 				);

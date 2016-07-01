@@ -184,7 +184,7 @@ function template_main()
 
 		echo '
 	<script>
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new pmxc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', $context['boards_check_all'] ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -211,10 +211,10 @@ function template_main()
 	echo '
 	</form>
 	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
+		var oAddMemberSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var,
 			sControlId: \'userspec\',
 			sSearchType: \'member\',
 			bItemList: false

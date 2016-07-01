@@ -11,7 +11,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -25,7 +25,7 @@ if (!defined('SMF'))
  */
 function getNotifyPrefs($members, $prefs = '', $process_default = false)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// We want this as an array whether it is or not.
 	$members = is_array($members) ? $members : (array) $members;
@@ -38,7 +38,7 @@ function getNotifyPrefs($members, $prefs = '', $process_default = false)
 	// We want to now load the default, which is stored with a member id of 0.
 	$members[] = 0;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, alert_pref, alert_value
 		FROM {db_prefix}user_alerts_prefs
 		WHERE id_member IN ({array_int:members})' . (!empty($prefs) ? '
@@ -48,7 +48,7 @@ function getNotifyPrefs($members, $prefs = '', $process_default = false)
 			'prefs' => $prefs,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$result[$row['id_member']][$row['alert_pref']] = $row['alert_value'];
 	}
@@ -74,7 +74,7 @@ function getNotifyPrefs($members, $prefs = '', $process_default = false)
  */
 function setNotifyPrefs($memID, $prefs = array())
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (empty($prefs) || !is_int($memID))
 		return;
@@ -83,7 +83,7 @@ function setNotifyPrefs($memID, $prefs = array())
 	foreach ($prefs as $k => $v)
 		$update_rows[] = array($memID, $k, $v);
 
-	$smcFunc['db_insert']('replace',
+	$pmxcFunc['db_insert']('replace',
 		'{db_prefix}user_alerts_prefs',
 		array('id_member' => 'int', 'alert_pref' => 'string', 'alert_value' => 'int'),
 		$update_rows,
@@ -99,12 +99,12 @@ function setNotifyPrefs($memID, $prefs = array())
  */
 function deleteNotifyPrefs($memID, array $prefs)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (empty($prefs) || empty($memID))
 		return;
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}user_alerts_prefs
 		WHERE id_member = {int:member}
 			AND alert_pref IN ({array_string:prefs})',

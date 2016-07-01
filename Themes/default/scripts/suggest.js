@@ -1,5 +1,5 @@
 // This file contains javascript associated with a autosuggest control
-function smc_AutoSuggest(oOptions)
+function pmxc_AutoSuggest(oOptions)
 {
 	this.opt = oOptions;
 
@@ -43,7 +43,7 @@ function smc_AutoSuggest(oOptions)
 	addLoadEvent(this.opt.sSelf + '.init();');
 }
 
-smc_AutoSuggest.prototype.init = function()
+pmxc_AutoSuggest.prototype.init = function()
 {
 	if (!window.XMLHttpRequest)
 		return false;
@@ -106,7 +106,7 @@ smc_AutoSuggest.prototype.init = function()
 }
 
 // Was it an enter key - if so assume they are trying to select something.
-smc_AutoSuggest.prototype.handleKey = function(oEvent)
+pmxc_AutoSuggest.prototype.handleKey = function(oEvent)
 {
 	// Grab the event object, one way or the other
 	if (!oEvent)
@@ -205,7 +205,7 @@ smc_AutoSuggest.prototype.handleKey = function(oEvent)
 }
 
 // Functions for integration.
-smc_AutoSuggest.prototype.registerCallback = function(sCallbackType, sCallback)
+pmxc_AutoSuggest.prototype.registerCallback = function(sCallbackType, sCallback)
 {
 	switch (sCallbackType)
 	{
@@ -228,7 +228,7 @@ smc_AutoSuggest.prototype.registerCallback = function(sCallbackType, sCallback)
 }
 
 // User hit submit?
-smc_AutoSuggest.prototype.handleSubmit = function()
+pmxc_AutoSuggest.prototype.handleSubmit = function()
 {
 	var bReturnValue = true;
 	var oFoundEntry = null;
@@ -274,7 +274,7 @@ smc_AutoSuggest.prototype.handleSubmit = function()
 }
 
 // Positions the box correctly on the window.
-smc_AutoSuggest.prototype.positionDiv = function()
+pmxc_AutoSuggest.prototype.positionDiv = function()
 {
 	// Only do it once.
 	if (this.bPositionComplete)
@@ -283,7 +283,7 @@ smc_AutoSuggest.prototype.positionDiv = function()
 	this.bPositionComplete = true;
 
 	// Put the div under the text box.
-	var aParentPos = smf_itemPos(this.oTextHandle);
+	var aParentPos = pmx_itemPos(this.oTextHandle);
 
 	this.oSuggestDivHandle.style.left = aParentPos[0] + 'px';
 	this.oSuggestDivHandle.style.top = (aParentPos[1] + this.oTextHandle.offsetHeight) + 'px';
@@ -293,7 +293,7 @@ smc_AutoSuggest.prototype.positionDiv = function()
 }
 
 // Do something after clicking an item.
-smc_AutoSuggest.prototype.itemClicked = function(oCurElement)
+pmxc_AutoSuggest.prototype.itemClicked = function(oCurElement)
 {
 	// Is there a div that we are populating?
 	if (this.bItemList)
@@ -309,7 +309,7 @@ smc_AutoSuggest.prototype.itemClicked = function(oCurElement)
 }
 
 // Remove the last searched for name from the search box.
-smc_AutoSuggest.prototype.removeLastSearchString = function ()
+pmxc_AutoSuggest.prototype.removeLastSearchString = function ()
 {
 	// Remove the text we searched for from the div.
 	var sTempText = this.oTextHandle.value.toLowerCase();
@@ -338,7 +338,7 @@ smc_AutoSuggest.prototype.removeLastSearchString = function ()
 }
 
 // Add a result if not already done.
-smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmit)
+pmxc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmit)
 {
 	// Increase the internal item count.
 	this.iItemCount ++;
@@ -353,7 +353,7 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 
 	var oNewDiv = document.createElement('div');
 	oNewDiv.id = 'suggest_' + this.opt.sSuggestId + '_' + sItemId;
-	setInnerHTML(oNewDiv, this.sItemTemplate.replace(/%post_name%/g, this.opt.sPostName).replace(/%item_id%/g, sItemId).replace(/%item_href%/g, smf_prepareScriptUrl(smf_scripturl) + this.opt.sURLMask.replace(/%item_id%/g, sItemId)).replace(/%item_name%/g, sItemName).replace(/%images_url%/g, smf_images_url).replace(/%self%/g, this.opt.sSelf).replace(/%delete_text%/g, this.sTextDeleteItem));
+	setInnerHTML(oNewDiv, this.sItemTemplate.replace(/%post_name%/g, this.opt.sPostName).replace(/%item_id%/g, sItemId).replace(/%item_href%/g, pmx_prepareScriptUrl(pmx_scripturl) + this.opt.sURLMask.replace(/%item_id%/g, sItemId)).replace(/%item_name%/g, sItemName).replace(/%images_url%/g, pmx_images_url).replace(/%self%/g, this.opt.sSelf).replace(/%delete_text%/g, this.sTextDeleteItem));
 	this.oItemList.appendChild(oNewDiv);
 
 	// If there's a registered callback, call it.
@@ -371,7 +371,7 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 }
 
 // Delete an item that has been added, if at all?
-smc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
+pmxc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
 {
 	var oDiv = document.getElementById('suggest_' + this.opt.sSuggestId + '_' + sItemId);
 
@@ -392,14 +392,14 @@ smc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
 }
 
 // Hide the box.
-smc_AutoSuggest.prototype.autoSuggestHide = function ()
+pmxc_AutoSuggest.prototype.autoSuggestHide = function ()
 {
 	// Delay to allow events to propogate through....
 	this.oHideTimer = setTimeout(this.opt.sSelf + '.autoSuggestActualHide();', 250);
 }
 
 // Do the actual hiding after a timeout.
-smc_AutoSuggest.prototype.autoSuggestActualHide = function()
+pmxc_AutoSuggest.prototype.autoSuggestActualHide = function()
 {
 	this.oSuggestDivHandle.style.display = 'none';
 	this.oSuggestDivHandle.style.visibility = 'hidden';
@@ -407,7 +407,7 @@ smc_AutoSuggest.prototype.autoSuggestActualHide = function()
 }
 
 // Show the box.
-smc_AutoSuggest.prototype.autoSuggestShow = function()
+pmxc_AutoSuggest.prototype.autoSuggestShow = function()
 {
 	if (this.oHideTimer)
 	{
@@ -422,7 +422,7 @@ smc_AutoSuggest.prototype.autoSuggestShow = function()
 }
 
 // Populate the actual div.
-smc_AutoSuggest.prototype.populateDiv = function(aResults)
+pmxc_AutoSuggest.prototype.populateDiv = function(aResults)
 {
 	// Cannot have any children yet.
 	while (this.oSuggestDivHandle.childNodes.length > 0)
@@ -479,19 +479,19 @@ smc_AutoSuggest.prototype.populateDiv = function(aResults)
 }
 
 // Refocus the element.
-smc_AutoSuggest.prototype.itemMouseOver = function (oCurElement)
+pmxc_AutoSuggest.prototype.itemMouseOver = function (oCurElement)
 {
 	this.oSelectedDiv = oCurElement;
 	oCurElement.className = 'auto_suggest_item_hover';
 }
 
 // Onfocus the element
-smc_AutoSuggest.prototype.itemMouseOut = function (oCurElement)
+pmxc_AutoSuggest.prototype.itemMouseOut = function (oCurElement)
 {
 	oCurElement.className = 'auto_suggest_item';
 }
 
-smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
+pmxc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 {
 	var sQuoteText = '';
 	var aItems = oXMLDoc.getElementsByTagName('item');
@@ -531,7 +531,7 @@ smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 }
 
 // Get a new suggestion.
-smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
+pmxc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 {
 	// If there's a callback then call it.
 	if ('onBeforeUpdate' in this.oCallback && typeof(this.oCallback.onBeforeUpdate) == 'string')
@@ -616,7 +616,7 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	sSearchString = sSearchString.php_to8bit().php_urlencode();
 
 	// Get the document.
-	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, smf_prepareScriptUrl(smf_scripturl)).replace(/%suggest_type%/g, this.opt.sSearchType).replace(/%search%/g, sSearchString).replace(/%sessionVar%/g, this.opt.sSessionVar).replace(/%sessionID%/g, this.opt.sSessionId).replace(/%time%/g, new Date().getTime()), '', this.onSuggestionReceived);
+	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, pmx_prepareScriptUrl(pmx_scripturl)).replace(/%suggest_type%/g, this.opt.sSearchType).replace(/%search%/g, sSearchString).replace(/%sessionVar%/g, this.opt.sSessionVar).replace(/%sessionID%/g, this.opt.sSessionId).replace(/%time%/g, new Date().getTime()), '', this.onSuggestionReceived);
 
 	return true;
 }

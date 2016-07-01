@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -26,7 +26,7 @@ if (!defined('SMF'))
  */
 function ViewMembers()
 {
-	global $txt, $scripturl, $context, $modSettings, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $pmxcFunc;
 
 	$subActions = array(
 		'all' => array('ViewMemberlist', 'moderate_forum'),
@@ -49,7 +49,7 @@ function ViewMembers()
 	loadTemplate('ManageMembers');
 
 	// Get counts on every type of activation - for sections and filtering alike.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*) AS total_members, is_activated
 		FROM {db_prefix}members
 		WHERE is_activated != {int:is_activated}
@@ -61,9 +61,9 @@ function ViewMembers()
 	$context['activation_numbers'] = array();
 	$context['awaiting_activation'] = 0;
 	$context['awaiting_approval'] = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		$context['activation_numbers'][$row['is_activated']] = $row['total_members'];
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	foreach ($context['activation_numbers'] as $activation_type => $total_members)
 	{
@@ -142,7 +142,7 @@ function ViewMembers()
  */
 function ViewMemberlist()
 {
-	global $txt, $scripturl, $context, $modSettings, $sourcedir, $smcFunc, $user_info;
+	global $txt, $scripturl, $context, $modSettings, $sourcedir, $pmxcFunc, $user_info;
 
 	// Set the current sub action.
 	$context['sub_action'] = $_REQUEST['sa'];
@@ -181,7 +181,7 @@ function ViewMemberlist()
 		);
 		$context['postgroups'] = array();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_group, group_name, min_posts
 			FROM {db_prefix}membergroups
 			WHERE id_group != {int:moderator_group}
@@ -191,7 +191,7 @@ function ViewMemberlist()
 				'newbie_group' => 4,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if ($row['min_posts'] == -1)
 				$context['membergroups'][] = array(
@@ -205,7 +205,7 @@ function ViewMemberlist()
 					'name' => $row['group_name']
 				);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Some data about the form fields and how they are linked to the database.
 		$params = array(
@@ -268,7 +268,7 @@ function ViewMemberlist()
 
 		$search_params = array();
 		if ($context['sub_action'] == 'query' && !empty($_REQUEST['params']) && empty($_POST['types']))
-			$search_params = smf_json_decode(base64_decode($_REQUEST['params']), true);
+			$search_params = pmx_json_decode(base64_decode($_REQUEST['params']), true);
 		elseif (!empty($_POST))
 		{
 			$search_params['types'] = $_POST['types'];
@@ -353,9 +353,9 @@ function ViewMemberlist()
 			else
 			{
 				// Replace the wildcard characters ('*' and '?') into MySQL ones.
-				$parameter = strtolower(strtr($smcFunc['htmlspecialchars']($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
+				$parameter = strtolower(strtr($pmxcFunc['htmlspecialchars']($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
-				if ($smcFunc['db_case_sensitive'])
+				if ($pmxcFunc['db_case_sensitive'])
 					$query_parts[] = '(LOWER(' . implode( ') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
 				else
 					$query_parts[] = '(' . implode( ' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
@@ -613,7 +613,7 @@ function ViewMemberlist()
  */
 function SearchMembers()
 {
-	global $context, $txt, $smcFunc;
+	global $context, $txt, $pmxcFunc;
 
 	// Get a list of all the membergroups and postgroups that can be selected.
 	$context['membergroups'] = array(
@@ -625,7 +625,7 @@ function SearchMembers()
 	);
 	$context['postgroups'] = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_group, group_name, min_posts
 		FROM {db_prefix}membergroups
 		WHERE id_group != {int:moderator_group}
@@ -635,7 +635,7 @@ function SearchMembers()
 			'newbie_group' => 4,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if ($row['min_posts'] == -1)
 			$context['membergroups'][] = array(
@@ -649,7 +649,7 @@ function SearchMembers()
 				'name' => $row['group_name']
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$context['page_title'] = $txt['admin_members'];
 	$context['sub_template'] = 'search_members';
@@ -1012,7 +1012,7 @@ function MembersAwaitingActivation()
  */
 function AdminApprove()
 {
-	global $scripturl, $modSettings, $sourcedir, $language, $user_info, $smcFunc;
+	global $scripturl, $modSettings, $sourcedir, $language, $user_info, $pmxcFunc;
 
 	// First, check our session.
 	checkSession();
@@ -1052,7 +1052,7 @@ function AdminApprove()
 	}
 
 	// Get information on each of the members, things that are important to us, like email address...
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, member_name, real_name, email_address, validation_code, lngfile
 		FROM {db_prefix}members
 		WHERE is_activated = {int:activated_status}' . $condition . '
@@ -1064,7 +1064,7 @@ function AdminApprove()
 		)
 	);
 
-	$member_count = $smcFunc['db_num_rows']($request);
+	$member_count = $pmxcFunc['db_num_rows']($request);
 
 	// If no results then just return!
 	if ($member_count == 0)
@@ -1073,7 +1073,7 @@ function AdminApprove()
 	$member_info = array();
 	$members = array();
 	// Fill the info array.
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$members[] = $row['id_member'];
 		$member_info[] = array(
@@ -1085,13 +1085,13 @@ function AdminApprove()
 			'code' => $row['validation_code']
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Are we activating or approving the members?
 	if ($_POST['todo'] == 'ok' || $_POST['todo'] == 'okemail')
 	{
 		// Approve/activate this member.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}members
 			SET validation_code = {string:blank_string}, is_activated = {int:is_activated}
 			WHERE is_activated = {int:activated_status}' . $condition,
@@ -1140,7 +1140,7 @@ function AdminApprove()
 			$validation_code = generateValidationCode();
 
 			// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}members
 				SET validation_code = {string:validation_code}, is_activated = {int:not_activated}
 				WHERE is_activated = {int:activated_status}

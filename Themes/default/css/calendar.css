@@ -15,7 +15,6 @@
 .calendar_week tr.days_wrapper td.calendar_today:first-child {
 	font-weight: bold;
 }
-.calendar_today,
 td.days:hover {
 	background: #fff;
 }
@@ -121,6 +120,11 @@ td.days:hover {
 #month_grid table td.birthdays {
 	background: rgba(102, 0, 255, 0.1);
 }
+#main_grid table td.calendar_today,
+#month_grid table td.calendar_today {
+	background: rgba(115, 100, 280, 0.3);
+}
+
 /* Special Case Highlighting */
 #main_grid table td.events:hover,
 #month_grid table td.events:hover,

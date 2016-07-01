@@ -14,7 +14,7 @@
 /**
  * Class ApprovePost_Notify_Background
  */
-class ApprovePost_Notify_Background extends SMF_BackgroundTask
+class ApprovePost_Notify_Background extends PMX_BackgroundTask
 {
 	/**
      * This executes the task - loads up the info, puts the email in the queue and inserts any alerts as needed.
@@ -22,7 +22,7 @@ class ApprovePost_Notify_Background extends SMF_BackgroundTask
 	 */
 	public function execute()
 	{
-		global $smcFunc, $sourcedir, $scripturl, $modSettings, $language;
+		global $pmxcFunc, $sourcedir, $scripturl, $modSettings, $language;
 
 		$msgOptions = $this->_details['msgOptions'];
 		$topicOptions = $this->_details['topicOptions'];
@@ -36,7 +36,7 @@ class ApprovePost_Notify_Background extends SMF_BackgroundTask
 		require_once($sourcedir . '/Subs-Members.php');
 		$modMembers = membersAllowedTo('approve_posts', $topicOptions['board']);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member, email_address, lngfile
 			FROM {db_prefix}members
 			WHERE id_member IN({array_int:members})',
@@ -46,12 +46,12 @@ class ApprovePost_Notify_Background extends SMF_BackgroundTask
 		);
 
 		$watched = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			$members[] = $row['id_member'];
 			$watched[$row['id_member']] = $row;
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (empty($members))
 			return true;
@@ -103,7 +103,7 @@ class ApprovePost_Notify_Background extends SMF_BackgroundTask
 
 		// Insert the alerts if any
 		if (!empty($alert_rows))
-			$smcFunc['db_insert']('',
+			$pmxcFunc['db_insert']('',
 				'{db_prefix}user_alerts',
 				array('alert_time' => 'int', 'id_member' => 'int', 'id_member_started' => 'int', 'member_name' => 'string',
 					'content_type' => 'string', 'content_id' => 'int', 'content_action' => 'string', 'is_read' => 'int', 'extra' => 'string'),

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -83,21 +83,21 @@ function PackageGet()
  */
 function PackageServers()
 {
-	global $txt, $context, $sourcedir, $packagesdir, $modSettings, $smcFunc;
+	global $txt, $context, $sourcedir, $packagesdir, $modSettings, $pmxcFunc;
 
 	// Ensure we use the correct template, and page title.
 	$context['sub_template'] = 'servers';
 	$context['page_title'] .= ' - ' . $txt['download_packages'];
 
 	// Load the list of servers.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_server, name, url
 		FROM {db_prefix}package_servers',
 		array(
 		)
 	);
 	$context['servers'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$context['servers'][] = array(
 			'name' => $row['name'],
@@ -105,13 +105,13 @@ function PackageServers()
 			'id' => $row['id_server'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$context['package_download_broken'] = !is_writable($packagesdir);
 
 	if ($context['package_download_broken'])
 	{
-		smf_chmod($packagesdir, 0777);
+		pmx_chmod($packagesdir, 0777);
 	}
 
 	$context['package_download_broken'] = !is_writable($packagesdir);
@@ -198,7 +198,7 @@ function PackageServers()
  */
 function PackageGBrowse()
 {
-	global $txt, $context, $scripturl, $sourcedir, $forum_version, $smcFunc;
+	global $txt, $context, $scripturl, $sourcedir, $forum_version, $pmxcFunc;
 
 	if (isset($_GET['server']))
 	{
@@ -208,7 +208,7 @@ function PackageGBrowse()
 		$server = (int) $_GET['server'];
 
 		// Query the server list to find the current server.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT name, url
 			FROM {db_prefix}package_servers
 			WHERE id_server = {int:current_server}
@@ -217,8 +217,8 @@ function PackageGBrowse()
 				'current_server' => $server,
 			)
 		);
-		list ($name, $url) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($name, $url) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// If the server does not exist, dump out.
 		if (empty($url))
@@ -248,7 +248,7 @@ function PackageGBrowse()
 			$context['sub_template'] = 'package_confirm';
 
 			$context['page_title'] = $txt['package_servers'];
-			$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], $smcFunc['htmlspecialchars']($_GET['absolute']));
+			$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], $pmxcFunc['htmlspecialchars']($_GET['absolute']));
 			$context['proceed_href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
 
 			return;
@@ -284,7 +284,7 @@ function PackageGBrowse()
 
 	// Use the package list's name if it exists.
 	if ($listing->exists('list-title'))
-		$name = $smcFunc['htmlspecialchars']($listing->fetch('list-title'));
+		$name = $pmxcFunc['htmlspecialchars']($listing->fetch('list-title'));
 
 	// Pick the correct template.
 	$context['sub_template'] = 'package_list';
@@ -305,20 +305,20 @@ function PackageGBrowse()
 	// Get default author and email if they exist.
 	if ($listing->exists('default-author'))
 	{
-		$default_author = $smcFunc['htmlspecialchars']($listing->fetch('default-author'));
+		$default_author = $pmxcFunc['htmlspecialchars']($listing->fetch('default-author'));
 		if ($listing->exists('default-author/@email') && filter_var($listing->fetch('default-author/@email'), FILTER_VALIDATE_EMAIL))
-			$default_email = $smcFunc['htmlspecialchars']($listing->fetch('default-author/@email'));
+			$default_email = $pmxcFunc['htmlspecialchars']($listing->fetch('default-author/@email'));
 	}
 
 	// Get default web site if it exists.
 	if ($listing->exists('default-website'))
 	{
-		$default_website = $smcFunc['htmlspecialchars']($listing->fetch('default-website'));
+		$default_website = $pmxcFunc['htmlspecialchars']($listing->fetch('default-website'));
 		if ($listing->exists('default-website/@title'))
-			$default_title = $smcFunc['htmlspecialchars']($listing->fetch('default-website/@title'));
+			$default_title = $pmxcFunc['htmlspecialchars']($listing->fetch('default-website/@title'));
 	}
 
-	$the_version = strtr($forum_version, array('SMF ' => ''));
+	$the_version = strtr($forum_version, array('PortaMx Forum ' => ''));
 	if (!empty($_SESSION['version_emulate']))
 		$the_version = $_SESSION['version_emulate'];
 
@@ -342,10 +342,10 @@ function PackageGBrowse()
 			);
 
 			if (in_array($package['type'], array('title', 'text')))
-				$context['package_list'][$packageSection][$package['type']] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+				$context['package_list'][$packageSection][$package['type']] = $pmxcFunc['htmlspecialchars']($thisPackage->fetch('.'));
 			// It's a Title, Heading, Rule or Text.
 			elseif (in_array($package['type'], array('heading', 'rule')))
-				$package['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+				$package['name'] = $pmxcFunc['htmlspecialchars']($thisPackage->fetch('.'));
 			// It's a Remote link.
 			elseif ($package['type'] == 'remote')
 			{
@@ -372,7 +372,7 @@ function PackageGBrowse()
 					$package['href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;absolute=' . $current_url;
 				}
 
-				$package['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+				$package['name'] = $pmxcFunc['htmlspecialchars']($thisPackage->fetch('.'));
 				$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
 			}
 			// It's a package...
@@ -396,7 +396,7 @@ function PackageGBrowse()
 				if ($package['description'] == '')
 					$package['description'] = $txt['package_no_description'];
 				else
-					$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', $smcFunc['htmlspecialchars']($package['description'])));
+					$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', $pmxcFunc['htmlspecialchars']($package['description'])));
 
 				$package['is_installed'] = isset($installed_mods[$package['id']]);
 				$package['is_current'] = $package['is_installed'] && ($installed_mods[$package['id']] == $package['version']);
@@ -428,7 +428,7 @@ function PackageGBrowse()
 						$package['author']['email'] = $default_email;
 
 					if ($thisPackage->exists('author') && $thisPackage->fetch('author') != '')
-						$package['author']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('author'));
+						$package['author']['name'] = $pmxcFunc['htmlspecialchars']($thisPackage->fetch('author'));
 					else
 						$package['author']['name'] = $default_author;
 
@@ -439,16 +439,16 @@ function PackageGBrowse()
 				if ($thisPackage->exists('website') || isset($default_website))
 				{
 					if ($thisPackage->exists('website') && $thisPackage->exists('website/@title'))
-						$package['author']['website']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('website/@title'));
+						$package['author']['website']['name'] = $pmxcFunc['htmlspecialchars']($thisPackage->fetch('website/@title'));
 					elseif (isset($default_title))
 						$package['author']['website']['name'] = $default_title;
 					elseif ($thisPackage->exists('website'))
-						$package['author']['website']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('website'));
+						$package['author']['website']['name'] = $pmxcFunc['htmlspecialchars']($thisPackage->fetch('website'));
 					else
 						$package['author']['website']['name'] = $default_website;
 
 					if ($thisPackage->exists('website') && $thisPackage->fetch('website') != '')
-						$authorhompage = $smcFunc['htmlspecialchars']($thisPackage->fetch('website'));
+						$authorhompage = $pmxcFunc['htmlspecialchars']($thisPackage->fetch('website'));
 					else
 						$authorhompage = $default_website;
 
@@ -529,7 +529,7 @@ function PackageGBrowse()
  */
 function PackageDownload()
 {
-	global $txt, $scripturl, $context, $packagesdir, $smcFunc;
+	global $txt, $scripturl, $context, $packagesdir, $pmxcFunc;
 
 	// Use the downloaded sub template.
 	$context['sub_template'] = 'downloaded';
@@ -546,7 +546,7 @@ function PackageDownload()
 		$server = (int) $_GET['server'];
 
 		// Query the server table to find the requested server.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT name, url
 			FROM {db_prefix}package_servers
 			WHERE id_server = {int:current_server}
@@ -555,8 +555,8 @@ function PackageDownload()
 				'current_server' => $server,
 			)
 		);
-		list ($name, $url) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($name, $url) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// If server does not exist then dump out.
 		if (empty($url))
@@ -666,7 +666,7 @@ function PackageUpload()
 
 	// Now move the file.
 	move_uploaded_file($_FILES['package']['tmp_name'], $destination);
-	smf_chmod($destination, 0777);
+	pmx_chmod($destination, 0777);
 
 	// If we got this far that should mean it's available.
 	$context['package'] = getPackageInfo($packageName);
@@ -726,7 +726,7 @@ function PackageUpload()
  */
 function PackageServerAdd()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	// Validate the user.
 	checkSession();
@@ -736,14 +736,14 @@ function PackageServerAdd()
 		$_POST['serverurl'] = substr($_POST['serverurl'], 0, -1);
 
 	// Are they both nice and clean?
-	$servername = trim($smcFunc['htmlspecialchars']($_POST['servername']));
-	$serverurl = trim($smcFunc['htmlspecialchars']($_POST['serverurl']));
+	$servername = trim($pmxcFunc['htmlspecialchars']($_POST['servername']));
+	$serverurl = trim($pmxcFunc['htmlspecialchars']($_POST['serverurl']));
 
 	// Make sure the URL has the correct prefix.
 	if (strpos($serverurl, 'http://') !== 0 && strpos($serverurl, 'https://') !== 0)
 		$serverurl = 'http://' . $serverurl;
 
-	$smcFunc['db_insert']('',
+	$pmxcFunc['db_insert']('',
 		'{db_prefix}package_servers',
 		array(
 			'name' => 'string-255', 'url' => 'string-255',
@@ -762,11 +762,11 @@ function PackageServerAdd()
  */
 function PackageServerRemove()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	checkSession('get');
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}package_servers
 		WHERE id_server = {int:current_server}',
 		array(

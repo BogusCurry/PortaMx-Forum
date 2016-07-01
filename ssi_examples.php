@@ -31,7 +31,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'home1')
 // Load the main template.
 template_ssi_above();
 ?>
-			<h2>SMF SSI.php Functions</h2>
+			<h2>PortaMx Forum SSI.php Functions</h2>
 			<p><strong>Current Version:</strong> 2.1 Beta 4</p>
 			<p>This file is used to demonstrate the capabilities of SSI.php using PHP include functions. The examples show the include tag, then the results of it.</p>
 
@@ -43,9 +43,6 @@ template_ssi_above();
 			<p>All the functions have an output method parameter.  This can either be &quot;echo&quot; (the default) or &quot;array&quot;</p>
 			<p>If it is &quot;echo&quot;, the function will act normally - otherwise, it will return an array containing information about the requested task. For example, it might return a list of topics for ssi_recentTopics.</p>
 			<p onclick="if (getInnerHTML(this).indexOf('Bird') == -1) setInnerHTML(this, getInnerHTML(this) + '<br><img src=&quot;http://www.simplemachines.org/images/chocobo.jpg&quot; title=&quot;Bird-san&quot; alt=&quot;Chocobo!&quot;>'); return false;">This functionality can be used to allow you to present the information in any way you wish.</p>
-
-			<h2>Additional Guides &amp; FAQ</h2>
-			<p>Need more information on using SSI.php? Check out <a href="http://docs.simplemachines.org/index.php?topic=400.0">Using SSI.php article</a> or <a href="http://www.simplemachines.org/community/index.php?topic=14906.0">the SSI FAQ</a>.</p>
 
 			<div id="sidenav" class="windowbg">
 				<span class="topslice"><span></span></span>
@@ -127,14 +124,6 @@ template_ssi_above();
 
 			<div class="ssi_preview" id="ssi_recentPosts">
 				<h2>Recent Posts Function</h2>
-				<h3>Code</h3>
-				<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">[Select]</a></div><code class="bbc_code">&lt;?php ssi_recentPosts(); ?&gt;</code>
-				<h3>Result</h3>
-				<div class="ssi_result"><?php ssi_recentPosts(); flush(); ?></div>
-			</div>
-
-			<div class="ssi_preview" id="ssi_recentPoll">
-				<h2>Recent Poll Function</h2>
 				<h3>Code</h3>
 				<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">[Select]</a></div><code class="bbc_code">&lt;?php ssi_recentPoll(); ?&gt;</code>
 				<h3>Result</h3>
@@ -415,7 +404,7 @@ function template_ssi_above()
 	echo '<!DOCTYPE html>
 <html>
 	<head>
-		<title>SMF 2.1 Beta 4 SSI.php Examples</title>
+		<title>PortaMx Forum 2.1 Beta 4 SSI.php Examples</title>
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?alp21">
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style>
@@ -474,9 +463,9 @@ function template_ssi_above()
 			}
 		</style>
 		<script>
-			var smf_scripturl = "', $scripturl, '";
-			var smf_iso_case_folding = ', $context['server']['iso_case_folding'] ? 'true' : 'false', ';
-			var smf_charset = "', $context['character_set'], '";
+			var pmx_scripturl = "', $scripturl, '";
+			var pmx_iso_case_folding = ', $context['server']['iso_case_folding'] ? 'true' : 'false', ';
+			var pmx_charset = "', $context['character_set'], '";
 
 			// Sets all ssi_preview class to hidden, then shows the one requested.
 			function showSSIBlock(elementID)
@@ -501,7 +490,7 @@ function template_ssi_above()
 	</head>
 	<body>
 		<div id="header">
-			<h1 class="forumtitle">SMF 2.1 Beta 4 SSI.php Examples</h1>
+			<h1 class="forumtitle">PortaMx Forum 2.1 Beta 4 SSI.php Examples</h1>
 			<img id="smflogo" src="Themes/default/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
 		</div>
 		<div id="wrapper">
@@ -640,7 +629,7 @@ $topics = ssi_recentTopics(8, null, null, \'array\');
 
 foreach ($topics as $topic)
 {
-	// Uncomment the following code to get a listing of array elements that SMF provides for this function.
+	// Uncomment the following code to get a listing of array elements that PMX provides for this function.
 	// echo \'<pre>\', print_r($topic), \'</pre>\';
 
 	echo \'

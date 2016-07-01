@@ -16,7 +16,7 @@
 /**
  * Class EventNew_Notify_Background
  */
-class EventNew_Notify_Background extends SMF_BackgroundTask
+class EventNew_Notify_Background extends PMX_BackgroundTask
 {
 	/**
      * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
@@ -24,7 +24,7 @@ class EventNew_Notify_Background extends SMF_BackgroundTask
 	 */
 	public function execute()
  	{
- 		global $sourcedir, $smcFunc, $user_profile;
+ 		global $sourcedir, $pmxcFunc, $user_profile;
 
 		// Get everyone who could be notified - those are the people who can see the calendar.
 		require_once($sourcedir . '/Subs-Members.php');
@@ -83,7 +83,7 @@ class EventNew_Notify_Background extends SMF_BackgroundTask
 				);
 			}
 
-			$smcFunc['db_insert']('insert',
+			$pmxcFunc['db_insert']('insert',
 				'{db_prefix}user_alerts',
 				array('alert_time' => 'int', 'id_member' => 'int', 'id_member_started' => 'int',
 					'member_name' => 'string', 'content_type' => 'string', 'content_id' => 'int',

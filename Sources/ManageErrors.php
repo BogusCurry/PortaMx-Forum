@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -26,7 +26,7 @@ if (!defined('SMF'))
  */
 function ViewErrorLog()
 {
-	global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
+	global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $pmxcFunc;
 
 	// Viewing contents of a file?
 	if (isset($_GET['file']))
@@ -56,7 +56,7 @@ function ViewErrorLog()
 		$filter = array(
 			'variable' => $_GET['filter'],
 			'value' => array(
-				'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $smcFunc['db_escape_wildcard_string']($_GET['value']),
+				'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $pmxcFunc['db_escape_wildcard_string']($_GET['value']),
 			),
 			'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 			'entity' => $filters[$_GET['filter']]
@@ -67,7 +67,7 @@ function ViewErrorLog()
 		deleteErrors();
 
 	// Just how many errors are there?
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_errors' . (isset($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
@@ -75,8 +75,8 @@ function ViewErrorLog()
 			'filter' => isset($filter) ? $filter['value']['sql'] : '',
 		)
 	);
-	list ($num_errors) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($num_errors) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// If this filter is empty...
 	if ($num_errors == 0 && isset($filter))
@@ -99,18 +99,18 @@ function ViewErrorLog()
 	else
 	{
 		// We want all errors, not just the number of filtered messages...
-		$query = $smcFunc['db_query']('', '
+		$query = $pmxcFunc['db_query']('', '
 			SELECT COUNT(id_error)
 			FROM {db_prefix}log_errors',
 			array()
 		);
 
-		list($context['num_errors']) = $smcFunc['db_fetch_row']($query);
-		$smcFunc['db_free_result']($query);
+		list($context['num_errors']) = $pmxcFunc['db_fetch_row']($query);
+		$pmxcFunc['db_free_result']($query);
 	}
 
 	// Find and sort out the errors.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
 		FROM {db_prefix}log_errors' . (isset($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
@@ -125,11 +125,11 @@ function ViewErrorLog()
 	$context['errors'] = array();
 	$members = array();
 
-	for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i ++)
+	for ($i = 0; $row = $pmxcFunc['db_fetch_assoc']($request); $i ++)
 	{
-		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $smcFunc['db_escape_wildcard_string']($row['message']));
+		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $pmxcFunc['db_escape_wildcard_string']($row['message']));
 		if ($search_message == $filter['value']['sql'])
-			$search_message = $smcFunc['db_escape_wildcard_string']($row['message']);
+			$search_message = $pmxcFunc['db_escape_wildcard_string']($row['message']);
 		$show_message = strtr(strtr(preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '$1', $row['message']), array("\r" => '', '<br>' => "\n", '<' => '&lt;', '>' => '&gt;', '"' => '&quot;')), array("\n" => '<br>'));
 
 		$context['errors'][$row['id_error']] = array(
@@ -141,8 +141,8 @@ function ViewErrorLog()
 			'time' => timeformat($row['log_time']),
 			'timestamp' => $row['log_time'],
 			'url' => array(
-				'html' => $smcFunc['htmlspecialchars'](strpos($row['url'], 'cron.php') === false ? (substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url'] : $row['url']),
-				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['url']))
+				'html' => $pmxcFunc['htmlspecialchars'](strpos($row['url'], 'cron.php') === false ? (substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url'] : $row['url']),
+				'href' => base64_encode($pmxcFunc['db_escape_wildcard_string']($row['url']))
 			),
 			'message' => array(
 				'html' => $show_message,
@@ -172,13 +172,13 @@ function ViewErrorLog()
 		// Make a list of members to load later.
 		$members[$row['id_member']] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Load the member data.
 	if (!empty($members))
 	{
 		// Get some additional member info...
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member, member_name, real_name
 			FROM {db_prefix}members
 			WHERE id_member IN ({array_int:member_list})
@@ -188,9 +188,9 @@ function ViewErrorLog()
 				'members' => count($members),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$members[$row['id_member']] = $row;
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// This is a guest...
 		$members[0] = array(
@@ -223,15 +223,15 @@ function ViewErrorLog()
 			$context['filter']['value']['html'] = '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $user_profile[$id]['real_name'] . '</a>';
 		}
 		elseif ($filter['variable'] == 'url')
-			$context['filter']['value']['html'] = '\'' . strtr($smcFunc['htmlspecialchars']((substr($filter['value']['sql'], 0, 1) == '?' ? $scripturl : '') . $filter['value']['sql']), array('\_' => '_')) . '\'';
+			$context['filter']['value']['html'] = '\'' . strtr($pmxcFunc['htmlspecialchars']((substr($filter['value']['sql'], 0, 1) == '?' ? $scripturl : '') . $filter['value']['sql']), array('\_' => '_')) . '\'';
 		elseif ($filter['variable'] == 'message')
 		{
-			$context['filter']['value']['html'] = '\'' . strtr($smcFunc['htmlspecialchars']($filter['value']['sql']), array("\n" => '<br>', '&lt;br /&gt;' => '<br>', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
+			$context['filter']['value']['html'] = '\'' . strtr($pmxcFunc['htmlspecialchars']($filter['value']['sql']), array("\n" => '<br>', '&lt;br /&gt;' => '<br>', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
 			$context['filter']['value']['html'] = preg_replace('~&amp;lt;span class=&amp;quot;remove&amp;quot;&amp;gt;(.+?)&amp;lt;/span&amp;gt;~', '$1', $context['filter']['value']['html']);
 		}
 		elseif ($filter['variable'] == 'error_type')
 		{
-			$context['filter']['value']['html'] = '\'' . strtr($smcFunc['htmlspecialchars']($filter['value']['sql']), array("\n" => '<br>', '&lt;br /&gt;' => '<br>', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
+			$context['filter']['value']['html'] = '\'' . strtr($pmxcFunc['htmlspecialchars']($filter['value']['sql']), array("\n" => '<br>', '&lt;br /&gt;' => '<br>', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
 		}
 		else
 			$context['filter']['value']['html'] = &$filter['value']['sql'];
@@ -248,7 +248,7 @@ function ViewErrorLog()
 
 	$sum = 0;
 	// What type of errors do we have and how many do we have?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT error_type, COUNT(*) AS num_errors
 		FROM {db_prefix}log_errors
 		GROUP BY error_type
@@ -257,7 +257,7 @@ function ViewErrorLog()
 			'critical_type' => 'critical',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Total errors so far?
 		$sum += $row['num_errors'];
@@ -266,10 +266,10 @@ function ViewErrorLog()
 			'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
 			'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
-			'is_selected' => isset($filter) && $filter['value']['sql'] == $smcFunc['db_escape_wildcard_string']($row['error_type']),
+			'is_selected' => isset($filter) && $filter['value']['sql'] == $pmxcFunc['db_escape_wildcard_string']($row['error_type']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Update the all errors tab with the total number of errors
 	$context['error_types']['all']['label'] .= ' (' . $sum . ')';
@@ -297,7 +297,7 @@ function ViewErrorLog()
  */
 function deleteErrors()
 {
-	global $filter, $smcFunc;
+	global $filter, $pmxcFunc;
 
 	// Make sure the session exists and is correct; otherwise, might be a hacker.
 	checkSession();
@@ -305,14 +305,14 @@ function deleteErrors()
 
 	// Delete all or just some?
 	if (isset($_POST['delall']) && !isset($filter))
-		$smcFunc['db_query']('truncate_table', '
+		$pmxcFunc['db_query']('truncate_table', '
 			TRUNCATE {db_prefix}log_errors',
 			array(
 			)
 		);
 	// Deleting all with a filter?
 	elseif (isset($_POST['delall']) && isset($filter))
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 			array(
@@ -322,7 +322,7 @@ function deleteErrors()
 	// Just specific errors?
 	elseif (!empty($_POST['delete']))
 	{
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE id_error IN ({array_int:error_list})',
 			array(
@@ -349,7 +349,7 @@ function deleteErrors()
  */
 function ViewFile()
 {
-	global $context, $boarddir, $sourcedir, $cachedir, $smcFunc;
+	global $context, $boarddir, $sourcedir, $cachedir, $pmxcFunc;
 
 	// Check for the administrative permission to do this.
 	isAllowedTo('admin_forum');
@@ -365,7 +365,7 @@ function ViewFile()
 
 	// Make sure the file we are looking for is one they are allowed to look at
 	if ($ext != '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || ($basename == 'settings.php' || $basename == 'settings_bak.php') || strpos($file, $real_cache) !== false || !is_readable($file))
-		fatal_lang_error('error_bad_file', true, array($smcFunc['htmlspecialchars']($file)));
+		fatal_lang_error('error_bad_file', true, array($pmxcFunc['htmlspecialchars']($file)));
 
 	// get the min and max lines
 	$min = $line - 20 <= 0 ? 1 : $line - 20;
@@ -374,7 +374,7 @@ function ViewFile()
 	if ($max <= 0 || $min >= $max)
 		fatal_lang_error('error_bad_line');
 
-	$file_data = explode('<br />', highlight_php_code($smcFunc['htmlspecialchars'](implode('', file($file)))));
+	$file_data = explode('<br />', highlight_php_code($pmxcFunc['htmlspecialchars'](implode('', file($file)))));
 
 	// We don't want to slice off too many so lets make sure we stop at the last one
 	$max = min($max, max(array_keys($file_data)));

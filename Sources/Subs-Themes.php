@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -23,7 +23,7 @@ if (!defined('SMF'))
  */
 function get_single_theme($id)
 {
-	global $smcFunc, $modSettings;
+	global $pmxcFunc, $modSettings;
 
 	// No data, no fun!
 	if (empty($id))
@@ -56,7 +56,7 @@ function get_single_theme($id)
 	$knownThemes = !empty($modSettings['knownThemes']) ? explode(',',$modSettings['knownThemes']) : array();
 	$enableThemes = !empty($modSettings['enableThemes']) ? explode(',',$modSettings['enableThemes']) : array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE variable IN ({array_string:theme_values})
@@ -69,7 +69,7 @@ function get_single_theme($id)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$single[$row['variable']] = $row['value'];
 
@@ -98,7 +98,7 @@ function get_single_theme($id)
  */
 function get_all_themes($enable_only = false)
 {
-	global $modSettings, $context, $smcFunc;
+	global $modSettings, $context, $pmxcFunc;
 
 	// Make our known/enable themes a little easier to work with.
 	$knownThemes = !empty($modSettings['knownThemes']) ? explode(',',$modSettings['knownThemes']) : array();
@@ -124,7 +124,7 @@ function get_all_themes($enable_only = false)
 	$query_where = $enable_only ? $enableThemes : $knownThemes;
 
 	// Perform the query as requested.
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE variable IN ({array_string:theme_values})
@@ -139,7 +139,7 @@ function get_all_themes($enable_only = false)
 
 	$context['themes'] = array();
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$context['themes'][$row['id_theme']]['id'] = (int) $row['id_theme'];
 
@@ -155,7 +155,7 @@ function get_all_themes($enable_only = false)
 		$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
 	}
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 }
 
 /**
@@ -207,10 +207,10 @@ function get_theme_info($path)
 	}
 
 	// So, we have an install tag which is cool and stuff but we also need to check it and match your current SMF version...
-	$the_version = strtr($forum_version, array('SMF ' => ''));
+	$the_version = strtr($forum_version, array('POrtaMx Forum ' => ''));
 	$install_versions = $theme_info_xml->path('theme-info/install/@for');
 
-	// The theme isn't compatible with the current SMF version.
+	// The theme isn't compatible with the current version.
 	if (!$install_versions || !matchPackageVersion($the_version, $install_versions))
 	{
 		remove_dir($path);
@@ -243,7 +243,7 @@ function get_theme_info($path)
 	}
 
 	if (!empty($theme_info_xml['extra']))
-		$xml_data += smf_json_decode($theme_info_xml['extra'], true);
+		$xml_data += pmx_json_decode($theme_info_xml['extra'], true);
 
 	return $xml_data;
 }
@@ -257,7 +257,7 @@ function get_theme_info($path)
  */
 function theme_install($to_install = array())
 {
-	global $smcFunc, $context, $themedir, $themeurl, $modSettings;
+	global $pmxcFunc, $context, $themedir, $themeurl, $modSettings;
 	global $settings, $explicit_images;
 
 	// External use? no problem!
@@ -272,7 +272,7 @@ function theme_install($to_install = array())
 	if (!empty($context['to_install']['version']))
 	{
 		$to_update = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE id_member = {int:no_member}
@@ -287,15 +287,15 @@ function theme_install($to_install = array())
 			)
 		);
 
-		$to_update = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$to_update = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Got something, lets figure it out what to do next.
 		if (!empty($to_update) && !empty($to_update['version']))
 			switch (compareVersions($context['to_install']['version'], $to_update['version']))
 			{
 				case 1: // Got a newer version, update the old entry.
-					$smcFunc['db_query']('', '
+					$pmxcFunc['db_query']('', '
 						UPDATE {db_prefix}themes
 						SET value = {string:new_value}
 						WHERE variable = {string:version}
@@ -334,7 +334,7 @@ function theme_install($to_install = array())
 			$context['to_install']['based_on'] = preg_replace('~[^A-Za-z0-9\-_ ]~', '', $context['to_install']['based_on']);
 
 			// Get the theme info first.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_theme
 				FROM {db_prefix}themes
 				WHERE id_member = {int:no_member}
@@ -347,10 +347,10 @@ function theme_install($to_install = array())
 				)
 			);
 
-			$based_on = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$based_on = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT variable, value
 				FROM {db_prefix}themes
 					WHERE variable IN ({array_string:theme_values})
@@ -362,8 +362,8 @@ function theme_install($to_install = array())
 					'based_on' => $based_on['id_theme'],
 				)
 			);
-			$temp = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$temp = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Found the based on theme info, add it to the current one being installed.
 			if (is_array($temp))
@@ -384,14 +384,14 @@ function theme_install($to_install = array())
 	}
 
 	// Find the newest id_theme.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT MAX(id_theme)
 		FROM {db_prefix}themes',
 		array(
 		)
 	);
-	list ($id_theme) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($id_theme) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// This will be theme number...
 	$id_theme++;
@@ -404,7 +404,7 @@ function theme_install($to_install = array())
 		$inserts[] = array($id_theme, $var, $val);
 
 	if (!empty($inserts))
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}themes',
 			array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 			$inserts,
@@ -458,7 +458,7 @@ function remove_dir($path)
  */
 function remove_theme($themeID)
 {
-	global $smcFunc, $modSettings;
+	global $pmxcFunc, $modSettings;
 
 	// Can't delete the default theme, sorry!
 	if (empty($themeID) || $themeID == 1)
@@ -468,7 +468,7 @@ function remove_theme($themeID)
 	$enable = explode(',', $modSettings['enableThemes']);
 
 	// Remove it from the themes table.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme = {int:current_theme}',
 		array(
@@ -477,7 +477,7 @@ function remove_theme($themeID)
 	);
 
 	// Update users preferences.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}members
 		SET id_theme = {int:default_theme}
 		WHERE id_theme = {int:current_theme}',
@@ -488,7 +488,7 @@ function remove_theme($themeID)
 	);
 
 	// Some boards may have it as preferred theme.
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}boards
 		SET id_theme = {int:default_theme}
 		WHERE id_theme = {int:current_theme}',

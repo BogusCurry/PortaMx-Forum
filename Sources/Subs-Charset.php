@@ -11,7 +11,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -556,9 +556,9 @@ function utf8_strtoupper($string)
  */
 function fix_serialized_columns()
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_action, extra
 		FROM {db_prefix}log_actions
 		WHERE action IN ({string:remove}, {string:delete})',
@@ -567,10 +567,10 @@ function fix_serialized_columns()
 			'delete' => 'delete',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		if (safe_unserialize($row['extra']) === false && preg_match('~^(a:3:{s:5:"topic";i:\d+;s:7:"subject";s:)(\d+):"(.+)"(;s:6:"member";s:5:"\d+";})$~', $row['extra'], $matches) === 1)
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				UPDATE {db_prefix}log_actions
 				SET extra = {string:extra}
 				WHERE id_action = {int:current_action}',
@@ -580,7 +580,7 @@ function fix_serialized_columns()
 				)
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Refresh some cached data.
 	updateSettings(array(

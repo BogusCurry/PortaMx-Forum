@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -20,7 +20,7 @@ if (!defined('SMF'))
  */
 function showAttachment()
 {
-	global $smcFunc, $modSettings, $maintenance, $context;
+	global $pmxcFunc, $modSettings, $maintenance, $context;
 
 	// Some defaults that we need.
 	$context['character_set'] = empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set'];
@@ -79,13 +79,13 @@ function showAttachment()
 		// Do we have a hook wanting to use our attachment system? We use $attachRequest to prevent accidental usage of $request.
 		$attachRequest = null;
 		call_integration_hook('integrate_download_request', array(&$attachRequest));
-		if (!is_null($attachRequest) && $smcFunc['db_is_resource']($attachRequest))
+		if (!is_null($attachRequest) && $pmxcFunc['db_is_resource']($attachRequest))
 			$request = $attachRequest;
 
 		else
 		{
 			// Make sure this attachment is on this board and load its info while we are at it.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_folder, filename, file_hash, fileext, id_attach, id_thumb, attachment_type, mime_type, approved, id_msg
 				FROM {db_prefix}attachments
 				WHERE id_attach = {int:attach}
@@ -97,14 +97,14 @@ function showAttachment()
 		}
 
 		// No attachment has been found.
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($pmxcFunc['db_num_rows']($request) == 0)
 		{
 			header('HTTP/1.0 404 File Not Found');
 			die('404 File Not Found');
 		}
 
-		$file = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$file = $pmxcFunc['db_fetch_assoc']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// If theres a message ID stored, we NEED a topic ID.
 		if (!empty($file['id_msg']) && empty($attachTopic) && empty($preview))
@@ -116,7 +116,7 @@ function showAttachment()
 		// Previews doesn't have this info.
 		if (empty($preview))
 		{
-			$request2 = $smcFunc['db_query']('', '
+			$request2 = $pmxcFunc['db_query']('', '
 				SELECT a.id_msg
 				FROM {db_prefix}attachments AS a
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
@@ -130,13 +130,13 @@ function showAttachment()
 			);
 
 			// The provided topic must match the one stored in the DB for this particular attachment, also.
-			if ($smcFunc['db_num_rows']($request2) == 0)
+			if ($pmxcFunc['db_num_rows']($request2) == 0)
 			{
 				header('HTTP/1.0 404 File Not Found');
 				die('404 File Not Found');
 			}
 
-			$smcFunc['db_free_result']($request2);
+			$pmxcFunc['db_free_result']($request2);
 		}
 
 		// set filePath and ETag time
@@ -150,7 +150,7 @@ function showAttachment()
 		$thumbFile = array();
 		if (!empty($file['id_thumb']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
 				FROM {db_prefix}attachments
 				WHERE id_attach = {int:thumb_id}
@@ -160,8 +160,8 @@ function showAttachment()
 				)
 			);
 
-			$thumbFile = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$thumbFile = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			// Got something! replace the $file var with the thumbnail info.
 			if ($thumbFile)
@@ -181,7 +181,7 @@ function showAttachment()
 
 	// Update the download counter (unless it's a thumbnail).
 	if ($file['attachment_type'] != 3 && empty($showThumb))
-		$smcFunc['db_query']('attach_download_increase', '
+		$pmxcFunc['db_query']('attach_download_increase', '
 			UPDATE LOW_PRIORITY {db_prefix}attachments
 			SET downloads = downloads + 1
 			WHERE id_attach = {int:id_attach}',

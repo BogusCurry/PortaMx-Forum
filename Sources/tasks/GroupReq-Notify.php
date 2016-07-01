@@ -16,7 +16,7 @@
 /**
  * Class GroupReq_Notify_Background
  */
-class GroupReq_Notify_Background extends SMF_BackgroundTask
+class GroupReq_Notify_Background extends PMX_BackgroundTask
 {
 	/**
      * This executes the task - loads up the information, puts the email in the queue and inserts any alerts as needed.
@@ -24,10 +24,10 @@ class GroupReq_Notify_Background extends SMF_BackgroundTask
 	 */
 	public function execute()
  	{
- 		global $sourcedir, $smcFunc, $language, $modSettings, $scripturl;
+ 		global $sourcedir, $pmxcFunc, $language, $modSettings, $scripturl;
 
 		// Do we have any group moderators?
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member
 			FROM {db_prefix}group_moderators
 			WHERE id_group = {int:selected_group}',
@@ -36,9 +36,9 @@ class GroupReq_Notify_Background extends SMF_BackgroundTask
 			)
 		);
 		$moderators = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$moderators[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		require_once($sourcedir . '/Subs-Members.php');
 
@@ -85,7 +85,7 @@ class GroupReq_Notify_Background extends SMF_BackgroundTask
 					);
 				}
 
-				$smcFunc['db_insert']('insert', '{db_prefix}user_alerts',
+				$pmxcFunc['db_insert']('insert', '{db_prefix}user_alerts',
 					array('alert_time' => 'int', 'id_member' => 'int', 'id_member_started' => 'int', 'member_name' => 'string',
 					'content_type' => 'string', 'content_id' => 'int', 'content_action' => 'string', 'is_read' => 'int', 'extra' => 'string'),
 					$alert_rows, array()
@@ -100,7 +100,7 @@ class GroupReq_Notify_Background extends SMF_BackgroundTask
 				require_once($sourcedir . '/Subs-Post.php');
 				loadEssentialThemeData();
 
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT id_member, email_address, lngfile, member_name, mod_prefs
 					FROM {db_prefix}members
 					WHERE id_member IN ({array_int:moderator_list})
@@ -110,7 +110,7 @@ class GroupReq_Notify_Background extends SMF_BackgroundTask
 					)
 				);
 
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $pmxcFunc['db_fetch_assoc']($request))
 				{
 					$replacements = array(
 						'RECPNAME' => $row['member_name'],

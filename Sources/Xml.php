@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -105,12 +105,12 @@ function RetrievePreview()
  */
 function newspreview()
 {
-	global $context, $sourcedir, $smcFunc;
+	global $context, $sourcedir, $pmxcFunc;
 
 	require_once($sourcedir . '/Subs-Post.php');
 
 	$errors = array();
-	$news = !isset($_POST['news'])? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
+	$news = !isset($_POST['news'])? '' : $pmxcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
 	if (empty($news))
 		$errors[] = array('value' => 'no_news');
 	else
@@ -162,7 +162,7 @@ function newsletterpreview()
  */
 function sig_preview()
 {
-	global $context, $sourcedir, $smcFunc, $txt, $user_info;
+	global $context, $sourcedir, $pmxcFunc, $txt, $user_info;
 
 	require_once($sourcedir . '/Profile-Modify.php');
 	loadLanguage('Profile');
@@ -178,7 +178,7 @@ function sig_preview()
 	$errors = array();
 	if (!empty($user) && $can_change)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT signature
 			FROM {db_prefix}members
 			WHERE id_member = {int:id_member}
@@ -187,8 +187,8 @@ function sig_preview()
 				'id_member' => $user,
 			)
 		);
-		list($current_signature) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list($current_signature) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 		censorText($current_signature);
 		$current_signature = !empty($current_signature) ? parse_bbc($current_signature, true, 'sig' . $user) : $txt['no_signature_set'];
 
@@ -245,7 +245,7 @@ function sig_preview()
  */
 function warning_preview()
 {
-	global $context, $sourcedir, $smcFunc, $txt, $user_info, $scripturl, $mbname;
+	global $context, $sourcedir, $pmxcFunc, $txt, $user_info, $scripturl, $mbname;
 
 	require_once($sourcedir . '/Subs-Post.php');
 	loadLanguage('Errors');
@@ -257,7 +257,7 @@ function warning_preview()
 	if (allowedTo('issue_warning'))
 	{
 		$warning_body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
-		$context['preview_subject'] = !empty($_POST['title']) ? trim($smcFunc['htmlspecialchars']($_POST['title'])) : '';
+		$context['preview_subject'] = !empty($_POST['title']) ? trim($pmxcFunc['htmlspecialchars']($_POST['title'])) : '';
 		if (isset($_POST['issuing']))
 		{
 			if (empty($_POST['title']) || empty($_POST['body']))

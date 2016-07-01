@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -20,11 +20,11 @@ if (!defined('SMF'))
  */
 function reloadSettings()
 {
-	global $modSettings, $boarddir, $smcFunc, $txt, $db_character_set, $sourcedir, $context, $cache_enable;
+	global $modSettings, $boarddir, $pmxcFunc, $txt, $db_character_set, $sourcedir, $context, $cache_enable;
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
-		$smcFunc['db_query']('set_character_set', '
+		$pmxcFunc['db_query']('set_character_set', '
 			SET NAMES ' . $db_character_set,
 			array(
 			)
@@ -33,7 +33,7 @@ function reloadSettings()
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array(
@@ -42,9 +42,9 @@ function reloadSettings()
 		$modSettings = array();
 		if (!$request)
 			display_db_error();
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $pmxcFunc['db_fetch_row']($request))
 			$modSettings[$row[0]] = $row[1];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// Do a few things to protect against missing settings or settings with invalid values...
 		if (empty($modSettings['defaultMaxTopics']) || $modSettings['defaultMaxTopics'] <= 0 || $modSettings['defaultMaxTopics'] > 999)
@@ -68,13 +68,13 @@ function reloadSettings()
 	// Set a list of common functions.
 	$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
 	$ent_check = empty($modSettings['disableEntityCheck']) ? function ($string)
-		{
-			$string = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string);
-			return $string;
-		} : function ($string)
-		{
-			return $string;
-		};
+	{
+		$string = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string);
+		return $string;
+	} : function ($string)
+	{
+		return $string;
+	};
 	$fix_utf8mb4 = function ($string) use ($utf8)
 	{
 		if (!$utf8)
@@ -119,7 +119,7 @@ function reloadSettings()
 	$space_chars = $utf8 ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0';
 
 	// global array of anonymous helper functions, used mostly to properly handle multi byte strings
-	$smcFunc += array(
+	$pmxcFunc += array(
 		'entity_fix' => function ($string)
 		{
 			$num = $string[0] === 'x' ? hexdec(substr($string, 1)) : (int) $string;
@@ -189,24 +189,24 @@ function reloadSettings()
 
 			return mb_strtoupper($string, 'UTF-8');
 		} : 'strtoupper',
-		'truncate' => function($string, $length) use ($utf8, $ent_check, $ent_list, &$smcFunc)
+		'truncate' => function($string, $length) use ($utf8, $ent_check, $ent_list, &$pmxcFunc)
 		{
 			$string = $ent_check($string);
-			preg_match('~^(' . $ent_list . '|.){' . $smcFunc['strlen'](substr($string, 0, $length)) . '}~'.  ($utf8 ? 'u' : ''), $string, $matches);
+			preg_match('~^(' . $ent_list . '|.){' . $pmxcFunc['strlen'](substr($string, 0, $length)) . '}~'.  ($utf8 ? 'u' : ''), $string, $matches);
 			$string = $matches[0];
 			while (strlen($string) > $length)
 				$string = preg_replace('~(?:' . $ent_list . '|.)$~'.  ($utf8 ? 'u' : ''), '', $string);
 			return $string;
 		},
-		'ucfirst' => $utf8 ? function ($string) use (&$smcFunc)
+		'ucfirst' => $utf8 ? function ($string) use (&$pmxcFunc)
 		{
-			return $smcFunc['strtoupper']($smcFunc['substr']($string, 0, 1)) . $smcFunc['substr']($string, 1);
+			return $pmxcFunc['strtoupper']($pmxcFunc['substr']($string, 0, 1)) . $pmxcFunc['substr']($string, 1);
 		} : 'ucfirst',
-		'ucwords' => $utf8 ? function ($string) use (&$smcFunc)
+		'ucwords' => $utf8 ? function ($string) use (&$pmxcFunc)
 		{
 			$words = preg_split('~([\s\r\n\t]+)~', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 			for ($i = 0, $n = count($words); $i < $n; $i += 2)
-				$words[$i] = $smcFunc['ucfirst']($words[$i]);
+				$words[$i] = $pmxcFunc['ucfirst']($words[$i]);
 			return implode('', $words);
 		} : 'ucwords',
 	);
@@ -254,9 +254,9 @@ function reloadSettings()
 	}
 
 	// Integration is cool.
-	if (defined('SMF_INTEGRATION_SETTINGS'))
+	if (defined('PMX_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = smf_json_decode(SMF_INTEGRATION_SETTINGS, true);
+		$integration_settings = pmx_json_decode(PMX_INTEGRATION_SETTINGS, true);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function, '', false);
 	}
@@ -326,14 +326,14 @@ function reloadSettings()
 	// Get an error count, if necessary
 	if (!isset($context['num_errors']))
 	{
-		$query = $smcFunc['db_query']('', '
+		$query = $pmxcFunc['db_query']('', '
 			SELECT COUNT(id_error)
 			FROM {db_prefix}log_errors',
 			array()
 		);
 
-		list($context['num_errors']) = $smcFunc['db_fetch_row']($query);
-		$smcFunc['db_free_result']($query);
+		list($context['num_errors']) = $pmxcFunc['db_fetch_row']($query);
+		$pmxcFunc['db_free_result']($query);
 	}
 
 	// Call pre load integration functions.
@@ -353,7 +353,7 @@ function reloadSettings()
  */
 function loadUserSettings($checkOnly = false)
 {
-	global $modSettings, $user_settings, $sourcedir, $smcFunc;
+	global $modSettings, $user_settings, $sourcedir, $pmxcFunc;
 	global $cookiename, $user_info, $language, $context, $image_proxy_enabled, $image_proxy_secret, $boardurl;
 
 	// Check first the integration, then the cookie, and last the session.
@@ -376,7 +376,7 @@ function loadUserSettings($checkOnly = false)
 
 	if (empty($id_member) && isset($_COOKIE[$cookiename]))
 	{
-		$cookie_data = smf_json_decode($_COOKIE[$cookiename], true, false);
+		$cookie_data = pmx_json_decode($_COOKIE[$cookiename], true, false);
 
 		if (empty($cookie_data))
 			$cookie_data = safe_unserialize($_COOKIE[$cookiename]);
@@ -387,7 +387,7 @@ function loadUserSettings($checkOnly = false)
 	elseif (empty($id_member) && isset($_SESSION['login_' . $cookiename]) && ($_SESSION['USER_AGENT'] == $_SERVER['HTTP_USER_AGENT'] || !empty($modSettings['disableCheckUA'])))
 	{
 		// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
-		$cookie_data = smf_json_decode($_SESSION['login_' . $cookiename]);
+		$cookie_data = pmx_json_decode($_SESSION['login_' . $cookiename]);
 
 		if (empty($cookie_data))
 			$cookie_data = safe_unserialize($_SESSION['login_' . $cookiename]);
@@ -408,7 +408,7 @@ function loadUserSettings($checkOnly = false)
 		// Is the member data cached?
 		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = cache_get_data('user_settings-' . $id_member, 60)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT mem.*, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
@@ -418,8 +418,8 @@ function loadUserSettings($checkOnly = false)
 					'id_member' => $id_member,
 				)
 			);
-			$user_settings = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$user_settings = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			if (!empty($modSettings['force_ssl']) && $image_proxy_enabled && stripos($user_settings['avatar'], 'http://') !== false)
 				$user_settings['avatar'] = strtr($boardurl, array('http://' => 'https://')) . '/proxy.php?request=' . urlencode($user_settings['avatar']) . '&hash=' . md5($user_settings['avatar'] . $image_proxy_secret);
@@ -464,7 +464,7 @@ function loadUserSettings($checkOnly = false)
 			{
 				if (!empty($_COOKIE[$tfacookie]))
 				{
-					$tfa_data = smf_json_decode($_COOKIE[$tfacookie]);
+					$tfa_data = pmx_json_decode($_COOKIE[$tfacookie]);
 
 					if (is_null($tfa_data))
 						$tfa_data = safe_unserialize($_COOKIE[$tfacookie]);
@@ -503,7 +503,7 @@ function loadUserSettings($checkOnly = false)
 				}
 
 				//Find out if any group requires 2FA
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT COUNT(id_group) AS total
 					FROM {db_prefix}membergroups
 					WHERE tfa_required = {int:tfa_required}
@@ -513,8 +513,8 @@ function loadUserSettings($checkOnly = false)
 						'full_groups' => $full_groups,
 					)
 				);
-				$row = $smcFunc['db_fetch_assoc']($request);
-				$smcFunc['db_free_result']($request);
+				$row = $pmxcFunc['db_fetch_assoc']($request);
+				$pmxcFunc['db_free_result']($request);
 			}
 			else
 				$row['total'] = 1; //simplifies logics in the next "if"
@@ -536,11 +536,11 @@ function loadUserSettings($checkOnly = false)
 		// 3. If it was set within this session, no need to set it again.
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
 		// 5. We're still logging in or authenticating
-		if (SMF != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('.xml', 'login2', 'logintfa'))) && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
+		if (PMX != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('.xml', 'login2', 'logintfa'))) && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
-			$result = $smcFunc['db_query']('', '
+			$result = $pmxcFunc['db_query']('', '
 				SELECT poster_time
 				FROM {db_prefix}messages
 				WHERE id_msg = {int:id_msg}
@@ -549,8 +549,8 @@ function loadUserSettings($checkOnly = false)
 					'id_msg' => $user_settings['id_msg_last_visit'],
 				)
 			);
-			list ($visitTime) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list ($visitTime) = $pmxcFunc['db_fetch_row']($result);
+			$pmxcFunc['db_free_result']($result);
 
 			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
 
@@ -621,7 +621,7 @@ function loadUserSettings($checkOnly = false)
 		// Expire the 2FA cookie
 		if (isset($_COOKIE[$cookiename . '_tfa']) && empty($context['tfa_member']))
 		{
-			$tfa_data = smf_json_decode($_COOKIE[$cookiename . '_tfa'], true);
+			$tfa_data = pmx_json_decode($_COOKIE[$cookiename . '_tfa'], true);
 
 			if (is_null($tfa_data))
 				$tfa_data = safe_unserialize($_COOKIE[$cookiename . '_tfa']);
@@ -753,7 +753,7 @@ function loadUserSettings($checkOnly = false)
 function loadBoard()
 {
 	global $txt, $scripturl, $context, $modSettings;
-	global $board_info, $board, $topic, $user_info, $smcFunc;
+	global $board_info, $board, $topic, $user_info, $pmxcFunc;
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
@@ -771,7 +771,7 @@ function loadBoard()
 		// Looking through the message table can be slow, so try using the cache first.
 		if (($topic = cache_get_data('msg_topic-' . $_REQUEST['msg'], 120)) === null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_topic
 				FROM {db_prefix}messages
 				WHERE id_msg = {int:id_msg}
@@ -782,10 +782,10 @@ function loadBoard()
 			);
 
 			// So did it find anything?
-			if ($smcFunc['db_num_rows']($request))
+			if ($pmxcFunc['db_num_rows']($request))
 			{
-				list ($topic) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				list ($topic) = $pmxcFunc['db_fetch_row']($request);
+				$pmxcFunc['db_free_result']($request);
 				// Save save save.
 				cache_put_data('msg_topic-' . $_REQUEST['msg'], $topic, 120);
 			}
@@ -826,7 +826,7 @@ function loadBoard()
 
 	if (empty($temp))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT
 				c.id_cat, b.name AS bname, b.description, b.num_topics, b.member_groups, b.deny_member_groups,
 				b.id_parent, c.name AS cname, COALESCE(mg.id_group, 0) AS id_moderator_group, mg.group_name,
@@ -844,13 +844,13 @@ function loadBoard()
 			WHERE b.id_board = {raw:board_link}',
 			array(
 				'current_topic' => $topic,
-				'board_link' => empty($topic) ? $smcFunc['db_quote']('{int:current_board}', array('current_board' => $board)) : 't.id_board',
+				'board_link' => empty($topic) ? $pmxcFunc['db_quote']('{int:current_board}', array('current_board' => $board)) : 't.id_board',
 			)
 		);
 		// If there aren't any, skip.
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if ($pmxcFunc['db_num_rows']($request) > 0)
 		{
-			$row = $smcFunc['db_fetch_assoc']($request);
+			$row = $pmxcFunc['db_fetch_assoc']($request);
 
 			// Set the current board.
 			if (!empty($row['id_board']))
@@ -906,18 +906,18 @@ function loadBoard()
 						'link' => '<a href="' . $scripturl . '?action=groups;sa=members;group=' . $row['id_moderator_group'] . '">' . $row['group_name'] . '</a>'
 					);
 			}
-			while ($row = $smcFunc['db_fetch_assoc']($request));
+			while ($row = $pmxcFunc['db_fetch_assoc']($request));
 
 			// If the board only contains unapproved posts and the user isn't an approver then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
 			if ($board_info['num_topics'] == 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
 			{
 				// Free the previous result
-				$smcFunc['db_free_result']($request);
+				$pmxcFunc['db_free_result']($request);
 
 				// @todo why is this using id_topic?
 				// @todo Can this get cached?
-				$request = $smcFunc['db_query']('', '
+				$request = $pmxcFunc['db_query']('', '
 					SELECT COUNT(id_topic)
 					FROM {db_prefix}topics
 					WHERE id_member_started={int:id_member}
@@ -930,7 +930,7 @@ function loadBoard()
 					)
 				);
 
-				list ($board_info['unapproved_user_topics']) = $smcFunc['db_fetch_row']($request);
+				list ($board_info['unapproved_user_topics']) = $pmxcFunc['db_fetch_row']($request);
 			}
 
 			if (!empty($modSettings['cache_enable']) && (empty($topic) || $modSettings['cache_enable'] >= 3))
@@ -952,7 +952,7 @@ function loadBoard()
 			$topic = null;
 			$board = 0;
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	if (!empty($topic))
@@ -1043,7 +1043,7 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings, $smcFunc, $sourcedir;
+	global $user_info, $board, $board_info, $modSettings, $pmxcFunc, $sourcedir;
 
 	if ($user_info['is_admin'])
 	{
@@ -1077,7 +1077,7 @@ function loadPermissions()
 	if (empty($user_info['permissions']))
 	{
 		// Get the general permissions.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
@@ -1088,14 +1088,14 @@ function loadPermissions()
 			)
 		);
 		$removals = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
 				$user_info['permissions'][] = $row['permission'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		if (isset($cache_groups))
 			cache_put_data('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
@@ -1108,7 +1108,7 @@ function loadPermissions()
 		if (!isset($board_info['profile']))
 			fatal_lang_error('no_board');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE (id_group IN ({array_int:member_groups})
@@ -1120,14 +1120,14 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) ? $modSettings['spider_group'] : 0,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
 				$user_info['permissions'][] = $row['permission'];
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Remove all the permissions they shouldn't have ;).
@@ -1171,7 +1171,7 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $smcFunc, $context;
+	global $user_profile, $modSettings, $board_info, $pmxcFunc, $context;
 	global $image_proxy_enabled, $image_proxy_secret, $boardurl;
 
 	// Can't just look for no users :P.
@@ -1243,7 +1243,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($users))
 	{
 		// Load the member's data.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})',
@@ -1253,7 +1253,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			)
 		);
 		$new_loaded_ids = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			// Take care of proxying avatar if required, do this here for maximum reach
 			if ($image_proxy_enabled && !empty($row['avatar']) && stripos($row['avatar'], 'http://') !== false)
@@ -1268,12 +1268,12 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			$row['options'] = array();
 			$user_profile[$row['id_member']] = $row;
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	if (!empty($new_loaded_ids) && $set !== 'minimal')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT *
 			FROM {db_prefix}themes
 			WHERE id_member IN ({array_int:loaded_ids})',
@@ -1281,9 +1281,9 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 				'loaded_ids' => $new_loaded_ids,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	$additional_mods = array();
@@ -1318,7 +1318,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	{
 		if (($row = cache_get_data('moderator_group_info', 480)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT group_name AS member_group, online_color AS member_group_color, icons
 				FROM {db_prefix}membergroups
 				WHERE id_group = {int:moderator_group}
@@ -1327,8 +1327,8 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 					'moderator_group' => 3,
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$row = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 
 			cache_put_data('moderator_group_info', $row, 480);
 		}
@@ -1360,7 +1360,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
-	global $context, $modSettings, $settings, $smcFunc;
+	global $context, $modSettings, $settings, $pmxcFunc;
 	static $dataLoaded = array();
 
 	// If this person's data is already loaded, skip it.
@@ -1437,17 +1437,17 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'posts' => $profile['posts'] > 500000 ? $txt['geek'] : comma_format($profile['posts']),
 			'last_login' => empty($profile['last_login']) ? $txt['never'] : timeformat($profile['last_login']),
 			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(0, $profile['last_login']),
-			'ip' => $smcFunc['htmlspecialchars']($profile['member_ip']),
-			'ip2' => $smcFunc['htmlspecialchars']($profile['member_ip2']),
+			'ip' => $pmxcFunc['htmlspecialchars']($profile['member_ip']),
+			'ip2' => $pmxcFunc['htmlspecialchars']($profile['member_ip2']),
 			'online' => array(
 				'is_online' => $profile['is_online'],
-				'text' => $smcFunc['htmlspecialchars']($txt[$profile['is_online'] ? 'online' : 'offline']),
-				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $smcFunc['htmlspecialchars']($profile['real_name'])),
+				'text' => $pmxcFunc['htmlspecialchars']($txt[$profile['is_online'] ? 'online' : 'offline']),
+				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $pmxcFunc['htmlspecialchars']($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' ', '-utf8' => ''))),
+			'language' => $pmxcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' ', '-utf8' => ''))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -1470,7 +1470,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		if (!empty($modSettings['gravatarOverride']) || (!empty($modSettings['gravatarEnabled']) && stristr($profile['avatar'], 'gravatar://')))
 		{
 			if (!empty($modSettings['gravatarAllowExtraEmail']) && stristr($profile['avatar'], 'gravatar://') && strlen($profile['avatar']) > 11)
-				$image = get_gravatar_url($smcFunc['substr']($profile['avatar'], 11));
+				$image = get_gravatar_url($pmxcFunc['substr']($profile['avatar'], 11));
 			else
 				$image = get_gravatar_url($profile['email_address']);
 		}
@@ -1501,7 +1501,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	{
 		$memberContext[$user]['custom_fields'] = array();
 		if (!isset($context['display_fields']))
-			$context['display_fields'] = smf_json_decode($modSettings['displayFields'], true);
+			$context['display_fields'] = pmx_json_decode($modSettings['displayFields'], true);
 
 		if(is_array($context['display_fields']))
 		{
@@ -1558,7 +1558,7 @@ function loadMemberContext($user, $display_custom_fields = false)
  */
 function loadMemberCustomFields($users, $params)
 {
-	global $smcFunc, $txt, $scripturl, $settings;
+	global $pmxcFunc, $txt, $scripturl, $settings;
 
 	// Do not waste my time...
 	if (empty($users) || empty($params))
@@ -1569,7 +1569,7 @@ function loadMemberCustomFields($users, $params)
 	$params = !is_array($params) ? array($params) : array_unique($params);
 	$return = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT c.id_field, c.col_name, c.field_name, c.field_desc, c.field_type, c.field_order, c.field_length, c.field_options, c.mask, show_reg,
 		c.show_display, c.show_profile, c.private, c.active, c.bbc, c.can_search, c.default_value, c.enclose, c.placement, t.variable, t.value, t.id_member
 		FROM {db_prefix}themes AS t
@@ -1583,7 +1583,7 @@ function loadMemberCustomFields($users, $params)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// BBC?
 		if (!empty($row['bbc']))
@@ -1619,7 +1619,7 @@ function loadMemberCustomFields($users, $params)
 		}
 	}
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return !empty($return) ? $return : false;
 }
@@ -1663,7 +1663,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 {
 	global $user_info, $user_settings, $board_info, $boarddir, $maintenance;
 	global $txt, $boardurl, $scripturl, $mbname, $modSettings;
-	global $context, $settings, $options, $sourcedir, $ssi_theme, $smcFunc, $language, $board, $image_proxy_enabled;
+	global $context, $settings, $options, $sourcedir, $ssi_theme, $pmxcFunc, $language, $board, $image_proxy_enabled;
 
 	// The theme was specified by parameter.
 	if (!empty($id_theme))
@@ -1724,7 +1724,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (empty($flag))
 	{
 		// Load variables from the current or default theme, global or this user's.
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT variable, value, id_member, id_theme
 			FROM {db_prefix}themes
 			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
@@ -1735,7 +1735,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			)
 		);
 		// Pick between $settings and $options depending on whose data it is.
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $pmxcFunc['db_fetch_assoc']($result))
 		{
 			// There are just things we shouldn't be able to change as members.
 			if ($row['id_member'] != 0 && in_array($row['variable'], array('actual_theme_url', 'actual_images_url', 'base_theme_dir', 'base_theme_url', 'default_images_url', 'default_theme_dir', 'default_theme_url', 'default_template', 'images_url', 'number_recent_posts', 'smiley_sets_default', 'theme_dir', 'theme_id', 'theme_layers', 'theme_templates', 'theme_url')))
@@ -1749,7 +1749,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != '1')
 				$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) == 'show_' ? $row['value'] == '1' : $row['value'];
 		}
-		$smcFunc['db_free_result']($result);
+		$pmxcFunc['db_free_result']($result);
 
 		if (!empty($themeData[-1]))
 			foreach ($themeData[-1] as $k => $v)
@@ -1791,7 +1791,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Check to see if we're forcing SSL
 	if (!empty($modSettings['force_ssl']) && $modSettings['force_ssl'] == 2 && empty($maintenance) &&
-		(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') && SMF != 'SSI')
+		(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') && PMX != 'SSI')
 		redirectexit(strtr($_SERVER['REQUEST_URL'], array('http://' => 'https://')));
 
 	// Check to see if they're accessing it from the wrong place.
@@ -1819,7 +1819,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		}
 
 		// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
-		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && SMF != 'SSI')
+		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && PMX != 'SSI')
 		{
 			// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
 			if (empty($_GET))
@@ -1932,9 +1932,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['session_var'] = isset($_SESSION['session_var']) ? $_SESSION['session_var'] : '';
 	$context['session_id'] = isset($_SESSION['session_value']) ? $_SESSION['session_value'] : '';
 	$context['forum_name'] = $mbname;
-	$context['forum_name_html_safe'] = $smcFunc['htmlspecialchars']($context['forum_name']);
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : $smcFunc['htmlspecialchars']($settings['header_logo_url']);
-	$context['current_action'] = isset($_REQUEST['action']) ? $smcFunc['htmlspecialchars']($_REQUEST['action']) : null;
+	$context['forum_name_html_safe'] = $pmxcFunc['htmlspecialchars']($context['forum_name']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : $pmxcFunc['htmlspecialchars']($settings['header_logo_url']);
+	$context['current_action'] = isset($_REQUEST['action']) ? $pmxcFunc['htmlspecialchars']($_REQUEST['action']) : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
 	if (isset($modSettings['load_average']))
@@ -2053,7 +2053,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
 
 	// And of course, let's load the default CSS file.
-	loadCSSFile('index.css', array('minimize' => true), 'smf_index');
+	loadCSSFile('index.css', array('minimize' => true), 'pmx_index');
 
 	// Here is my luvly Responsive CSS
 	if(!empty($modSettings['isMobile']))
@@ -2065,7 +2065,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	if ($context['right_to_left'])
-		loadCSSFile('rtl.css', array(), 'smf_rtl');
+		loadCSSFile('rtl.css', array(), 'pmx_rtl');
 
 	// We allow theme variants, because we're cool.
 	$context['theme_variant'] = '';
@@ -2088,9 +2088,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 		if (!empty($context['theme_variant']))
 		{
-			loadCSSFile('index' . $context['theme_variant'] . '.css', array(), 'smf_index' . $context['theme_variant']);
+			loadCSSFile('index' . $context['theme_variant'] . '.css', array(), 'pmx_index' . $context['theme_variant']);
 			if ($context['right_to_left'])
-				loadCSSFile('rtl' . $context['theme_variant'] . '.css', array(), 'smf_rtl' . $context['theme_variant']);
+				loadCSSFile('rtl' . $context['theme_variant'] . '.css', array(), 'pmx_rtl' . $context['theme_variant']);
 		}
 	}
 
@@ -2106,16 +2106,16 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Default JS variables for use in every theme
 	$context['javascript_vars'] = array(
-		'smf_theme_url' => '"' . $settings['theme_url'] . '"',
-		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'smf_images_url' => '"' . $settings['images_url'] . '"',
-		'smf_smileys_url' => '"' . $modSettings['smileys_url'] . '"',
-		'smf_scripturl' => '"' . $scripturl . '"',
-		'smf_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
-		'smf_charset' => '"' . $context['character_set'] . '"',
-		'smf_session_id' => '"' . $context['session_id'] . '"',
-		'smf_session_var' => '"' . $context['session_var'] . '"',
-		'smf_member_id' => $context['user']['id'],
+		'pmx_theme_url' => '"' . $settings['theme_url'] . '"',
+		'pmx_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
+		'pmx_images_url' => '"' . $settings['images_url'] . '"',
+		'pmx_smileys_url' => '"' . $modSettings['smileys_url'] . '"',
+		'pmx_scripturl' => '"' . $scripturl . '"',
+		'pmx_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
+		'pmx_charset' => '"' . $context['character_set'] . '"',
+		'pmx_session_id' => '"' . $context['session_id'] . '"',
+		'pmx_session_var' => '"' . $context['session_var'] . '"',
+		'pmx_member_id' => $context['user']['id'],
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
 		'mobile_device' => !empty($modSettings['isMobile']) ? 'true' : 'false',
@@ -2123,29 +2123,29 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Add the JQuery library to the list of files to load.
 	if (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'cdn')
-		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js', array('external' => true), 'smf_jquery');
+		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js', array('external' => true), 'pmx_jquery');
 
 	elseif (isset($modSettings['jquery_source']) && $modSettings['jquery_source'] == 'local')
-		loadJavascriptFile('jquery-2.2.4.min.js', array('seed' => false), 'smf_jquery');
+		loadJavascriptFile('jquery-2.2.4.min.js', array('seed' => false), 'pmx_jquery');
 
 	elseif (isset($modSettings['jquery_source'], $modSettings['jquery_custom']) && $modSettings['jquery_source'] == 'custom')
-		loadJavascriptFile($modSettings['jquery_custom'], array(), 'smf_jquery');
+		loadJavascriptFile($modSettings['jquery_custom'], array(), 'pmx_jquery');
 
 	// Auto loading? template_javascript() will take care of the local half of this.
 	else
-		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js', array('external' => true), 'smf_jquery');
+		loadJavascriptFile('https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js', array('external' => true), 'pmx_jquery');
 
 	// Queue our JQuery plugins!
-	loadJavascriptFile('smf_jquery_plugins.js', array('minimize' => true), 'smf_jquery_plugins');
+	loadJavascriptFile('jquery_plugins.js', array('minimize' => true), 'jquery_plugins');
 	if (!$user_info['is_guest'])
 	{
-		loadJavascriptFile('jquery.custom-scrollbar.js', array(), 'smf_jquery_scrollbar');
-		loadCSSFile('jquery.custom-scrollbar.css', array('force_current' => false, 'validate' => true), 'smf_scrollbar');
+		loadJavascriptFile('jquery.custom-scrollbar.js', array(), 'pmx_jquery_scrollbar');
+		loadCSSFile('jquery.custom-scrollbar.css', array('force_current' => false, 'validate' => true), 'pmx_scrollbar');
 	}
 
 	// script.js and theme.js, always required, so always add them! Makes index.template.php cleaner and all.
-	loadJavascriptFile('script.js', array('defer' => false, 'minimize' => true), 'smf_script');
-	loadJavascriptFile('theme.js', array('minimize' => true), 'smf_theme');
+	loadJavascriptFile('script.js', array('defer' => false, 'minimize' => true), 'pmx_script');
+	loadJavascriptFile('theme.js', array('minimize' => true), 'pmx_theme');
 
 	// load lightbox
 	$enableOnRequest = false;
@@ -2190,7 +2190,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			addInlineJavascript('
 		function smfAutoTask()
 		{
-			$.get(smf_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '");
+			$.get(pmx_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '");
 		}
 		window.setTimeout("smfAutoTask();", 1);');
 		}
@@ -2716,7 +2716,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
  */
 function getBoardParents($id_parent)
 {
-	global $scripturl, $smcFunc;
+	global $scripturl, $pmxcFunc;
 
 	// First check if we have this cached already.
 	if (($boards = cache_get_data('board_parents-' . $id_parent, 480)) === null)
@@ -2727,7 +2727,7 @@ function getBoardParents($id_parent)
 		// Loop while the parent is non-zero.
 		while ($id_parent != 0)
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $pmxcFunc['db_query']('', '
 				SELECT
 					b.id_parent, b.name, {int:board_parent} AS id_board, b.member_groups, b.deny_member_groups,
 					b.child_level, COALESCE(mem.id_member, 0) AS id_moderator, mem.real_name,
@@ -2743,9 +2743,9 @@ function getBoardParents($id_parent)
 				)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
-			if ($smcFunc['db_num_rows']($result) == 0)
+			if ($pmxcFunc['db_num_rows']($result) == 0)
 				fatal_lang_error('parent_not_found', 'critical');
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $pmxcFunc['db_fetch_assoc']($result))
 			{
 				if (!isset($boards[$row['id_board']]))
 				{
@@ -2784,7 +2784,7 @@ function getBoardParents($id_parent)
 						);
 					}
 			}
-			$smcFunc['db_free_result']($result);
+			$pmxcFunc['db_free_result']($result);
 		}
 
 		cache_put_data('board_parents-' . $original_parent, $boards, 480);
@@ -2803,13 +2803,13 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true, $favor_utf8 = true)
 {
-	global $context, $smcFunc, $settings, $modSettings;
+	global $context, $pmxcFunc, $settings, $modSettings;
 
 	// Either we don't use the cache, or its expired.
 	if (!$use_cache || ($context['languages'] = cache_get_data('known_languages' . ($favor_utf8 ? '' : '_all'), !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
 	{
 		// If we don't have our ucwords function defined yet, let's load the settings data.
-		if (empty($smcFunc['ucwords']))
+		if (empty($pmxcFunc['ucwords']))
 			reloadSettings();
 
 		// If we don't have our theme information yet, let's get it.
@@ -2844,7 +2844,7 @@ function getLanguages($use_cache = true, $favor_utf8 = true)
 					continue;
 
 				$context['languages'][$matches[1]] = array(
-					'name' => $smcFunc['ucwords'](strtr($matches[1], array('_' => ' '))),
+					'name' => $pmxcFunc['ucwords'](strtr($matches[1], array('_' => ' '))),
 					'selected' => false,
 					'filename' => $matches[1],
 					'location' => $language_dir . '/index.' . $matches[1] . '.php',
@@ -3148,19 +3148,19 @@ function loadDatabase()
 		$db_options['port'] = $db_port;
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
-	if (SMF == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+	if (PMX == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 	{
 		$options = array_merge($db_options, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true));
 
-		$db_connection = smf_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, $options);
+		$db_connection = pmx_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, $options);
 	}
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($db_connection))
 	{
-		$options = array_merge($db_options, array('persist' => $db_persist, 'dont_select_db' => SMF == 'SSI'));
+		$options = array_merge($db_options, array('persist' => $db_persist, 'dont_select_db' => PMX == 'SSI'));
 
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $options);
+		$db_connection = pmx_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $options);
 	}
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
@@ -3168,7 +3168,7 @@ function loadDatabase()
 		display_db_error();
 
 	// If in SSI mode fix up the prefix.
-	if (SMF == 'SSI')
+	if (PMX == 'SSI')
 		db_fix_prefix($db_prefix, $db_name);
 }
 
@@ -3249,7 +3249,7 @@ function cache_put_data($key, $value, $ttl = 120)
 		$st = microtime();
 	}
 
-	$key = md5($boardurl . filemtime($cachedir . '/' . 'index.php')) . '-SMF-' . strtr($key, ':/', '-_');
+	$key = md5($boardurl . filemtime($cachedir . '/' . 'index.php')) . '-PMX-' . strtr($key, ':/', '-_');
 	$value = $value === null ? null : json_encode($value);
 
 	switch ($cache_accelerator)
@@ -3273,15 +3273,15 @@ function cache_put_data($key, $value, $ttl = 120)
 			{
 				// An extended key is needed to counteract a bug in APC.
 				if ($value === null)
-					apc_delete($key . 'smf');
+					apc_delete($key . 'pmx');
 				else
-					apc_store($key . 'smf', $value, $ttl);
+					apc_store($key . 'pmx', $value, $ttl);
 			}
 			break;
 		case 'zend':
 			// Zend Platform/ZPS/etc.
 			if (function_exists('zend_shm_cache_store'))
-				zend_shm_cache_store('SMF::' . $key, $value, $ttl);
+				zend_shm_cache_store('PMX::' . $key, $value, $ttl);
 			elseif (function_exists('output_cache_put'))
 				output_cache_put($key, $value);
 			break;
@@ -3374,7 +3374,7 @@ function cache_get_data($key, $ttl = 120)
 		case 'zend':
 			// Zend's pricey stuff.
 			if (function_exists('zend_shm_cache_fetch'))
-				$value = zend_shm_cache_fetch('SMF::' . $key);
+				$value = zend_shm_cache_fetch('PMX::' . $key);
 			elseif (function_exists('output_cache_get'))
 				$value = output_cache_get($key, $ttl);
 			break;
@@ -3411,7 +3411,7 @@ function cache_get_data($key, $ttl = 120)
 	if (function_exists('call_integration_hook') && isset($value))
 		call_integration_hook('cache_get_data', array(&$key, &$ttl, &$value));
 
-	return empty($value) ? null : smf_json_decode($value, true);
+	return empty($value) ? null : pmx_json_decode($value, true);
 }
 
 /**
@@ -3480,7 +3480,7 @@ function get_memcached_server($level = 3)
  */
 function set_avatar_data($data = array())
 {
-	global $modSettings, $boardurl, $smcFunc, $image_proxy_enabled, $image_proxy_secret;
+	global $modSettings, $boardurl, $pmxcFunc, $image_proxy_enabled, $image_proxy_secret;
 
 	// Come on!
 	if (empty($data))
@@ -3493,7 +3493,7 @@ function set_avatar_data($data = array())
 	if (!empty($modSettings['gravatarOverride']))
 	{
 		if (!empty($modSettings['gravatarAllowExtraEmail']) && !empty($data['avatar']) && stristr($data['avatar'], 'gravatar://'))
-			$image = get_gravatar_url($smcFunc['substr']($data['avatar'], 11));
+			$image = get_gravatar_url($pmxcFunc['substr']($data['avatar'], 11));
 
 		else if (!empty($data['email']))
 			$image = get_gravatar_url($data['email']);
@@ -3512,7 +3512,7 @@ function set_avatar_data($data = array())
 					$image = get_gravatar_url($data['email']);
 
 				elseif (!empty($modSettings['gravatarAllowExtraEmail']))
-					$image = get_gravatar_url($smcFunc['substr']($data['avatar'], 11));
+					$image = get_gravatar_url($pmxcFunc['substr']($data['avatar'], 11));
 			}
 
 			// External url.

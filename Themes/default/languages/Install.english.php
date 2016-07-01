@@ -13,7 +13,7 @@ $txt['install_step_databasechange'] = 'Database Population';
 $txt['install_step_admin'] = 'Admin Account';
 $txt['install_step_delete'] = 'Finalize Install';
 
-$txt['smf_installer'] = 'PortaMx Forum Installer';
+$txt['pmx_installer'] = 'PortaMx Forum Installer';
 $txt['installer_language'] = 'Language';
 $txt['installer_language_set'] = 'Set';
 $txt['congratulations'] = 'Congratulations, the installation process is complete!';
@@ -22,7 +22,7 @@ $txt['still_writable'] = 'Your installation directory is still writable. It\'s a
 $txt['delete_installer'] = 'Click here to delete this install.php file now.';
 $txt['delete_installer_maybe'] = '<em>(doesn\'t work on all servers.)</em>';
 $txt['go_to_your_forum'] = 'Now you can see <a href="%1$s">your newly installed forum</a> and begin to use it. You should first make sure you are logged in, after which you will be able to access the administration center.';
-$txt['good_luck'] = 'Good luck!<br>Simple Machines';
+$txt['good_luck'] = 'Good luck!<br>PortaMx corp.';
 
 $txt['install_welcome'] = 'Welcome';
 $txt['install_welcome_desc'] = 'Welcome to PortaMx Forum. This script will guide you through the process for installing %1$s. We\'ll gather a few details about your forum over the next few steps, and after a couple of minutes your forum will be ready for use.';
@@ -32,18 +32,20 @@ $txt['user_refresh_install'] = 'Forum Refreshed';
 $txt['user_refresh_install_desc'] = 'While installing, the installer found that (with the details you provided) one or more of the tables this installer might create already existed.<br>Any missing tables in your installation have been recreated with the default data, but no data was deleted from existing tables.';
 
 $txt['default_topic_subject'] = 'Welcome to PortaMx Forum!';
-$txt['default_topic_message'] = 'Welcome to PortaMx Forum!<br><br>We hope you enjoy using your forum.&nbsp; If you have any problems, please feel free to [url=http://portamx.com]ask us for assistance[/url].<br><br>Thanks!<br>Simple Machines';
+$txt['default_topic_message'] = 'Welcome to PortaMx Forum!<br><br>We hope you enjoy using your forum.&nbsp; If you have any problems, please feel free to [url=http://portamx.com]ask us for assistance[/url].<br><br>Thanks!<br>PortaMx corp.';
 $txt['default_board_name'] = 'General Discussion';
 $txt['default_board_description'] = 'Feel free to talk about anything and everything in this board.';
 $txt['default_category_name'] = 'General Category';
 $txt['default_time_format'] = '%b %d, %Y, %I:%M %p';
 $txt['default_news'] = 'PortaMx Forum - Just Installed!';
 $txt['default_reserved_names'] = 'Admin\nWebmaster\nGuest\nroot';
-$txt['default_smileyset_name'] = 'Alienine\'s Set';
+$txt['default_smileyset_name'] = 'PortaMx Set';
+$txt['default_portamx_smileyset_name'] = 'PortaMx Set';
+$txt['default_alienine_smileyset_name'] = 'Alienine\'s Set';
 $txt['default_aaron_smileyset_name'] = 'Aaron\'s Set';
 $txt['default_akyhne_smileyset_name'] = 'Akyhne\'s Set';
 $txt['default_fugue_smileyset_name'] = 'Fugue\'s Set';
-$txt['default_theme_name'] = 'PortaMx Forum Default Theme - Curve2';
+$txt['default_theme_name'] = 'PortaMx Forum Default Theme';
 $txt['default_core_theme_name'] = 'Core Theme';
 $txt['default_classic_theme_name'] = 'Classic YaBB SE Theme';
 $txt['default_babylon_theme_name'] = 'Babylon Theme';

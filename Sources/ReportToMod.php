@@ -11,7 +11,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -24,7 +24,7 @@ if (!defined('SMF'))
  */
 function ReportToModerator()
 {
-	global $txt, $topic, $context, $smcFunc, $scripturl, $sourcedir;
+	global $txt, $topic, $context, $pmxcFunc, $scripturl, $sourcedir;
 
 	$context['robot_no_index'] = true;
 	$context['comment_body'] = '';
@@ -45,7 +45,7 @@ function ReportToModerator()
 		require_once($sourcedir . '/Subs-Post.php');
 
 		// Set up the preview message.
-		$context['preview_message'] = $smcFunc['htmlspecialchars']($_POST['comment'], ENT_QUOTES);
+		$context['preview_message'] = $pmxcFunc['htmlspecialchars']($_POST['comment'], ENT_QUOTES);
 		preparsecode($context['preview_message']);
 
 		// We censor for your protection...
@@ -76,7 +76,7 @@ function ReportToModerator()
 	if (isset($_REQUEST['msg']))
 	{
 		// Check the message's ID - don't want anyone reporting a post they can't even see!
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT m.id_msg, m.id_member, t.id_member_started
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
@@ -88,10 +88,10 @@ function ReportToModerator()
 				'id_msg' => $_REQUEST['msg'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($result) == 0)
+		if ($pmxcFunc['db_num_rows']($result) == 0)
 			fatal_lang_error('no_board', false);
-		list ($_REQUEST['msg'], $member, $starter) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		list ($_REQUEST['msg'], $member, $starter) = $pmxcFunc['db_fetch_row']($result);
+		$pmxcFunc['db_free_result']($result);
 
 
 		// This is here so that the user could, in theory, be redirected back to the topic.
@@ -104,7 +104,7 @@ function ReportToModerator()
 	else
 	{
 		// Check the user's ID
-		$result = $smcFunc['db_query']('', '
+		$result = $pmxcFunc['db_query']('', '
 			SELECT id_member, real_name, member_name
 			FROM {db_prefix}members
 			WHERE id_member = {int:current_user}',
@@ -113,9 +113,9 @@ function ReportToModerator()
 			)
 		);
 
-		if ($smcFunc['db_num_rows']($result) == 0)
+		if ($pmxcFunc['db_num_rows']($result) == 0)
 			fatal_lang_error('no_user', false);
-		list($_REQUEST['u'], $display_name, $username) = $smcFunc['db_fetch_row']($result);
+		list($_REQUEST['u'], $display_name, $username) = $pmxcFunc['db_fetch_row']($result);
 
 		$context['current_user'] = $_REQUEST['u'];
 		$context['submit_url'] = $scripturl . '?action=reporttm;u=' . $_REQUEST['u'];
@@ -163,7 +163,7 @@ function ReportToModerator()
  */
 function ReportToModerator2()
 {
-	global $txt, $sourcedir, $context, $smcFunc;
+	global $txt, $sourcedir, $context, $pmxcFunc;
 
 	// Sorry, no guests allowed... Probably just trying to spam us anyway
 	is_not_guest();
@@ -190,12 +190,12 @@ function ReportToModerator2()
 		$post_errors[] = 'session_timeout';
 
 	// Make sure we have a comment and it's clean.
-	if (!isset($_POST['comment']) || $smcFunc['htmltrim']($_POST['comment']) === '')
+	if (!isset($_POST['comment']) || $pmxcFunc['htmltrim']($_POST['comment']) === '')
 		$post_errors[] = 'no_comment';
 
-	$poster_comment = strtr($smcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\t" => ''));
+	$poster_comment = strtr($pmxcFunc['htmlspecialchars']($_POST['comment']), array("\r" => '', "\t" => ''));
 
-	if ($smcFunc['strlen']($poster_comment) > 254)
+	if ($pmxcFunc['strlen']($poster_comment) > 254)
 		$post_errors[] = 'post_too_long';
 
 	// Any errors?
@@ -229,12 +229,12 @@ function ReportToModerator2()
  */
 function reportPost($msg, $reason)
 {
-	global $context, $smcFunc, $user_info, $topic;
+	global $context, $pmxcFunc, $user_info, $topic;
 
 	// Get the basic topic information, and make sure they can see it.
 	$_POST['msg'] = (int) $msg;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)
@@ -246,16 +246,16 @@ function reportPost($msg, $reason)
 			'id_msg' => $_POST['msg'],
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('no_board', false);
-	$message = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$message = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
 	$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
 	$subject = un_htmlspecialchars($message['subject']);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_report, ignore_all
 		FROM {db_prefix}log_reported
 		WHERE id_msg = {int:id_msg}
@@ -267,10 +267,10 @@ function reportPost($msg, $reason)
 			'ignored' => 1,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
-		list ($id_report, $ignore) = $smcFunc['db_fetch_row']($request);
+	if ($pmxcFunc['db_num_rows']($request) != 0)
+		list ($id_report, $ignore) = $pmxcFunc['db_fetch_row']($request);
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// If we're just going to ignore these, then who gives a monkeys...
 	if (!empty($ignore))
@@ -278,7 +278,7 @@ function reportPost($msg, $reason)
 
 	// Already reported? My god, we could be dealing with a real rogue here...
 	if (!empty($id_report))
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}log_reported
 			SET num_reports = num_reports + 1, time_updated = {int:current_time}
 			WHERE id_report = {int:id_report}',
@@ -293,7 +293,7 @@ function reportPost($msg, $reason)
 		if (empty($message['real_name']))
 			$message['real_name'] = $message['poster_name'];
 
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}log_reported',
 			array(
 				'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
@@ -306,13 +306,13 @@ function reportPost($msg, $reason)
 			),
 			array('id_report')
 		);
-		$id_report = $smcFunc['db_insert_id']('{db_prefix}log_reported', 'id_report');
+		$id_report = $pmxcFunc['db_insert_id']('{db_prefix}log_reported', 'id_report');
 	}
 
 	// Now just add our report...
 	if ($id_report)
 	{
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}log_reported_comments',
 			array(
 				'id_report' => 'int', 'id_member' => 'int', 'membername' => 'string',
@@ -326,7 +326,7 @@ function reportPost($msg, $reason)
 		);
 
 		// And get ready to notify people.
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}background_tasks',
 			array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 			array('$sourcedir/tasks/MsgReport-Notify.php', 'MsgReport_Notify_Background', json_encode(array(
@@ -357,12 +357,12 @@ function reportPost($msg, $reason)
  */
 function reportUser($id_member, $reason)
 {
-	global $context, $smcFunc, $user_info;
+	global $context, $pmxcFunc, $user_info;
 
 	// Get the basic topic information, and make sure they can see it.
 	$_POST['u'] = (int) $id_member;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name, member_name
 		FROM {db_prefix}members
 		WHERE id_member = {int:id_member}',
@@ -370,15 +370,15 @@ function reportUser($id_member, $reason)
 			'id_member' => $_POST['u']
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($pmxcFunc['db_num_rows']($request) == 0)
 		fatal_lang_error('no_user', false);
-	$user = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$user = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$user_name = un_htmlspecialchars($user['real_name']) . ($user['real_name'] != $user['member_name'] ? ' (' . $user['member_name'] . ')' : '');
 	$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_report, ignore_all
 		FROM {db_prefix}log_reported
 		WHERE id_member = {int:id_member}
@@ -392,10 +392,10 @@ function reportUser($id_member, $reason)
 			'ignored' => 1,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) != 0)
-		list ($id_report, $ignore) = $smcFunc['db_fetch_row']($request);
+	if ($pmxcFunc['db_num_rows']($request) != 0)
+		list ($id_report, $ignore) = $pmxcFunc['db_fetch_row']($request);
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// If we're just going to ignore these, then who gives a monkeys...
 	if (!empty($ignore))
@@ -403,7 +403,7 @@ function reportUser($id_member, $reason)
 
 	// Already reported? My god, we could be dealing with a real rogue here...
 	if (!empty($id_report))
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}log_reported
 			SET num_reports = num_reports + 1, time_updated = {int:current_time}
 			WHERE id_report = {int:id_report}',
@@ -415,7 +415,7 @@ function reportUser($id_member, $reason)
 	// Otherwise, we shall make one!
 	else
 	{
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}log_reported',
 			array(
 				'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
@@ -428,13 +428,13 @@ function reportUser($id_member, $reason)
 			),
 			array('id_report')
 		);
-		$id_report = $smcFunc['db_insert_id']('{db_prefix}log_reported', 'id_report');
+		$id_report = $pmxcFunc['db_insert_id']('{db_prefix}log_reported', 'id_report');
 	}
 
 	// Now just add our report...
 	if ($id_report)
 	{
-		$smcFunc['db_insert']('',
+		$pmxcFunc['db_insert']('',
 			'{db_prefix}log_reported_comments',
 			array(
 				'id_report' => 'int', 'id_member' => 'int', 'membername' => 'string',
@@ -448,7 +448,7 @@ function reportUser($id_member, $reason)
 		);
 
 		// And get ready to notify people.
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}background_tasks',
 			array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 			array('$sourcedir/tasks/MemberReport-Notify.php', 'MemberReport_Notify_Background', json_encode(array(

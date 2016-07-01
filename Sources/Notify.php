@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -27,7 +27,7 @@ if (!defined('SMF'))
  */
 function BoardNotify()
 {
-	global $board, $user_info, $context, $smcFunc, $sourcedir;
+	global $board, $user_info, $context, $pmxcFunc, $sourcedir;
 
 	// Permissions are an important part of anything ;).
 	is_not_guest();
@@ -49,14 +49,14 @@ function BoardNotify()
 
 		if ($mode > 1)
 			// Turn notification on.  (note this just blows smoke if it's already on.)
-			$smcFunc['db_insert']('ignore',
+			$pmxcFunc['db_insert']('ignore',
 				'{db_prefix}log_notify',
 				array('id_member' => 'int', 'id_board' => 'int'),
 				array($user_info['id'], $board),
 				array('id_member', 'id_board')
 			);
 		else
-			$smcFunc['db_query']('', '
+			$pmxcFunc['db_query']('', '
 				DELETE FROM {db_prefix}log_notify
 				WHERE id_member = {int:current_member}
 				AND id_board = {int:current_board}',
@@ -95,7 +95,7 @@ function BoardNotify()
  */
 function TopicNotify()
 {
-	global $smcFunc, $user_info, $topic, $sourcedir, $context;
+	global $pmxcFunc, $user_info, $topic, $sourcedir, $context;
 
 	// Let's do something only if the function is enabled
 	if (!$user_info['is_guest'])
@@ -110,7 +110,7 @@ function TopicNotify()
 			if (empty($mode))
 				$mode = 1;
 
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT id_member, id_topic, id_msg, unwatched
 				FROM {db_prefix}log_topics
 				WHERE id_member = {int:current_user}
@@ -120,8 +120,8 @@ function TopicNotify()
 					'current_topic' => $topic,
 				)
 			);
-			$log = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$log = $pmxcFunc['db_fetch_assoc']($request);
+			$pmxcFunc['db_free_result']($request);
 			if (empty($log))
 			{
 				$insert = true;
@@ -138,7 +138,7 @@ function TopicNotify()
 				$log['unwatched'] = empty($mode) ? 1 : 0;
 			}
 
-			$smcFunc['db_insert']($insert ? 'insert' : 'replace',
+			$pmxcFunc['db_insert']($insert ? 'insert' : 'replace',
 				'{db_prefix}log_topics',
 				array(
 					'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'unwatched' => 'int',
@@ -153,7 +153,7 @@ function TopicNotify()
 			if ($mode > 1)
 			{
 				// Turn notification on.  (note this just blows smoke if it's already on.)
-				$smcFunc['db_insert']('ignore',
+				$pmxcFunc['db_insert']('ignore',
 					'{db_prefix}log_notify',
 					array('id_member' => 'int', 'id_topic' => 'int'),
 					array($user_info['id'], $log['id_topic']),
@@ -161,7 +161,7 @@ function TopicNotify()
 				);
 			}
 			else
-				$smcFunc['db_query']('', '
+				$pmxcFunc['db_query']('', '
 					DELETE FROM {db_prefix}log_notify
 					WHERE id_topic = {int:topic}
 						AND id_member = {int:member}',

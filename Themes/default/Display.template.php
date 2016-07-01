@@ -296,8 +296,8 @@ function template_main()
 						sSelf: \'oInTopicModeration\',
 						sCheckboxContainerMask: \'in_topic_mod_check_\',
 						aMessageIds: [\'', implode('\', \'', $context['removableMessageIDs']), '\'],
-						sSessionId: smf_session_id,
-						sSessionVar: smf_session_var,
+						sSessionId: pmx_session_id,
+						sSessionVar: pmx_session_var,
 						sButtonStrip: \'moderationbuttons\',
 						sButtonStripDisplay: \'moderationbuttons_strip\',
 						bUseImageButton: false,
@@ -322,8 +322,8 @@ function template_main()
 						sSelf: \'oInTopicModerationMobile\',
 						sCheckboxContainerMask: \'in_topic_mod_check_\',
 						aMessageIds: [\'', implode('\', \'', $context['removableMessageIDs']), '\'],
-						sSessionId: smf_session_id,
-						sSessionVar: smf_session_var,
+						sSessionId: pmx_session_id,
+						sSessionVar: pmx_session_var,
 						sButtonStrip: \'moderationbuttons_mobile\',
 						sButtonStripDisplay: \'moderationbuttons_strip_mobile\',
 						bUseImageButton: false,
@@ -347,7 +347,7 @@ function template_main()
 					if (\'XMLHttpRequest\' in window)
 					{
 						var oQuickModify = new QuickModify({
-							sScriptUrl: smf_scripturl,
+							sScriptUrl: pmx_scripturl,
 							sClassName: \'quick_edit\',
 							bShowModify: ', $modSettings['show_modify'] ? 'true' : 'false', ',
 							iTopicId: ', $context['current_topic'], ',
@@ -388,12 +388,12 @@ function template_main()
 						aIconLists[aIconLists.length] = new IconList({
 							sBackReference: "aIconLists[" + aIconLists.length + "]",
 							sIconIdPrefix: "msg_icon_",
-							sScriptUrl: smf_scripturl,
+							sScriptUrl: pmx_scripturl,
 							bShowModify: ', !empty($modSettings['show_modify']) ? 'true' : 'false', ',
 							iBoardId: ', $context['current_board'], ',
 							iTopicId: ', $context['current_topic'], ',
-							sSessionId: smf_session_id,
-							sSessionVar: smf_session_var,
+							sSessionId: pmx_session_id,
+							sSessionVar: pmx_session_var,
 							sLabelIconList: "', $txt['message_icon'], '",
 							sBoxBackground: "transparent",
 							sBoxBackgroundHover: "#ffffff",
@@ -1006,9 +1006,9 @@ function template_quickreply()
 							function insertQuoteFast(messageid)
 							{
 								if (window.XMLHttpRequest)
-									getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), onDocReceived);
+									getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), onDocReceived);
 								else
-									reqWin(smf_prepareScriptUrl(smf_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), 240, 90);
+									reqWin(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), 240, 90);
 								return false;
 							}
 							function onDocReceived(XMLDoc)
@@ -1053,7 +1053,7 @@ function template_quickreply()
 	if (!empty($context['drafts_autosave']))
 		echo '
 			<script>
-				var oDraftAutoSave = new smf_DraftAutoSave({
+				var oDraftAutoSave = new pmx_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',', !empty($context['post_box_name']) ? '
@@ -1074,8 +1074,8 @@ function template_quickreply()
 						bDefaultCollapsed: false,
 						iTopicId: ', $context['current_topic'], ',
 						iStart: ', $context['start'], ',
-						sScriptUrl: smf_scripturl,
-						sImagesUrl: smf_images_url,
+						sScriptUrl: pmx_scripturl,
+						sImagesUrl: pmx_images_url,
 						sContainerId: "quickReplyOptions",
 						sImageId: "quickReplyExpand",
 						sClassCollapsed: "toggle_up",

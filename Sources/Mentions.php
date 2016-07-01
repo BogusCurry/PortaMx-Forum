@@ -31,9 +31,9 @@ class Mentions
 	 */
 	public static function getMentionsByContent($content_type, $content_id, array $members = array())
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT mem.id_member, mem.real_name, mem.email_address, mem.id_group, mem.id_post_group, mem.additional_groups,
 				mem.lngfile, ment.id_member AS id_mentioned_by, ment.real_name AS mentioned_by_name
 			FROM {db_prefix}mentions AS m
@@ -49,7 +49,7 @@ class Mentions
 			)
 		);
 		$members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$members[$row['id_member']] = array(
 				'id' => $row['id_member'],
 				'real_name' => $row['real_name'],
@@ -61,7 +61,7 @@ class Mentions
 				),
 				'lngfile' => $row['lngfile'],
 			);
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		return $members;
 	}
@@ -78,12 +78,12 @@ class Mentions
 	 */
 	public static function insertMentions($content_type, $content_id, array $members, $id_member)
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
 		call_integration_hook('mention_insert_' . $content_type, array($content_id, &$members));
 
 		foreach ($members as $member)
-			$smcFunc['db_insert']('ignore',
+			$pmxcFunc['db_insert']('ignore',
 				'{db_prefix}mentions',
 				array('content_id' => 'int', 'content_type' => 'string', 'id_member' => 'int', 'id_mentioned' => 'int', 'time' => 'int'),
 				array((int) $content_id, $content_type, $id_member, $member['id'], time()),
@@ -118,14 +118,14 @@ class Mentions
 	 */
 	public static function getMentionedMembers($body)
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
 		$possible_names = self::getPossibleMentions($body);
 
 		if (empty($possible_names) || !allowedTo('mention'))
 			return array();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member, real_name
 			FROM {db_prefix}members
 			WHERE real_name IN ({array_string:names})
@@ -137,7 +137,7 @@ class Mentions
 			)
 		);
 		$members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			if (stripos($body, static::$char . $row['real_name']) === false)
 				continue;
@@ -147,7 +147,7 @@ class Mentions
 				'real_name' => $row['real_name'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		return $members;
 	}

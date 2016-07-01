@@ -412,7 +412,7 @@ $.sceditor.plugins.bbcode.bbcode.set(
 				attribs += ' name="' + attrs.name + '"';
 
 			// Is this an image?
-			var contentUrl = smf_scripturl +'?action=dlattach;attach='+ content + ';type=preview;thumb';
+			var contentUrl = pmx_scripturl +'?action=dlattach;attach='+ content + ';type=preview;thumb';
 			contentIMG = new Image();
 			contentIMG.src = contentUrl;
 
@@ -422,7 +422,7 @@ $.sceditor.plugins.bbcode.bbcode.set(
 				if (typeof attrs.name !== "undefined")
 					name = ' name="' + attrs.name + '"';
 
-				return '<a href="' + smf_scripturl +'?action=dlattach;attach='+ content + ';type=preview;file"' + ' data-attachment="'+ content +'"'+name+'>'+ (typeof attrs.name !== "undefined" ? attrs.name : content) +'</a>';
+				return '<a href="' + pmx_scripturl +'?action=dlattach;attach='+ content + ';type=preview;file"' + ' data-attachment="'+ content +'"'+name+'>'+ (typeof attrs.name !== "undefined" ? attrs.name : content) +'</a>';
 			}
 
 			else{
@@ -594,7 +594,7 @@ $.sceditor.plugins.bbcode.bbcode.set(
 				if (key.substr(0, 4) == 'link' && attrs.hasOwnProperty(key) && attrs[key] != '')
 				{
 					var attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
-					link = attr_link.substr(0, 7) == 'http://' ? attr_link : smf_scripturl + '?' + attr_link;
+					link = attr_link.substr(0, 7) == 'http://' ? attr_link : pmx_scripturl + '?' + attr_link;
 				}
 			}
 

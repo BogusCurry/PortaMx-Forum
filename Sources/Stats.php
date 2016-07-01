@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -25,7 +25,7 @@ if (!defined('SMF'))
  */
 function DisplayStats()
 {
-	global $txt, $scripturl, $modSettings, $context, $smcFunc;
+	global $txt, $scripturl, $modSettings, $context, $pmxcFunc;
 
 	isAllowedTo('view_stats');
 	// Page disabled - redirect them out
@@ -74,7 +74,7 @@ function DisplayStats()
 
 	loadLanguage('Stats');
 	loadTemplate('Stats');
-	loadJavascriptFile('stats.js', array('default_theme' => true, 'defer' => false), 'smf_stats');
+	loadJavascriptFile('stats.js', array('default_theme' => true, 'defer' => false), 'pmx_stats');
 
 	// Build the link tree......
 	$context['linktree'][] = array(
@@ -86,7 +86,7 @@ function DisplayStats()
 	$context['show_member_list'] = allowedTo('view_mlist');
 
 	// Get averages...
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT
 			SUM(posts) AS posts, SUM(topics) AS topics, SUM(registers) AS registers,
 			SUM(most_on) AS most_on, MIN(date) AS date, SUM(hits) AS hits
@@ -94,8 +94,8 @@ function DisplayStats()
 		array(
 		)
 	);
-	$row = $smcFunc['db_fetch_assoc']($result);
-	$smcFunc['db_free_result']($result);
+	$row = $pmxcFunc['db_fetch_assoc']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// This would be the amount of time the forum has been up... in days...
 	$total_days_up = ceil((time() - strtotime($row['date'])) / (60 * 60 * 24));
@@ -109,17 +109,17 @@ function DisplayStats()
 	$context['num_hits'] = comma_format($row['hits'], 0);
 
 	// How many users are online now.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_online',
 		array(
 		)
 	);
-	list ($context['users_online']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($context['users_online']) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// Statistics such as number of boards, categories, etc.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}boards AS b
 		WHERE b.redirect = {string:blank_redirect}',
@@ -127,17 +127,17 @@ function DisplayStats()
 			'blank_redirect' => '',
 		)
 	);
-	list ($context['num_boards']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($context['num_boards']) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}categories AS c',
 		array(
 		)
 	);
-	list ($context['num_categories']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($context['num_categories']) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	// Format the numbers nicely.
 	$context['users_online'] = comma_format($context['users_online']);
@@ -159,7 +159,7 @@ function DisplayStats()
 	{
 		if (($context['gender'] = cache_get_data('stats_gender', 240)) == null)
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $pmxcFunc['db_query']('', '
 				SELECT COUNT(id_member) AS total_members, value AS gender
 				FROM {db_prefix}themes
 				WHERE variable = {string:gender_var}
@@ -169,11 +169,11 @@ function DisplayStats()
 				)
 			);
 			$context['gender'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $pmxcFunc['db_fetch_assoc']($result))
 			{
 				$context['gender'][$row['gender']] = $row['total_members'];
 			}
-			$smcFunc['db_free_result']($result);
+			$pmxcFunc['db_free_result']($result);
 
 			cache_put_data('stats_gender', $context['gender'], 240);
 		}
@@ -182,7 +182,7 @@ function DisplayStats()
 	$date = strftime('%Y-%m-%d', forum_time(false));
 
 	// Members online so far today.
-	$result = $smcFunc['db_query']('', '
+	$result = $pmxcFunc['db_query']('', '
 		SELECT most_on
 		FROM {db_prefix}log_activity
 		WHERE date = {date:today_date}
@@ -191,13 +191,13 @@ function DisplayStats()
 			'today_date' => $date,
 		)
 	);
-	list ($context['online_today']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($context['online_today']) = $pmxcFunc['db_fetch_row']($result);
+	$pmxcFunc['db_free_result']($result);
 
 	$context['online_today'] = comma_format((int) $context['online_today']);
 
 	// Poster top 10.
-	$members_result = $smcFunc['db_query']('', '
+	$members_result = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name, posts
 		FROM {db_prefix}members
 		WHERE posts > {int:no_posts}
@@ -209,7 +209,7 @@ function DisplayStats()
 	);
 	$context['stats_blocks']['posters'] = array();
 	$max_num_posts = 1;
-	while ($row_members = $smcFunc['db_fetch_assoc']($members_result))
+	while ($row_members = $pmxcFunc['db_fetch_assoc']($members_result))
 	{
 		$context['stats_blocks']['posters'][] = array(
 			'name' => $row_members['real_name'],
@@ -222,7 +222,7 @@ function DisplayStats()
 		if ($max_num_posts < $row_members['posts'])
 			$max_num_posts = $row_members['posts'];
 	}
-	$smcFunc['db_free_result']($members_result);
+	$pmxcFunc['db_free_result']($members_result);
 
 	foreach ($context['stats_blocks']['posters'] as $i => $poster)
 	{
@@ -231,7 +231,7 @@ function DisplayStats()
 	}
 
 	// Board top 10.
-	$boards_result = $smcFunc['db_query']('', '
+	$boards_result = $pmxcFunc['db_query']('', '
 		SELECT id_board, name, num_posts
 		FROM {db_prefix}boards AS b
 		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -246,7 +246,7 @@ function DisplayStats()
 	);
 	$context['stats_blocks']['boards'] = array();
 	$max_num_posts = 1;
-	while ($row_board = $smcFunc['db_fetch_assoc']($boards_result))
+	while ($row_board = $pmxcFunc['db_fetch_assoc']($boards_result))
 	{
 		$context['stats_blocks']['boards'][] = array(
 			'id' => $row_board['id_board'],
@@ -259,7 +259,7 @@ function DisplayStats()
 		if ($max_num_posts < $row_board['num_posts'])
 			$max_num_posts = $row_board['num_posts'];
 	}
-	$smcFunc['db_free_result']($boards_result);
+	$pmxcFunc['db_free_result']($boards_result);
 
 	foreach ($context['stats_blocks']['boards'] as $i => $board)
 	{
@@ -270,7 +270,7 @@ function DisplayStats()
 	// Are you on a larger forum?  If so, let's try to limit the number of topics we search through.
 	if ($modSettings['totalMessages'] > 100000)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_topic
 			FROM {db_prefix}topics
 			WHERE num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
@@ -283,15 +283,15 @@ function DisplayStats()
 			)
 		);
 		$topic_ids = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$topic_ids[] = $row['id_topic'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 		$topic_ids = array();
 
 	// Topic replies top 10.
-	$topic_reply_result = $smcFunc['db_query']('', '
+	$topic_reply_result = $pmxcFunc['db_query']('', '
 		SELECT m.subject, t.num_replies, t.id_board, t.id_topic, b.name
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -310,7 +310,7 @@ function DisplayStats()
 	);
 	$context['stats_blocks']['topics_replies'] = array();
 	$max_num_replies = 1;
-	while ($row_topic_reply = $smcFunc['db_fetch_assoc']($topic_reply_result))
+	while ($row_topic_reply = $pmxcFunc['db_fetch_assoc']($topic_reply_result))
 	{
 		censorText($row_topic_reply['subject']);
 
@@ -331,7 +331,7 @@ function DisplayStats()
 		if ($max_num_replies < $row_topic_reply['num_replies'])
 			$max_num_replies = $row_topic_reply['num_replies'];
 	}
-	$smcFunc['db_free_result']($topic_reply_result);
+	$pmxcFunc['db_free_result']($topic_reply_result);
 
 	foreach ($context['stats_blocks']['topics_replies'] as $i => $topic)
 	{
@@ -342,7 +342,7 @@ function DisplayStats()
 	// Large forums may need a bit more prodding...
 	if ($modSettings['totalMessages'] > 100000)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_topic
 			FROM {db_prefix}topics
 			WHERE num_views != {int:no_views}
@@ -353,15 +353,15 @@ function DisplayStats()
 			)
 		);
 		$topic_ids = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$topic_ids[] = $row['id_topic'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 		$topic_ids = array();
 
 	// Topic views top 10.
-	$topic_view_result = $smcFunc['db_query']('', '
+	$topic_view_result = $pmxcFunc['db_query']('', '
 		SELECT m.subject, t.num_views, t.id_board, t.id_topic, b.name
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -380,7 +380,7 @@ function DisplayStats()
 	);
 	$context['stats_blocks']['topics_views'] = array();
 	$max_num = 1;
-	while ($row_topic_views = $smcFunc['db_fetch_assoc']($topic_view_result))
+	while ($row_topic_views = $pmxcFunc['db_fetch_assoc']($topic_view_result))
 	{
 		censorText($row_topic_views['subject']);
 
@@ -401,7 +401,7 @@ function DisplayStats()
 		if ($max_num < $row_topic_views['num_views'])
 			$max_num = $row_topic_views['num_views'];
 	}
-	$smcFunc['db_free_result']($topic_view_result);
+	$pmxcFunc['db_free_result']($topic_view_result);
 
 	foreach ($context['stats_blocks']['topics_views'] as $i => $topic)
 	{
@@ -412,7 +412,7 @@ function DisplayStats()
 	// Try to cache this when possible, because it's a little unavoidably slow.
 	if (($members = cache_get_data('stats_top_starters', 360)) == null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member_started, COUNT(*) AS hits
 			FROM {db_prefix}topics' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			WHERE id_board != {int:recycle_board}' : '') . '
@@ -424,9 +424,9 @@ function DisplayStats()
 			)
 		);
 		$members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$members[$row['id_member_started']] = $row['hits'];
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		cache_put_data('stats_top_starters', $members, 360);
 	}
@@ -435,7 +435,7 @@ function DisplayStats()
 		$members = array(0 => 0);
 
 	// Topic poster top 10.
-	$members_result = $smcFunc['db_query']('', '
+	$members_result = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
@@ -446,7 +446,7 @@ function DisplayStats()
 	);
 	$context['stats_blocks']['starters'] = array();
 	$max_num = 1;
-	while ($row_members = $smcFunc['db_fetch_assoc']($members_result))
+	while ($row_members = $pmxcFunc['db_fetch_assoc']($members_result))
 	{
 		$i = array_search($row_members['id_member'], array_keys($members));
 		$context['stats_blocks']['starters'][$i] = array(
@@ -461,7 +461,7 @@ function DisplayStats()
 			$max_num = $members[$row_members['id_member']];
 	}
 	ksort($context['stats_blocks']['starters']);
-	$smcFunc['db_free_result']($members_result);
+	$pmxcFunc['db_free_result']($members_result);
 
 	foreach ($context['stats_blocks']['starters'] as $i => $topic)
 	{
@@ -471,7 +471,7 @@ function DisplayStats()
 
 	// Time online top 10.
 	$temp = cache_get_data('stats_total_time_members', 600);
-	$members_result = $smcFunc['db_query']('', '
+	$members_result = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name, total_time_logged_in
 		FROM {db_prefix}members' . (!empty($temp) ? '
 		WHERE id_member IN ({array_int:member_list_cached})' : '') . '
@@ -484,7 +484,7 @@ function DisplayStats()
 	$context['stats_blocks']['time_online'] = array();
 	$temp2 = array();
 	$max_time_online = 1;
-	while ($row_members = $smcFunc['db_fetch_assoc']($members_result))
+	while ($row_members = $pmxcFunc['db_fetch_assoc']($members_result))
 	{
 		$temp2[] = (int) $row_members['id_member'];
 		if (count($context['stats_blocks']['time_online']) >= 10)
@@ -514,7 +514,7 @@ function DisplayStats()
 		if ($max_time_online < $row_members['total_time_logged_in'])
 			$max_time_online = $row_members['total_time_logged_in'];
 	}
-	$smcFunc['db_free_result']($members_result);
+	$pmxcFunc['db_free_result']($members_result);
 
 	foreach ($context['stats_blocks']['time_online'] as $i => $member)
 		$context['stats_blocks']['time_online'][$i]['percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
@@ -529,7 +529,7 @@ function DisplayStats()
 		// Liked messages top 10.
 		$context['stats_blocks']['liked_messages'] = array();
 		$max_liked_message = 1;
-		$liked_messages = $smcFunc['db_query']('', '
+		$liked_messages = $pmxcFunc['db_query']('', '
 			SELECT m.id_msg, m.subject, m.likes, m.id_board, m.id_topic, t.approved
 			FROM {db_prefix}messages as m
 				INNER JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)
@@ -545,7 +545,7 @@ function DisplayStats()
 			)
 		);
 
-		while ($row_liked_message = $smcFunc['db_fetch_assoc']($liked_messages))
+		while ($row_liked_message = $pmxcFunc['db_fetch_assoc']($liked_messages))
 		{
 			censorText($row_liked_message['subject']);
 
@@ -560,7 +560,7 @@ function DisplayStats()
 			if ($max_liked_message < $row_liked_message['likes'])
 				$max_liked_message = $row_liked_message['likes'];
 		}
-		$smcFunc['db_free_result']($liked_messages);
+		$pmxcFunc['db_free_result']($liked_messages);
 
 		foreach ($context['stats_blocks']['liked_messages'] as $i => $liked_messages)
 			$context['stats_blocks']['liked_messages'][$i]['percent'] = round(($liked_messages['num'] * 100) / $max_liked_message);
@@ -568,7 +568,7 @@ function DisplayStats()
 		// Liked users top 10.
 		$context['stats_blocks']['liked_users'] = array();
 		$max_liked_users = 1;
-		$liked_users = $smcFunc['db_query']('', '
+		$liked_users = $pmxcFunc['db_query']('', '
 			SELECT m.id_member AS liked_user, COUNT(l.content_id) AS count, mem.real_name
 			FROM {db_prefix}user_likes AS l
 				INNER JOIN {db_prefix}messages AS m ON (l.content_id = m.id_msg)
@@ -584,7 +584,7 @@ function DisplayStats()
 			)
 		);
 
-		while ($row_liked_users = $smcFunc['db_fetch_assoc']($liked_users))
+		while ($row_liked_users = $pmxcFunc['db_fetch_assoc']($liked_users))
 		{
 			$context['stats_blocks']['liked_users'][] = array(
 				'id' => $row_liked_users['liked_user'],
@@ -598,14 +598,14 @@ function DisplayStats()
 				$max_liked_users = $row_liked_users['count'];
 		}
 
-		$smcFunc['db_free_result']($liked_users);
+		$pmxcFunc['db_free_result']($liked_users);
 
 		foreach ($context['stats_blocks']['liked_users'] as $i => $liked_users)
 			$context['stats_blocks']['liked_users'][$i]['percent'] = round(($liked_users['num'] * 100) / $max_liked_users);
 	}
 
 	// Activity by month.
-	$months_result = $smcFunc['db_query']('', '
+	$months_result = $pmxcFunc['db_query']('', '
 		SELECT
 			YEAR(date) AS stats_year, MONTH(date) AS stats_month, SUM(hits) AS hits, SUM(registers) AS registers, SUM(topics) AS topics, SUM(posts) AS posts, MAX(most_on) AS most_on, COUNT(*) AS num_days
 		FROM {db_prefix}log_activity
@@ -614,7 +614,7 @@ function DisplayStats()
 	);
 
 	$context['yearly'] = array();
-	while ($row_months = $smcFunc['db_fetch_assoc']($months_result))
+	while ($row_months = $pmxcFunc['db_fetch_assoc']($months_result))
 	{
 		$ID_MONTH = $row_months['stats_year'] . sprintf('%02d', $row_months['stats_month']);
 		$expanded = !empty($_SESSION['expanded_stats'][$row_months['stats_year']]) && in_array($row_months['stats_month'], $_SESSION['expanded_stats'][$row_months['stats_year']]);
@@ -712,17 +712,17 @@ function DisplayStats()
  */
 function getDailyStats($condition_string, $condition_parameters = array())
 {
-	global $context, $smcFunc;
+	global $context, $pmxcFunc;
 
 	// Activity by day.
-	$days_result = $smcFunc['db_query']('', '
+	$days_result = $pmxcFunc['db_query']('', '
 		SELECT YEAR(date) AS stats_year, MONTH(date) AS stats_month, DAYOFMONTH(date) AS stats_day, topics, posts, registers, most_on, hits
 		FROM {db_prefix}log_activity
 		WHERE ' . $condition_string . '
 		ORDER BY stats_day ASC',
 		$condition_parameters
 	);
-	while ($row_days = $smcFunc['db_fetch_assoc']($days_result))
+	while ($row_days = $pmxcFunc['db_fetch_assoc']($days_result))
 		$context['yearly'][$row_days['stats_year']]['months'][(int) $row_days['stats_month']]['days'][] = array(
 			'day' => sprintf('%02d', $row_days['stats_day']),
 			'month' => sprintf('%02d', $row_days['stats_month']),
@@ -733,7 +733,7 @@ function getDailyStats($condition_string, $condition_parameters = array())
 			'most_members_online' => comma_format($row_days['most_on']),
 			'hits' => comma_format($row_days['hits'])
 		);
-	$smcFunc['db_free_result']($days_result);
+	$pmxcFunc['db_free_result']($days_result);
 }
 
 /**
@@ -781,7 +781,7 @@ function SMStats()
 		'php_version' => $serverVersions['php']['version'],
 		'database_type' => strtolower($serverVersions['db_server']['title']),
 		'database_version' => $serverVersions['db_server']['version'],
-		'smf_version' => $forum_version,
+		'pmx_version' => $forum_version,
 		'smfd_version' => $modSettings['smfVersion'],
 	);
 

@@ -194,7 +194,7 @@ function template_maintain_members()
 
 			$("#membersPanel").slideToggle(300);
 
-			document.getElementById("membersIcon").src = smf_images_url + (membersSwap ? "/selected_open.png" : "/selected.png");
+			document.getElementById("membersIcon").src = pmx_images_url + (membersSwap ? "/selected_open.png" : "/selected.png");
 			setInnerHTML(document.getElementById("membersText"), membersSwap ? "', $txt['maintain_members_choose'], '" : "', $txt['maintain_members_all'], '");
 
 			for (var i = 0; i < membersForm.length; i++)
@@ -324,10 +324,10 @@ function template_maintain_members()
 	</div>
 
 	<script>
-		var oAttributeMemberSuggest = new smc_AutoSuggest({
+		var oAttributeMemberSuggest = new pmxc_AutoSuggest({
 			sSelf: \'oAttributeMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var,
 			sSuggestId: \'attributeMember\',
 			sControlId: \'to\',
 			sSearchType: \'member\',
@@ -360,7 +360,7 @@ function template_maintain_topics()
 				rotSwap = !rotSwap;
 
 				// Toggle icon
-				document.getElementById("rotIcon").src = smf_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
+				document.getElementById("rotIcon").src = pmx_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
 				setInnerHTML(document.getElementById("rotText"), rotSwap ? ', JavaScriptEscape($txt['maintain_old_choose']), ' : ', JavaScriptEscape($txt['maintain_old_all']), ');
 
 				// Toggle panel

@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -82,7 +82,7 @@ function ManagePostSettings()
  */
 function SetCensor()
 {
-	global $txt, $modSettings, $context, $smcFunc, $sourcedir;
+	global $txt, $modSettings, $context, $pmxcFunc, $sourcedir;
 
 	if (!empty($_POST['save_censor']))
 	{
@@ -139,7 +139,7 @@ function SetCensor()
 	if (isset($_POST['censortest']))
 	{
 		require_once($sourcedir . '/Subs-Post.php');
-		$censorText = $smcFunc['htmlspecialchars']($_POST['censortest'], ENT_QUOTES);
+		$censorText = $pmxcFunc['htmlspecialchars']($_POST['censortest'], ENT_QUOTES);
 		preparsecode($censorText);
 		$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));
 	}
@@ -158,7 +158,7 @@ function SetCensor()
 		if (trim(strtr($censor_vulgar[$i], '*', ' ')) == '')
 			continue;
 
-		$context['censored_words'][$smcFunc['htmlspecialchars'](trim($censor_vulgar[$i]))] = isset($censor_proper[$i]) ? $smcFunc['htmlspecialchars']($censor_proper[$i]) : '';
+		$context['censored_words'][$pmxcFunc['htmlspecialchars'](trim($censor_vulgar[$i]))] = isset($censor_proper[$i]) ? $pmxcFunc['htmlspecialchars']($censor_proper[$i]) : '';
 	}
 
 	call_integration_hook('integrate_censors');
@@ -183,7 +183,7 @@ function SetCensor()
  */
 function ModifyPostSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc, $db_type;
+	global $context, $txt, $modSettings, $scripturl, $sourcedir, $pmxcFunc, $db_type;
 
 	// Make an inline conditional a little shorter...
 	$can_spell_check = false;
@@ -245,7 +245,7 @@ function ModifyPostSettings($return_config = false)
 		{
 			db_extend('packages');
 
-			$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+			$colData = $pmxcFunc['db_list_columns']('{db_prefix}messages', true);
 			foreach ($colData as $column)
 				if ($column['name'] == 'body')
 					$body_type = $column['type'];
@@ -357,7 +357,7 @@ function ModifyTopicSettings($return_config = false)
  */
 function ModifyDraftSettings($return_config = false)
 {
-	global $context, $txt, $sourcedir, $scripturl, $smcFunc;
+	global $context, $txt, $sourcedir, $scripturl, $pmxcFunc;
 
 	// Here are all the draft settings, a bit lite for now, but we can add more :P
 	$config_vars = array(
@@ -390,7 +390,7 @@ function ModifyDraftSettings($return_config = false)
 		$_POST['drafts_autosave_frequency'] = !isset($_POST['drafts_autosave_frequency']) || $_POST['drafts_autosave_frequency'] < 30 ? 30 : $_POST['drafts_autosave_frequency'];
 
 		// Also disable the scheduled task if we're not using it.
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}scheduled_tasks
 			SET disabled = {int:disabled}
 			WHERE task = {string:task}',

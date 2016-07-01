@@ -13,7 +13,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -30,7 +30,7 @@ if (!defined('SMF'))
 
 function getBoardIndex($boardIndexOptions)
 {
-	global $smcFunc, $scripturl, $user_info, $modSettings, $txt;
+	global $pmxcFunc, $scripturl, $user_info, $modSettings, $txt;
 	global $settings, $options, $context, $sourcedir;
 
 	require_once($sourcedir . '/Subs-Boards.php');
@@ -43,7 +43,7 @@ function getBoardIndex($boardIndexOptions)
 		);
 
 	// Find all boards and categories, as well as related information.  This will be sorted by the natural order of boards and categories, which we control.
-	$result_boards = $smcFunc['db_query']('boardindex_fetch_boards', '
+	$result_boards = $pmxcFunc['db_query']('boardindex_fetch_boards', '
 		SELECT' . ($boardIndexOptions['include_categories'] ? '
 			c.id_cat, c.name AS cat_name, c.description AS cat_desc,' : '') . '
 			b.id_board, b.name AS board_name, b.description,
@@ -80,7 +80,7 @@ function getBoardIndex($boardIndexOptions)
 	$boards = array();
 
 	// Run through the categories and boards (or only boards)....
-	while ($row_board = $smcFunc['db_fetch_assoc']($result_boards))
+	while ($row_board = $pmxcFunc['db_fetch_assoc']($result_boards))
 	{
 		// Perhaps we are ignoring this board?
 		$ignoreThisBoard = in_array($row_board['id_board'], $user_info['ignoreboards']);
@@ -314,7 +314,7 @@ function getBoardIndex($boardIndexOptions)
 				'ref' => &$this_category[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'],
 			);
 	}
-	$smcFunc['db_free_result']($result_boards);
+	$pmxcFunc['db_free_result']($result_boards);
 
 	// Fetch the board's moderators and moderator groups
 	$boards = array_unique($boards);

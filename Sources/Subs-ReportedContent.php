@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -24,7 +24,7 @@ if (!defined('SMF'))
  */
 function updateReport($action, $value, $report_id)
 {
-	global $smcFunc, $user_info, $context;
+	global $pmxcFunc, $user_info, $context;
 
 	// Don't bother.
 	if (empty($action) || empty($report_id))
@@ -45,7 +45,7 @@ function updateReport($action, $value, $report_id)
 	}
 
 	// Update the report...
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}log_reported
 		SET  {raw:action} = {string:value}
 		'. (is_array($report_id) ? 'WHERE id_report IN ({array_int:id_report})' : 'WHERE id_report = {int:id_report}') .'
@@ -66,7 +66,7 @@ function updateReport($action, $value, $report_id)
 	if ($context['report_type'] == 'posts')
 	{
 		// Get the board, topic and message for this report
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_board, id_topic, id_msg, id_report
 			FROM {db_prefix}log_reported
 			WHERE id_report IN ({array_int:id_report})',
@@ -75,7 +75,7 @@ function updateReport($action, $value, $report_id)
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$extra[$row['id_report']] = array(
 				'report' => $row['id_report'],
 				'board' => $row['id_board'],
@@ -83,11 +83,11 @@ function updateReport($action, $value, $report_id)
 				'topic' => $row['id_topic'],
 			);
 
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_report, id_member, membername
 			FROM {db_prefix}log_reported
 			WHERE id_report IN ({array_int:id_report})',
@@ -96,13 +96,13 @@ function updateReport($action, $value, $report_id)
 			)
 		);
 
-		while($row = $smcFunc['db_fetch_assoc']($request))
+		while($row = $pmxcFunc['db_fetch_assoc']($request))
 			$extra[$row['id_report']] = array(
 				'report' => $row['id_report'],
 				'member' => $row['id_member'],
 			);
 
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Back to "ignore".
@@ -133,7 +133,7 @@ function updateReport($action, $value, $report_id)
  */
 function countReports($closed = 0)
 {
-	global $smcFunc, $user_info, $context;
+	global $pmxcFunc, $user_info, $context;
 
 	$total_reports = 0;
 
@@ -157,7 +157,7 @@ function countReports($closed = 0)
 	}
 
 	// How many entries are we viewing?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported AS lr
 		WHERE lr.closed = {int:view_closed}
@@ -166,8 +166,8 @@ function countReports($closed = 0)
 			'view_closed' => (int) $closed,
 		)
 	);
-	list ($total_reports) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_reports) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $total_reports;
 }
@@ -180,7 +180,7 @@ function countReports($closed = 0)
  */
 function getReports($closed = 0)
 {
-	global $smcFunc, $context, $user_info, $scripturl, $txt;
+	global $pmxcFunc, $context, $user_info, $scripturl, $txt;
 
 	// Lonely, standalone var.
 	$reports = array();
@@ -188,7 +188,7 @@ function getReports($closed = 0)
 	// By George, that means we are in a position to get the reports, golly good.
 	if ($context['report_type'] == 'members')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT lr.id_report, lr.id_member,
 				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
 				COALESCE(mem.real_name, lr.membername) AS user_name, COALESCE(mem.id_member, 0) AS id_user
@@ -207,7 +207,7 @@ function getReports($closed = 0)
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
 				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
 				COALESCE(mem.real_name, lr.membername) AS author_name, COALESCE(mem.id_member, 0) AS id_author
@@ -229,7 +229,7 @@ function getReports($closed = 0)
 	$report_ids = array();
 	$report_boards_ids = array();
 	$i = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$report_ids[] = $row['id_report'];
 		$reports[$row['id_report']] = array(
@@ -278,14 +278,14 @@ function getReports($closed = 0)
 		$reports[$row['id_report']] = array_merge($reports[$row['id_report']], $extraDetails);
 		$i++;
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Get the names of boards those topics are in. Slightly faster this way.
 	if (!empty($report_boards_ids))
 	{
 		$report_boards_ids = array_unique($report_boards_ids);
 		$board_names = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_board, name
 			FROM {db_prefix}boards
 			WHERE id_board IN ({array_int:boards})',
@@ -294,10 +294,10 @@ function getReports($closed = 0)
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$board_names[$row['id_board']] = $row['name'];
 
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		foreach ($reports as $id_report => $report)
 			if (!empty($board_names[$report['topic']['id_board']]))
@@ -307,7 +307,7 @@ function getReports($closed = 0)
 	// Now get all the people who reported it.
 	if (!empty($report_ids))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment,
 				COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lrc.membername) AS reporter
 			FROM {db_prefix}log_reported_comments AS lrc
@@ -317,7 +317,7 @@ function getReports($closed = 0)
 				'report_list' => $report_ids,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
 			$reports[$row['id_report']]['comments'][] = array(
 				'id' => $row['id_comment'],
@@ -331,7 +331,7 @@ function getReports($closed = 0)
 				),
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$pmxcFunc['db_free_result']($request);
 	}
 
 	// Get the boards where the current user can remove any message.
@@ -349,14 +349,14 @@ function getReports($closed = 0)
  */
 function recountOpenReports($type)
 {
-	global $user_info, $smcFunc;
+	global $user_info, $pmxcFunc;
 
 	if ($type == 'members')
 		$bq = '';
 	else
 		$bq = '	AND ' . $user_info['mod_cache']['bq'];
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported
 		WHERE closed = {int:not_closed}
@@ -369,8 +369,8 @@ function recountOpenReports($type)
 			'not_a_reported_post' => 0,
 		)
 	);
-	list ($open_reports) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($open_reports) = $pmxcFunc['db_fetch_row']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	$arr = ($type == 'members' ? 'member_reports' : 'reports');
 	$_SESSION['rc'] = array_merge(!empty($_SESSION['rc']) ? $_SESSION['rc'] : array(),
@@ -391,7 +391,7 @@ function recountOpenReports($type)
  */
 function getReportDetails($report_id)
 {
-	global $smcFunc, $user_info, $context;
+	global $pmxcFunc, $user_info, $context;
 
 	if (empty($report_id))
 		return false;
@@ -399,7 +399,7 @@ function getReportDetails($report_id)
 	// We don't need all this info if we're only getting user info
 	if ($context['report_type'] == 'members')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT lr.id_report, lr.id_member,
 					lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
 					COALESCE(mem.real_name, lr.membername) AS user_name, COALESCE(mem.id_member, 0) AS id_user
@@ -416,7 +416,7 @@ function getReportDetails($report_id)
 	else
 	{
 		// Get the report details, need this so we can limit access to a particular board.
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
 				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
 				COALESCE(mem.real_name, lr.membername) AS author_name, COALESCE(mem.id_member, 0) AS id_author
@@ -432,12 +432,12 @@ function getReportDetails($report_id)
 	}
 
 	// So did we find anything?
-	if (!$smcFunc['db_num_rows']($request))
+	if (!$pmxcFunc['db_num_rows']($request))
 		return false;
 
 	// Woohoo we found a report and they can see it!
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $pmxcFunc['db_fetch_assoc']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $row;
 }
@@ -450,7 +450,7 @@ function getReportDetails($report_id)
  */
 function getReportComments($report_id)
 {
-	global $smcFunc, $scripturl, $user_info, $txt;
+	global $pmxcFunc, $scripturl, $user_info, $txt;
 
 	if (empty($report_id))
 		return false;
@@ -461,7 +461,7 @@ function getReportComments($report_id)
 	);
 
 	// So what bad things do the reporters have to say about it?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment, lrc.member_ip,
 			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lrc.membername) AS reporter
 		FROM {db_prefix}log_reported_comments AS lrc
@@ -472,7 +472,7 @@ function getReportComments($report_id)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$report['comments'][] = array(
 			'id' => $row['id_comment'],
@@ -487,10 +487,10 @@ function getReportComments($report_id)
 			),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Hang about old chap, any comments from moderators on this one?
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT lc.id_comment, lc.id_notice, lc.log_time, lc.body,
 			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS moderator
 		FROM {db_prefix}log_comments AS lc
@@ -502,7 +502,7 @@ function getReportComments($report_id)
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$report['mod_comments'][] = array(
 			'id' => $row['id_comment'],
@@ -518,7 +518,7 @@ function getReportComments($report_id)
 		);
 	}
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	return $report;
 }
@@ -532,14 +532,14 @@ function getReportComments($report_id)
  */
 function getCommentModDetails($comment_id)
 {
-	global $smcFunc, $user_info;
+	global $pmxcFunc, $user_info;
 
 	$comment = array();
 
 	if (empty($comment_id))
 		return false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $pmxcFunc['db_query']('', '
 		SELECT id_comment, id_notice, log_time, body, id_member
 		FROM {db_prefix}log_comments
 		WHERE id_comment = {int:id_comment}
@@ -549,9 +549,9 @@ function getCommentModDetails($comment_id)
 		)
 	);
 
-	$comment = $smcFunc['db_fetch_assoc']($request);
+	$comment = $pmxcFunc['db_fetch_assoc']($request);
 
-	$smcFunc['db_free_result']($request);
+	$pmxcFunc['db_free_result']($request);
 
 	// Add the permission
 	if (!empty($comment))
@@ -569,14 +569,14 @@ function getCommentModDetails($comment_id)
  */
 function saveModComment($report_id, $data)
 {
-	global $smcFunc, $user_info, $context;
+	global $pmxcFunc, $user_info, $context;
 
 	if (empty($data))
 		return false;
 
 	$data = array_merge(array($user_info['id'], $user_info['name'], 'reportc', ''), $data);
 
-	$smcFunc['db_insert']('',
+	$pmxcFunc['db_insert']('',
 		'{db_prefix}log_comments',
 		array(
 			'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
@@ -585,7 +585,7 @@ function saveModComment($report_id, $data)
 		$data,
 		array('id_comment')
 	);
-	$last_comment = $smcFunc['db_insert_id']('{db_prefix}log_comments', 'id_comment');
+	$last_comment = $pmxcFunc['db_insert_id']('{db_prefix}log_comments', 'id_comment');
 
 	$report = getReportDetails($report_id);
 
@@ -619,7 +619,7 @@ function saveModComment($report_id, $data)
 
 	// And get ready to notify people.
 	if (!empty($report))
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}background_tasks',
 			array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 			array('$sourcedir/tasks/' . $prefix . 'ReportReply-Notify.php', $prefix . 'ReportReply_Notify_Background', json_encode($data), 0),
@@ -636,12 +636,12 @@ function saveModComment($report_id, $data)
  */
 function editModComment($comment_id, $edited_comment)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (empty($comment_id) || empty($edited_comment))
 		return false;
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		UPDATE {db_prefix}log_comments
 		SET  body = {string:body}
 		WHERE id_comment = {int:id_comment}',
@@ -660,12 +660,12 @@ function editModComment($comment_id, $edited_comment)
  */
 function deleteModComment($comment_id)
 {
-	global $smcFunc;
+	global $pmxcFunc;
 
 	if (empty($comment_id))
 		return false;
 
-	$smcFunc['db_query']('', '
+	$pmxcFunc['db_query']('', '
 		DELETE FROM {db_prefix}log_comments
 		WHERE id_comment = {int:comment_id}',
 		array(

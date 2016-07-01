@@ -118,7 +118,7 @@ function template_download_language()
 			<div class="righttext padding">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 				<input type="hidden" name="', $context['admin-dlang_token_var'], '" value="', $context['admin-dlang_token'], '">
-				<input type="submit" name="do_install" value="', $txt['add_language_smf_install'], '" class="button_submit">
+				<input type="submit" name="do_install" value="', $txt['add_language_pmx_install'], '" class="button_submit">
 			</div>
 		</form>
 	</div>';
@@ -333,30 +333,30 @@ function template_add_language()
 			<div class="windowbg2">
 				<fieldset>
 					<legend>', $txt['add_language_smf'], '</legend>
-					<label class="smalltext">', $txt['add_language_smf_browse'], '</label>
-					<input type="text" name="smf_add" size="40" value="', !empty($context['smf_search_term']) ? $context['smf_search_term'] : '', '" class="input_text">';
+					<label class="smalltext">', $txt['add_language_pmx_browse'], '</label>
+					<input type="text" name="pmx_add" size="40" value="', !empty($context['pmx_search_term']) ? $context['pmx_search_term'] : '', '" class="input_text">';
 
 	// Do we have some errors? Too bad.
-	if (!empty($context['smf_error']))
+	if (!empty($context['pmx_error']))
 	{
 		// Display a little error box.
 		echo '
-					<div><br><p class="errorbox">', $txt['add_language_error_' . $context['smf_error']], '</p></div>';
+					<div><br><p class="errorbox">', $txt['add_language_error_' . $context['pmx_error']], '</p></div>';
 	}
 
 	echo '
 				</fieldset>', isBrowser('is_ie') ? '<input type="text" name="ie_fix" style="display: none;" class="input_text"> ' : '', '
-				<input type="submit" name="smf_add_sub" value="', $txt['search'], '" class="button_submit">
+				<input type="submit" name="pmx_add_sub" value="', $txt['search'], '" class="button_submit">
 				<br>
 			</div>';
 
 	// Had some results?
-	if (!empty($context['smf_languages']['rows']))
+	if (!empty($context['pmx_languages']['rows']))
 	{
 		echo '
-			<div class="cat_bar"><h3 class="catbg">', $txt['add_language_found_title'], '</div><div class="information">', $txt['add_language_smf_found'], '</div>';
+			<div class="cat_bar"><h3 class="catbg">', $txt['add_language_found_title'], '</div><div class="information">', $txt['add_language_pmx_found'], '</div>';
 
-		template_show_list('smf_languages');
+		template_show_list('pmx_languages');
 	}
 
 	echo '

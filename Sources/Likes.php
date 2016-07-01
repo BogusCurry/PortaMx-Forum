@@ -12,7 +12,7 @@
  * @version 2.1 Beta 4
  */
 
-if (!defined('SMF'))
+if (!defined('PMX'))
 	die('No direct access...');
 
 /**
@@ -178,7 +178,7 @@ class Likes
 	 */
 	protected function check()
 	{
-		global $smcFunc, $modSettings;
+		global $pmxcFunc, $modSettings;
 
 		// This feature is currently disable.
 		if (empty($modSettings['enable_likes']))
@@ -198,7 +198,7 @@ class Likes
 			// So we're doing something off a like. We need to verify that it exists, and that the current user can see it.
 			// Fortunately for messages, this is quite easy to do - and we'll get the topic id while we're at it, because
 			// we need this later for other things.
-			$request = $smcFunc['db_query']('', '
+			$request = $pmxcFunc['db_query']('', '
 				SELECT m.id_topic, m.id_member
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
@@ -208,10 +208,10 @@ class Likes
 					'msg' => $this->_content,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) == 1)
-				list ($this->_idTopic, $topicOwner) = $smcFunc['db_fetch_row']($request);
+			if ($pmxcFunc['db_num_rows']($request) == 1)
+				list ($this->_idTopic, $topicOwner) = $pmxcFunc['db_fetch_row']($request);
 
-			$smcFunc['db_free_result']($request);
+			$pmxcFunc['db_free_result']($request);
 			if (empty($this->_idTopic))
 				return $this->_error = 'cannot_';
 
@@ -275,9 +275,9 @@ class Likes
 	 */
 	protected function delete()
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			DELETE FROM {db_prefix}user_likes
 			WHERE content_id = {int:like_content}
 				AND content_type = {string:like_type}
@@ -301,7 +301,7 @@ class Likes
 	 */
 	protected function insert()
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
 		// Any last minute changes? Temporarily turn the passed properties to normal vars to prevent unexpected behaviour with other methods using these properties.
 		$type = $this->_type;
@@ -311,7 +311,7 @@ class Likes
 		call_integration_hook('integrate_issue_like_before', array(&$type, &$content, &$user, &$time));
 
 		// Insert the like.
-		$smcFunc['db_insert']('insert',
+		$pmxcFunc['db_insert']('insert',
 			'{db_prefix}user_likes',
 			array('content_id' => 'int', 'content_type' => 'string-6', 'id_member' => 'int', 'like_time' => 'int'),
 			array($content, $type, $user['id'], $time),
@@ -321,7 +321,7 @@ class Likes
 		// Add a background task to process sending alerts.
 		// Mod author, you can add your own background task for your own custom like event using the "integrate_issue_like" hook or your callback, both are immediately called after this.
 		if ($this->_type == 'msg')
-			$smcFunc['db_insert']('insert',
+			$pmxcFunc['db_insert']('insert',
 				'{db_prefix}background_tasks',
 				array('task_file' => 'string', 'task_class' => 'string', 'task_data' => 'string', 'claimed_time' => 'int'),
 				array('$sourcedir/tasks/Likes-Notify.php', 'Likes_Notify_Background', json_encode(array(
@@ -346,9 +346,9 @@ class Likes
 	 */
 	protected function _count()
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT COUNT(id_member)
 			FROM {db_prefix}user_likes
 			WHERE content_id = {int:like_content}
@@ -358,8 +358,8 @@ class Likes
 				'like_type' => $this->_type,
 			)
 		);
-		list ($this->_numLikes) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($this->_numLikes) = $pmxcFunc['db_fetch_row']($request);
+		$pmxcFunc['db_free_result']($request);
 
 		// If you want to call this directly, fill out _data property too.
 		if ($this->_sa == __FUNCTION__)
@@ -373,14 +373,14 @@ class Likes
 	 */
 	protected function like()
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
 		// Safety first!
 		if (empty($this->_type) || empty($this->_content))
 			return $this->_error = 'cannot_';
 
 		// Do we already like this?
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT content_id, content_type, id_member
 			FROM {db_prefix}user_likes
 			WHERE content_id = {int:like_content}
@@ -392,8 +392,8 @@ class Likes
 				'id_member' => $this->_user['id'],
 			)
 		);
-		$this->_alreadyLiked = (bool) $smcFunc['db_num_rows']($request) != 0;
-		$smcFunc['db_free_result']($request);
+		$this->_alreadyLiked = (bool) $pmxcFunc['db_num_rows']($request) != 0;
+		$pmxcFunc['db_free_result']($request);
 
 		if ($this->_alreadyLiked)
 			$this->delete();
@@ -446,12 +446,12 @@ class Likes
 	 */
 	function msgIssueLike()
 	{
-		global $smcFunc;
+		global $pmxcFunc;
 
 		if ($this->_type !== 'msg')
 			return;
 
-		$smcFunc['db_query']('', '
+		$pmxcFunc['db_query']('', '
 			UPDATE {db_prefix}messages
 			SET likes = {int:num_likes}
 			WHERE id_msg = {int:id_msg}',
@@ -462,7 +462,7 @@ class Likes
 		);
 
 		// Note that we could just as easily have cleared the cache here, or set up the redirection address
-		// but if your liked content doesn't need to do anything other than have the record in smf_user_likes,
+		// but if your liked content doesn't need to do anything other than have the record in pmx_user_likes,
 		// there's no point in creating another function unnecessarily.
 	}
 
@@ -475,11 +475,11 @@ class Likes
 	 */
 	function view()
 	{
-		global $smcFunc, $txt, $context, $memberContext;
+		global $pmxcFunc, $txt, $context, $memberContext;
 
 		// Firstly, load what we need. We already know we can see this, so that's something.
 		$context['likers'] = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member, like_time
 			FROM {db_prefix}user_likes
 			WHERE content_id = {int:like_content}
@@ -490,7 +490,7 @@ class Likes
 				'like_type' => $this->_type,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$context['likers'][$row['id_member']] = array('timestamp' => $row['like_time']);
 
 		// Now to get member data, including avatars and so on.
