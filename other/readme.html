@@ -167,6 +167,14 @@
 				<p>If you want or need to install any languages other than English, download the corresponding versions from the download page, and upload them to the same directory you uploaded PortaMx Forum to.  This should put additional files in <tt>Themes/default/languages</tt> and, in most cases, <tt>Themes/default/images</tt>.</p>
 				<h3>Language files</h3>
 				<p>If you are using additional languages it will be useful to upload also the updated versions of the language files along with the upgrading packages. Doing so all updated text strings will appear correctly after the upgrade, and will allow the upgrade to run in your selected language.</p>
+				<h3>Install files</h3>
+				<p>Copy follow files from the folder <b>other/install</b> to your forum base directory.</p>
+				<ul><li>install.php
+				</li><li>settings.php</li></ul>
+				<p>if you have a MySql Database:</p>
+				<ul><li>install_2-1_mysql.sql</li></ul>
+				<p>if you have a Postgres Database:</p>
+				<ul><li>install_2-1_postgresql.sql</li></ul>
 			</div>
 			<div class="panel">
 				<h2 id="Set_File_Permissions">Set file permissions</h2>
@@ -218,8 +226,6 @@
 					<dd>Sessions can be stored in the database, or in files. Database sessions are more reliable, secure, and may work better on sites with multiple servers.</dd>
 					<dt>UTF-8 Character Set</dt>
 					<dd>UTF-8 character sets are useful for international forums, or forums that use languages other than English.</dd>
-					<dt>Allow Stat Collection</dt>
-					<dd>This option allows Simple Machines to collect statistics from your forum, anonymously, so the software can grow to meet the needs of its user base.</dd>
 				</dl>
 				<h3>Database server settings</h3>
 				<dl>
@@ -243,7 +249,7 @@
 				<h2 id="finishing">Finishing everything up</h2>
 				<p>Once all steps of the installation process have been completed, check the box to remove the install files from the server. If this does not work, they will need to be deleted via FTP. All installer files should be removed from the server once the installation process is complete, as they are a major security risk if left on a server unattended. Once PortaMx Forum is installed they are no longer needed.</p>
 				<p>Good luck!<br />
-				Simple Machines</p>
+				PortaMx corp.</p>
 			</div>
 		</div>
 		<input type="radio" name="install_upgrade" id="upgrade">
@@ -318,6 +324,20 @@
 				<p>All you need to do is upload all of the files in this package, excluding this file itself, to your server.  You should upload it to the same directory as your previous installation of PortaMx Forum or YaBB SE. If you are given the option to &quot;resume&quot; uploads, make sure you do not do that - you must upload all of the files.  You may wish to make sure that all of the files were uploaded, such as those in <tt>Themes/default/languages</tt>, because some FTP clients have been known to drop files.</p>
 				<h3>Language files</h3>
 				<p>If you are using additional languages it will be useful to upload also the updated versions of the language files along with the upgrading packages. Doing so all updated text strings will appear correctly after the upgrade, and will allow the upgrade to run in your selected language.</p>
+				<h3>Upgrade files</h3>
+				<p>Copy follow files in from folder <b>other/upgrade</b> to you forum base directory.</p>
+				<ul><li>upgrade.php</li></ul>
+					<p>if you have a MySql Database:</p>
+					<ul>
+						<li>upgrade_2-0_mysql.sql</li>
+						<li>upgrade_2-1_mysql.sql</li>
+					</ul>
+					<p>if you have a Postgres Database:</p>
+					<ul>
+						<li>upgrade_2-0_postgresql.sql</li>
+						<li>upgrade_2-1_postgresql.sql</li>
+					</ul>
+				</ul>
 			</div>
 			<div class="panel">
 				<h2 id="Set_File_Permissions">Set file permissions</h2>
@@ -333,12 +353,9 @@
 				</li><li>/Packages
 				</li><li>/Packages/installed.list
 				</li><li>/Smileys
+				</li><li>/Sources
 				</li><li>/Themes
-				</li><li>agreement.txt
-				</li><li>Settings.php
-				</li><li>Settings_bak.php
-				</li><li>upgrade.php
-				</li></ul>
+				</ul>
 				<p>If the permission on your files or folders does not make them writable, the PortaMx Forum upgrader will report the problem. In that case, use your FTP client or host panel to reset the permissions for the files or folders the upgrader reports.</p>
 			</div>
 			<div class="panel">
@@ -358,16 +375,10 @@
 			<div class="panel">
 				<h2 id="finishing">Finishing the upgrade and cleaning up</h2>
 				<p>Once all parts of the upgrade have completed, check the box to remove the upgrade files from the server. If this does not work, they will need to be deleted via FTP. All upgrade files should be removed from the server once the upgrade process is complete. These files are upgrade.php and the .sql files whose name starts with 'upgrade'. They are a major security risk if they are left on a server unattended. Once PortaMx Forum has been upgraded, they are no longer needed.</p>
-				<p>Good luck!<br />
-				PortaMx</p>
+				<p><br>Good luck!<br>
+				PortaMx corp.</p>
 			</div>
 		</div>
-	</div>
-	<div id="footer">
-		<ul>
-			<li class="copyright"><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0; margin-bottom: 0.7em;" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.</li>
-			<li>PortaMx Forum</li>
-		</ul>
 	</div>
 </body>
 </html>
