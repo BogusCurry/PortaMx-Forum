@@ -3376,7 +3376,7 @@ function template_header()
 			// We are already checking so many files...just few more doesn't make any difference! :P
 			if (!empty($modSettings['currentAttachmentUploadDir']))
 			{
-				if (!is_array($modSettings['attachmentUploadDir']))
+				if (!is_array($modSettings['attachmentUploadDir']) && pmx_is_JSON($modSettings['attachmentUploadDir']))
 					$modSettings['attachmentUploadDir'] = pmx_json_decode($modSettings['attachmentUploadDir'], true);
 				$path = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 			}
@@ -5194,11 +5194,16 @@ function inet_ptod($ip_address)
  */
 function inet_dtop($bin)
 {
+	global $db_type;
+
 	if(empty($bin))
 		return '';
 
+	if ($db_type == 'postgresql')
+		return $bin;
+
 	$ip_address = @inet_ntop($bin);
-	if($ip_address === false)
+	if ($ip_address === false)
 		return '';
 
 	return $ip_address;
@@ -5511,6 +5516,15 @@ function pmx_chmod($file, $value = 0)
 	}
 
 	return $isWritable;
+}
+
+/**
+ * Test if the variable a valid json array
+ */
+function pmx_is_JSON($data)
+{
+	call_user_func_array('json_decode', func_get_args());
+	return (json_last_error() === JSON_ERROR_NONE);
 }
 
 /**
