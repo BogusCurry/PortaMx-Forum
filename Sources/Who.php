@@ -542,7 +542,7 @@ function determineActions($urls, $preferred_prefix = false)
  */
 function Credits($in_admin = false)
 {
-	global $context, $pmxcFunc, $forum_copyright, $forum_version, $software_year, $txt, $user_info;
+	global $context, $pmxcFunc, $pmxCacheFunc, $forum_copyright, $forum_version, $software_year, $txt, $user_info;
 
 	// Don't blink. Don't even blink. Blink and you're dead.
 	loadLanguage('Who');
@@ -600,7 +600,7 @@ function Credits($in_admin = false)
 
 	// Support for mods that use the <credits> tag via the package manager
 	$context['credits_modifications'] = array();
-	if (($mods = cache_get_data('mods_credits', 86400)) === null)
+	if (($mods = $pmxCacheFunc['get']('mods_credits')) === null)
 	{
 		$mods = array();
 		$request = $pmxcFunc['db_query']('substring', '
@@ -629,7 +629,7 @@ function Credits($in_admin = false)
 			$mod_name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
 			$mods[] = $mod_name . (!empty($license) ? ' | ' . $license  : '') . (!empty($copyright) ? ' | ' . $copyright  : '');
 		}
-		cache_put_data('mods_credits', $mods, 86400);
+		$pmxCacheFunc['put']('mods_credits', $mods, 86400);
 	}
 	$context['credits_modifications'] = $mods;
 

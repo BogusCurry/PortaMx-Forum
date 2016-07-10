@@ -29,7 +29,7 @@ function ModifyProfile($post_errors = array())
 {
 	global $txt, $scripturl, $user_info, $context, $sourcedir, $user_profile, $cur_profile;
 	global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
-	global $db_show_debug, $pmxcFunc;
+	global $db_show_debug, $pmxcFunc, $pmxCacheFunc;
 
 	// Don't reload this as we may have processed error strings.
 	if (empty($post_errors))
@@ -716,7 +716,7 @@ function ModifyProfile($post_errors = array())
 			$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : sprintf($txt['profile_updated_else'], $cur_profile['member_name']);
 
 			// Invalidate any cached data.
-			cache_put_data('member_data-profile-' . $memID, null, 0);
+			$pmxCacheFunc['put']('member_data-profile-' . $memID, null, 0);
 		}
 	}
 

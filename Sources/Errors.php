@@ -385,7 +385,7 @@ function display_maintenance_message()
  */
 function display_db_error()
 {
-	global $mbname, $modSettings, $maintenance;
+	global $mbname, $modSettings, $maintenance, $pmxCacheFunc;
 	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, $pmxcFunc, $sourcedir;
 
 	require_once($sourcedir . '/Logging.php');
@@ -394,14 +394,14 @@ function display_db_error()
 	// For our purposes, we're gonna want this on if at all possible.
 	$modSettings['cache_enable'] = '1';
 
-	if (($temp = cache_get_data('db_last_error', 600)) !== null)
+	if (($temp = $pmxCacheFunc['get']('db_last_error')) !== null)
 		$db_last_error = max($db_last_error, $temp);
 
 	if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 	{
 		// Avoid writing to the Settings.php file if at all possible; use shared memory instead.
-		cache_put_data('db_last_error', time(), 600);
-		if (($temp = cache_get_data('db_last_error', 600)) === null)
+		$pmxCacheFunc['put']('db_last_error', time(), 600);
+		if (($temp = $pmxCacheFunc['get']('db_last_error')) === null)
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.

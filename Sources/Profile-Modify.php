@@ -952,7 +952,7 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
  */
 function makeThemeChanges($memID, $id_theme)
 {
-	global $modSettings, $pmxcFunc, $context, $user_info;
+	global $modSettings, $pmxcFunc, $pmxCacheFunc, $context, $user_info;
 
 	$reservedVars = array(
 		'actual_theme_url',
@@ -1060,7 +1060,7 @@ function makeThemeChanges($memID, $id_theme)
 		// Admins can choose any theme, even if it's not enabled...
 		$themes = allowedTo('admin_forum') ? explode(',', $modSettings['knownThemes']) : explode(',', $modSettings['enableThemes']);
 		foreach ($themes as $t)
-			cache_put_data('theme_settings-' . $t . ':' . $memID, null, 60);
+			$pmxCacheFunc['put']('theme_settings-' . $t . '-' . $memID, null, 60);
 	}
 }
 

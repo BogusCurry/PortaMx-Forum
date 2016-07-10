@@ -13,6 +13,7 @@
 // Version information...
 define('SMF_VERSION', '2.1 Beta 4');
 define('SMF_LANG_VERSION', '2.1 Beta 4');
+define('PMX', 1);
 
 $GLOBALS['required_php_version'] = '5.3.8';
 $GLOBALS['required_mysql_version'] = '5.0.3';
@@ -48,12 +49,27 @@ $databases = array(
 $timeLimitThreshold = 3;
 $upgrade_path = dirname(__FILE__);
 $upgradeurl = $_SERVER['PHP_SELF'];
-// Where the SMF images etc are kept.
-$smfsite = 'http://portamx.com';
+$pmxforumsite = 'http://portamx.com';
 // Disable the need for admins to login?
 $disable_security = false;
 // How long, in seconds, must admin be inactive to allow someone else to run?
 $upcontext['inactive_timeout'] = 10;
+
+// Detect all available optimizers
+global $pmxCacheFunc;
+$cache_accelerator = '';
+if (function_exists('apc_store'))
+	$cache_accelerator = 'apc';
+else if (function_exists('output_cache_put') || function_exists('zend_shm_cache_store'))
+	$cache_accelerator = 'zend';
+else if (function_exists('memcache_set'))
+	$cache_accelerator = 'memcache';
+else
+{
+	$cachedir = $cachedir_temp;
+	$cache_accelerator = 'file';
+}
+$cache_enable = '1';
 
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
@@ -95,6 +111,7 @@ else
 
 // Load this now just because we can.
 require_once($upgrade_path . '/Settings.php');
+require_once($sourcedir .'/Subs-Cache.php');
 
 // Are we logged in?
 if (isset($upgradeData))
@@ -135,6 +152,7 @@ if (isset($_GET['ssi']))
 {
 	require_once($sourcedir . '/Errors.php');
 	require_once($sourcedir . '/Logging.php');
+	require_once($sourcedir . '/Subs-Cache.php');
 	require_once($sourcedir . '/Load.php');
 	require_once($sourcedir . '/Security.php');
 	require_once($sourcedir . '/Subs-Package.php');
@@ -176,32 +194,20 @@ if (!function_exists('text2words'))
 	}
 }
 
-if (!function_exists('clean_cache'))
+// clear the cache
+$pmxCacheFunc['clean']();
+global $cachedir, $sourcedir;
+if (is_dir($cachedir))
 {
-	// Empty out the cache folder.
-	function clean_cache($type = '')
+	$dh = opendir($cachedir);
+	while ($file = readdir($dh))
 	{
-		global $cachedir, $sourcedir;
-
-		// No directory = no game.
-		if (!is_dir($cachedir))
-			return;
-
-		// Remove the files in SMF's own disk cache, if any
-		$dh = opendir($cachedir);
-		while ($file = readdir($dh))
-		{
-			if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
-				@unlink($cachedir . '/' . $file);
-		}
-		closedir($dh);
-
-		// Invalidate cache, to be sure!
-		// ... as long as index.php can be modified, anyway.
-		@touch($cachedir . '/' . 'index.php');
-		clearstatcache();
+		if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
+			@unlink($cachedir . '/' . $file);
 	}
+	closedir($dh);
 }
+clearstatcache();
 
 // MD5 Encryption.
 if (!function_exists('md5_hmac'))
@@ -810,7 +816,6 @@ function loadEssentialData()
 		@set_magic_quotes_runtime(0);
 
 	error_reporting(E_ALL);
-	define('PMX', 1);
 
 	// Start the session.
 	if (@ini_get('session.save_handler') == 'user')
@@ -870,6 +875,7 @@ function loadEssentialData()
 	}
 
 	require_once($sourcedir . '/Subs.php');
+	require_once($sourcedir . '/Subs-Package.php');
 
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
 	if (file_exists($sourcedir . '/QueryString.php') && php_version_check())
@@ -952,21 +958,14 @@ function initialize_inputs()
 		@unlink(dirname(__FILE__) . '/Themes/default/Wireless.template.php');
 
 		// 2.0 Language files not in 2.1+
-		@unlink(dirname(__FILE__) . '/Themes/default/languages/'. glob('Wireless.*.php'));
+		foreach (glob(dirname(__FILE__) . '/Themes/default/languages/Wireless.*') as $filename)
+			@unlink($filename); 
 
 		header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
 		exit;
 	}
 
-	// Anybody home?
-	if (!isset($_GET['xml']))
-	{
-		$upcontext['remote_files_available'] = false;
-		$test = @fsockopen('www.simplemachines.org', 80, $errno, $errstr, 1);
-		if ($test)
-			$upcontext['remote_files_available'] = true;
-		@fclose($test);
-	}
+	$upcontext['remote_files_available'] = false;
 
 	// Something is causing this to happen, and it's annoying.  Stop it.
 	$temp = 'upgrade_php?step';
@@ -987,6 +986,7 @@ function WelcomeLogin()
 {
 	global $boarddir, $sourcedir, $modSettings, $cachedir, $upgradeurl, $upcontext;
 	global $pmxcFunc, $db_type, $databases, $txt, $boardurl;
+	global $pmxCacheFunc, $cache_enable, $cachedir, $cache_accelerator;
 
 	$upcontext['sub_template'] = 'welcome_message';
 
@@ -1001,10 +1001,6 @@ function WelcomeLogin()
 	// Need legacy scripts?
 	if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < 2.1)
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_2-0_' . $type . '.sql');
-	if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < 2.0)
-		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-1.sql');
-	if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] < 1.1)
-		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	// This needs to exist!
 	if (!file_exists($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php'))
@@ -1055,6 +1051,13 @@ function WelcomeLogin()
 		$modSettings['theme_dir'] . '/scripts/minified_deferred.js',
 	);
 
+	// Check the cache directory.
+	$cachedir_temp = empty($cachedir) ? $boarddir . '/cache' : $cachedir;
+	if (!file_exists($cachedir_temp))
+		@mkdir($cachedir_temp);
+	if (!file_exists($cachedir_temp))
+		return throw_error('The cache directory could not be found.<br><br>Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
+
 	// Do we need to add this setting?
 	$need_settings_update = empty($modSettings['custom_avatar_dir']);
 
@@ -1069,20 +1072,12 @@ function WelcomeLogin()
 		return throw_error(sprintf('The directory: %1$s has to be writable to continue the upgrade. Please make sure permissions are correctly set to allow this.', $custom_av_dir));
 	elseif ($need_settings_update)
 	{
-		if (!function_exists('cache_put_data'))
-			require_once($sourcedir . '/Load.php');
+		require_once($sourcedir . '/Load.php');
 		updateSettings(array('custom_avatar_dir' => $custom_av_dir));
 		updateSettings(array('custom_avatar_url' => $custom_av_url));
 	}
 
 	require_once($sourcedir . '/Security.php');
-
-	// Check the cache directory.
-	$cachedir_temp = empty($cachedir) ? $boarddir . '/cache' : $cachedir;
-	if (!file_exists($cachedir_temp))
-		@mkdir($cachedir_temp);
-	if (!file_exists($cachedir_temp))
-		return throw_error('The cache directory could not be found.<br><br>Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
 	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['smfVersion']) && !isset($_GET['lang']))
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br>SMF will not work without the primary language files installed.<br><br>Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
@@ -2067,7 +2062,7 @@ function CleanupMods()
 // Delete the damn thing!
 function DeleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $boarddir, $sourcedir, $forum_version, $user_info, $maintenance, $pmxcFunc, $db_type;
+	global $command_line, $language, $upcontext, $boarddir, $sourcedir, $forum_version, $user_info, $maintenance, $pmxcFunc, $pmxCacheFunc, $db_type;
 
 	// Now it's nice to have some of the basic SMF source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -2104,7 +2099,7 @@ function DeleteUpgrade()
 	changeSettings($changes);
 
 	// Clean any old cache files away.
-	clean_cache();
+	$pmxCacheFunc['clean']();
 
 	// Can we delete the file?
 	$upcontext['can_delete_script'] = is_writable(dirname(__FILE__)) || is_writable(__FILE__);
@@ -4082,7 +4077,7 @@ function convertUtf8()
 
 function serialize_to_json()
 {
-	global $command_line, $pmxcFunc, $modSettings, $sourcedir, $upcontext, $support_js, $is_debug;
+	global $command_line, $pmxcFunc, $pmxCacheFunc, $modSettings, $sourcedir, $upcontext, $support_js, $is_debug;
 
 	$upcontext['sub_template'] = isset($_GET['xml']) ? 'serialize_json_xml' : 'serialize_json';
 	// First thing's first - did we already do this?
@@ -4190,8 +4185,6 @@ function serialize_to_json()
 				}
 
 				// Update everything at once
-				if (!function_exists('cache_put_data'))
-					require_once($sourcedir . '/Load.php');
 				updateSettings($new_settings, true);
 
 				if ($command_line)

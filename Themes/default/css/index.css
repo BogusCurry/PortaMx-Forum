@@ -51,8 +51,7 @@ textarea, textarea.editor {
 #quick_edit_body_container textarea,
 .move_topic textarea,
 dd textarea {
-	width: 100%;
-	min-height: 100px;
+	width: 99.5%;
 }
 /* Apply the font only to these elements. */
 input, button, select {
@@ -1253,7 +1252,7 @@ ul li.greeting {
 }
 
 #footerfix{
-	padding-bottom: 75px;
+	padding-bottom: 90px;
 }
 /* the posting icons */
 #postbuttons_upper ul li a span {
@@ -2859,6 +2858,7 @@ h3 .collapse {
 	border: 1px solid #DDD;
 	margin-bottom: 3px;
 	margin-top: -1px;
+	border-radius: 0 0 6px 6px;
 }
 /* Child boards */
 .children {

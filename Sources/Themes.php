@@ -42,7 +42,7 @@ if (!defined('PMX'))
  */
 function ThemesMain()
 {
-	global $txt, $context, $sourcedir;
+	global $txt, $context, $sourcedir, $pmxCacheFunc;
 
 	// Load the important language files...
 	loadLanguage('Themes');
@@ -99,7 +99,7 @@ function ThemesMain()
 	call_integration_hook('integrate_manage_themes', array(&$subActions));
 
 	// Whatever you decide to do, clean the minify cache.
-	cache_put_data('minimized_css', null);
+	$pmxCacheFunc['put']('minimized_css', null, 90);
 
 	// Follow the sa or just go to administration.
 	if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
@@ -121,7 +121,7 @@ function ThemesMain()
  */
 function ThemeAdmin()
 {
-	global $context, $boarddir;
+	global $context, $boarddir, $pmxCacheFunc;
 
 	// Are handling any settings?
 	if (isset($_POST['save']))
@@ -216,7 +216,7 @@ function ThemeList()
 				$setValues[] = array($id, 0, 'base_images_url', $_POST['reset_url'] . '/' . basename($theme['base_theme_dir']) . '/' . basename($theme['base_images_url']));
 			}
 
-			cache_put_data('theme_settings-' . $id, null, 90);
+			$pmxCacheFunc['put']('theme_settings-' . $id, null, 90);
 		}
 
 		if (!empty($setValues))
@@ -251,7 +251,7 @@ function ThemeList()
  */
 function SetThemeOptions()
 {
-	global $txt, $context, $settings, $modSettings, $pmxcFunc;
+	global $txt, $context, $settings, $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
@@ -386,8 +386,8 @@ function SetThemeOptions()
 			);
 		}
 
-		cache_put_data('theme_settings-' . $_GET['th'], null, 90);
-		cache_put_data('theme_settings-1', null, 90);
+		$pmxCacheFunc['put']('theme_settings-' . $_GET['th'], null, 90);
+		$pmxCacheFunc['put']('theme_settings-1', null, 90);
 
 		redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 	}
@@ -634,7 +634,7 @@ function SetThemeOptions()
  */
 function SetThemeSettings()
 {
-	global $txt, $context, $settings, $modSettings, $pmxcFunc;
+	global $txt, $context, $settings, $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	if (empty($_GET['th']) && empty($_GET['id']))
 		return ThemeAdmin();
@@ -735,8 +735,8 @@ function SetThemeSettings()
 			);
 		}
 
-		cache_put_data('theme_settings-' . $_GET['th'], null, 90);
-		cache_put_data('theme_settings-1', null, 90);
+		$pmxCacheFunc['put']('theme_settings-' . $_GET['th'], null, 90);
+		$pmxCacheFunc['put']('theme_settings-1', null, 90);
 
 		// Invalidate the cache.
 		updateSettings(array('settings_updated' => time()));
@@ -884,7 +884,7 @@ function EnableTheme()
  */
 function PickTheme()
 {
-	global $txt, $context, $modSettings, $user_info, $language, $pmxcFunc, $settings, $scripturl;
+	global $txt, $context, $modSettings, $user_info, $language, $pmxcFunc, $pmxCacheFunc, $settings, $scripturl;
 
 	loadLanguage('Profile');
 	loadTemplate('Themes');
@@ -933,7 +933,7 @@ function PickTheme()
 					array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
 					array('id_theme', 'id_member', 'variable')
 				);
-				cache_put_data('theme_settings-' . $_GET['th'] . ':' . $user_info['id'], null, 90);
+				$pmxCacheFunc['put']('theme_settings-' . $_GET['th'] . '-' . $user_info['id'], null, 90);
 
 				$_SESSION['id_variant'] = 0;
 			}
@@ -952,7 +952,7 @@ function PickTheme()
 			);
 
 			// Make it obvious that it's changed
-			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
+			$pmxCacheFunc['put']('theme_settings-' . $_GET['th'], null, 90);
 		}
 
 		// For everyone.
@@ -1000,7 +1000,7 @@ function PickTheme()
 					array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
 					array('id_theme', 'id_member', 'variable')
 				);
-				cache_put_data('theme_settings-' . $_GET['th'] . ':' . (int) $_REQUEST['u'], null, 90);
+				$pmxCacheFunc['put']('theme_settings-' . $_GET['th'] . '-' . (int) $_REQUEST['u'], null, 90);
 
 				if ($user_info['id'] == $_REQUEST['u'])
 					$_SESSION['id_variant'] = 0;
@@ -1573,7 +1573,7 @@ function WrapAction()
  */
 function SetJavaScript()
 {
-	global $settings, $user_info, $pmxcFunc, $options;
+	global $settings, $user_info, $pmxcFunc, $pmxCacheFunc, $options;
 
 	// Check the session id.
 	checkSession('get');
@@ -1614,7 +1614,7 @@ function SetJavaScript()
 	if (isset($_GET['th']) || isset($_GET['id']))
 	{
 		// Invalidate the current themes cache too.
-		cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
+		$pmxCacheFunc['put']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id'], null, 60);
 
 		$settings['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 	}
@@ -1639,7 +1639,7 @@ function SetJavaScript()
 		array('id_theme', 'id_member', 'variable')
 	);
 
-	cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
+	$pmxCacheFunc['put']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id'], null, 60);
 
 	// Don't output anything...
 	redirectexit($settings['images_url'] . '/blank.png');

@@ -767,7 +767,7 @@ function PackageInstallTest()
 function PackageInstall()
 {
 	global $boarddir, $txt, $context, $boardurl, $scripturl, $sourcedir, $packagesdir, $modSettings;
-	global $user_info, $pmxcFunc;
+	global $user_info, $pmxcFunc, $pmxCacheFunc;
 
 	// Make sure we don't install this mod twice.
 	checkSubmitOnce('check');
@@ -1222,7 +1222,7 @@ function PackageInstall()
 	logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => $pmxcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $pmxcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
 
 	// Just in case, let's clear the whole cache to avoid anything going up the swanny.
-	clean_cache();
+	$pmxCacheFunc['clean']();
 
 	// Restore file permissions?
 	create_chmod_control(array(), array(), true);

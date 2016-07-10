@@ -222,7 +222,7 @@ function eclCookieparts()
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $pmxcFunc;
+	global $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	switch ($type)
 	{
@@ -394,7 +394,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			if ($parameter2 !== null && !in_array('posts', $parameter2))
 				return;
 
-			$postgroups = cache_get_data('updateStats:postgroups', 360);
+			$postgroups = $pmxCacheFunc['get']('updateStats:postgroups');
 			if ($postgroups == null || $parameter1 == null)
 			{
 				// Fetch the postgroups!
@@ -414,7 +414,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				// Sort them this way because if it's done with MySQL it causes a filesort :(.
 				arsort($postgroups);
 
-				cache_put_data('updateStats:postgroups', $postgroups, 360);
+				$pmxCacheFunc['put']('updateStats:postgroups', $postgroups, 360);
 			}
 
 			// Oh great, they've screwed their post groups.
@@ -470,7 +470,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  */
 function updateMemberData($members, $data)
 {
-	global $modSettings, $user_info, $pmxcFunc;
+	global $modSettings, $user_info, $pmxcFunc, $pmxCacheFunc;
 
 	$parameters = array();
 	if (is_array($members))
@@ -598,11 +598,11 @@ function updateMemberData($members, $data)
 		{
 			if ($modSettings['cache_enable'] >= 3)
 			{
-				cache_put_data('member_data-profile-' . $member, null, 120);
-				cache_put_data('member_data-normal-' . $member, null, 120);
-				cache_put_data('member_data-minimal-' . $member, null, 120);
+				$pmxCacheFunc['put']('member_data-profile-' . $member, null, 120);
+				$pmxCacheFunc['put']('member_data-normal-' . $member, null, 120);
+				$pmxCacheFunc['put']('member_data-minimal-' . $member, null, 120);
 			}
-			cache_put_data('user_settings-' . $member, null, 60);
+			$pmxCacheFunc['put']('user_settings-' . $member, null, 60);
 		}
 	}
 }
@@ -623,7 +623,7 @@ function updateMemberData($members, $data)
  */
 function updateSettings($changeArray, $update = false)
 {
-	global $modSettings, $pmxcFunc;
+	global $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -667,7 +667,7 @@ function updateSettings($changeArray, $update = false)
 		}
 
 		// Clean out the cache and make sure the cobwebs are gone too.
-		cache_put_data('modSettings', null, 90);
+		$pmxCacheFunc['put']('modSettings', null, 90);
 
 		return;
 	}
@@ -698,7 +698,7 @@ function updateSettings($changeArray, $update = false)
 	);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	cache_put_data('modSettings', null, 90);
+	$pmxCacheFunc['put']('modSettings', null, 90);
 }
 
 /**
@@ -1099,7 +1099,7 @@ function permute($array)
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
 {
-	global $txt, $scripturl, $context, $modSettings, $user_info, $sourcedir;
+	global $txt, $scripturl, $context, $modSettings, $user_info, $pmxCacheFunc, $sourcedir;
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
 	static $disabled;
 
@@ -1935,7 +1935,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		// It's likely this will change if the message is modified.
 		$cache_key = 'parse:' . $cache_id . '-' . md5(md5($message) . '-' . $smileys . (empty($disabled) ? '' : implode(',', array_keys($disabled))) . json_encode($context['browser']) . $txt['lang_locale'] . $user_info['time_offset'] . $user_info['time_format']);
 
-		if (($temp = cache_get_data($cache_key, 240)) != null)
+		if (($temp = $pmxCacheFunc['get']($cache_key)) != null)
 			return $temp;
 
 		$cache_t = microtime();
@@ -2706,7 +2706,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 	// Cache the output if it took some time...
 	if (isset($cache_key, $cache_t) && array_sum(explode(' ', microtime())) - array_sum(explode(' ', $cache_t)) > 0.05)
-		cache_put_data($cache_key, $message, 240);
+		$pmxCacheFunc['put']($cache_key, $message, 240);
 
 	// If this was a force parse revert if needed.
 	if (!empty($parse_tags))
@@ -2747,7 +2747,7 @@ function sort_bbc_tags($a, $b)
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info, $context, $pmxcFunc;
+	global $modSettings, $txt, $user_info, $context, $pmxcFunc, $pmxCacheFunc;
 	static $smileyPregSearch = null, $smileyPregReplacements = array();
 
 	// No smiley set at all?!
@@ -2767,7 +2767,7 @@ function parsesmileys(&$message)
 		else
 		{
 			// Load the smileys in reverse order by length so they don't get parsed wrong.
-			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
+			if (($temp = $pmxCacheFunc['get']('parsing_smileys')) == null)
 			{
 				$result = $pmxcFunc['db_query']('', '
 					SELECT code, filename, description
@@ -2787,7 +2787,7 @@ function parsesmileys(&$message)
 				}
 				$pmxcFunc['db_free_result']($result);
 
-				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
+				$pmxCacheFunc['put']('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
 			}
 			else
 				list ($smileysfrom, $smileysto, $smileysdescs) = $temp;
@@ -3023,13 +3023,13 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
  */
 function url_image_size($url)
 {
-	global $sourcedir;
+	global $sourcedir, $pmxCacheFunc;
 
 	// Make sure it is a proper URL.
 	$url = str_replace(' ', '%20', $url);
 
 	// Can we pull this from the cache... please please?
-	if (($temp = cache_get_data('url_image_size-' . md5($url), 240)) !== null)
+	if (($temp = $pmxCacheFunc['get']('url_image_size-' . md5($url))) !== null)
 		return $temp;
 	$t = microtime();
 
@@ -3089,7 +3089,7 @@ function url_image_size($url)
 
 	// If this took a long time, we may never have to do it again, but then again we might...
 	if (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $t)) > 0.8)
-		cache_put_data('url_image_size-' . md5($url), $size, 240);
+		$pmxCacheFunc['put']('url_image_size-' . md5($url), $size, 240);
 
 	// Didn't work.
 	return $size;
@@ -3678,7 +3678,7 @@ function template_css()
  */
 function custMinify($data, $type, $do_deferred = false)
 {
-	global $sourcedir, $pmxcFunc, $settings, $txt, $context;
+	global $sourcedir, $pmxcFunc, $pmxCacheFunc, $settings, $txt, $context;
 
 	$types = array('css', 'js');
 	$type = !empty($type) && in_array($type, $types) ? $type : false;
@@ -3689,7 +3689,7 @@ function custMinify($data, $type, $do_deferred = false)
 		return false;
 
 	// Did we already did this?
-	$toCache = cache_get_data('minimized_'. $settings['theme_id'] .'_'. $type, 86400);
+	$toCache = $pmxCacheFunc['get']('minimized_'. $settings['theme_id'] .'_'. $type);
 
 	// Already done?
 	if (!empty($toCache))
@@ -3715,7 +3715,7 @@ function custMinify($data, $type, $do_deferred = false)
 	{
 		loadLanguage('Errors');
 		log_error(sprintf($txt['file_not_created'], $toCreate), 'general');
-		cache_put_data('minimized_'. $settings['theme_id'] .'_'. $type, null);
+		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null);
 
 		// The process failed so roll back to print each individual file.
 		return $data;
@@ -3750,14 +3750,14 @@ function custMinify($data, $type, $do_deferred = false)
 	{
 		loadLanguage('Errors');
 		log_error(sprintf($txt['file_not_created'], $toCreate), 'general');
-		cache_put_data('minimized_'. $settings['theme_id'] .'_'. $type, null);
+		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null);
 
 		// The process failed so roll back to print each individual file.
 		return $data;
 	}
 
 	// And create a long lived cache entry.
-	cache_put_data('minimized_'. $settings['theme_id'] .'_'. $type, $toCreate, 86400);
+	$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, $toCreate, 86400);
 
 	return true;
 }
@@ -3910,9 +3910,9 @@ function ip2range($fullip)
  */
 function host_from_ip($ip)
 {
-	global $modSettings;
+	global $modSettings, $pmxCacheFunc;
 
-	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null)
+	if (($host = $pmxCacheFunc['get']('hostlookup-' . $ip)) !== null)
 		return $host;
 	$t = microtime();
 
@@ -3951,7 +3951,7 @@ function host_from_ip($ip)
 
 	// It took a long time, so let's cache it!
 	if (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $t)) > 0.5)
-		cache_put_data('hostlookup-' . $ip, $host, 600);
+		$pmxCacheFunc['put']('hostlookup-' . $ip, $host, 600);
 
 	return $host;
 }
@@ -4034,97 +4034,6 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
 }
 
 /**
- * Empty out the cache in use as best it can
- *
- * It may only remove the files of a certain type (if the $type parameter is given)
- * Type can be user, data or left blank
- * 	- user clears out user data
- *  - data clears out system / opcode data
- *  - If no type is specified will perform a complete cache clearing
- * For cache engines that do not distinguish on types, a full cache flush will be done
- *
- * @param string $type The cache type ('memcached', 'apc', 'xcache', 'zend' or something else for SMF's file cache)
- */
-function clean_cache($type = '')
-{
-	global $cachedir, $sourcedir, $cache_accelerator, $modSettings, $memcached;
-
-	switch ($cache_accelerator)
-	{
-		case 'memcached':
-			if (function_exists('memcache_flush') || function_exists('memcached_flush') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
-			{
-				// Not connected yet?
-				if (empty($memcached))
-					get_memcached_server();
-				if (!$memcached)
-					return;
-
-				// clear it out
-				if (function_exists('memcache_flush'))
-					memcache_flush($memcached);
-				else
-					memcached_flush($memcached);
-			}
-			break;
-		case 'apc':
-			if (function_exists('apc_clear_cache'))
-			{
-				// if passed a type, clear that type out
-				if ($type === '' || $type === 'data')
-				{
-					apc_clear_cache('user');
-					apc_clear_cache('system');
-				}
-				elseif ($type === 'user')
-					apc_clear_cache('user');
-			}
-			break;
-		case 'zend':
-			if (function_exists('zend_shm_cache_clear'))
-				zend_shm_cache_clear('PMX');
-			break;
-		case 'xcache':
-			if (function_exists('xcache_clear_cache'))
-			{
-				//
-				if ($type === '')
-				{
-					xcache_clear_cache(XC_TYPE_VAR, 0);
-					xcache_clear_cache(XC_TYPE_PHP, 0);
-				}
-				if ($type === 'user')
-					xcache_clear_cache(XC_TYPE_VAR, 0);
-				if ($type === 'data')
-					xcache_clear_cache(XC_TYPE_PHP, 0);
-			}
-			break;
-		default:
-			// No directory = no game.
-			if (!is_dir($cachedir))
-				return;
-
-			// Remove the files in SMF's own disk cache, if any
-			$dh = opendir($cachedir);
-			while ($file = readdir($dh))
-			{
-				if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
-					@unlink($cachedir . '/' . $file);
-			}
-			closedir($dh);
-			break;
-	}
-
-	// Invalidate cache, to be sure!
-	// ... as long as index.php can be modified, anyway.
-	if (empty($type))
-		@touch($cachedir . '/' . 'index.php');
-
-	call_integration_hook('integrate_clean_cache');
-	clearstatcache();
-}
-
-/**
  * Sets up all of the top menu buttons
  * Saves them in the cache if it is available and on
  * Places the results in $context
@@ -4132,7 +4041,7 @@ function clean_cache($type = '')
  */
 function setupMenuContext()
 {
-	global $context, $modSettings, $user_info, $txt, $scripturl, $sourcedir, $settings;
+	global $context, $modSettings, $user_info, $txt, $scripturl, $sourcedir, $settings, $pmxCacheFunc;
 
 	// Set up the menu privileges.
 	$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : (!$user_info['is_guest'] && allowedTo('search_posts'));
@@ -4184,7 +4093,7 @@ function setupMenuContext()
 	}
 
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
-	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
+	if (($menu_buttons = $pmxCacheFunc['get']('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'])) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
 		$buttons = array(
 			'home' => array(
@@ -4376,7 +4285,7 @@ function setupMenuContext()
 			}
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+			$pmxCacheFunc['put']('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
 	}
 
 	$context['menu_buttons'] = $menu_buttons;
@@ -4820,7 +4729,7 @@ function load_file($string)
  */
 function prepareLikesContext($topic)
 {
-	global $user_info, $pmxcFunc;
+	global $user_info, $pmxcFunc, $pmxCacheFunc;
 
 	// Make sure we have something to work with.
 	if (empty($topic))
@@ -4832,7 +4741,7 @@ function prepareLikesContext($topic)
 	$cache_key = 'likes_topic_' . $topic . '_' . $user;
 	$ttl = 180;
 
-	if (($temp = cache_get_data($cache_key, $ttl)) === null)
+	if (($temp = $pmxCacheFunc['get']($cache_key)) === null)
 	{
 		$temp = array();
 		$request = $pmxcFunc['db_query']('', '
@@ -4850,7 +4759,7 @@ function prepareLikesContext($topic)
 		while ($row = $pmxcFunc['db_fetch_assoc']($request))
 			$temp[] = (int) $row['content_id'];
 
-		cache_put_data($cache_key, $temp, $ttl);
+		$pmxCacheFunc['put']($cache_key, $temp, $ttl);
 	}
 
 	return $temp;

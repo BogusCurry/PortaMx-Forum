@@ -3022,13 +3022,13 @@ if (empty($modSettings['installed_new_smiley_sets_20']))
 	// First, the entries.
 	upgrade_query("
 		UPDATE {$db_prefix}settings
-		SET value = CONCAT(value, ',aaron,akyhne,portamx')
+		SET value = CONCAT(value, ',fugue,portamx')
 		WHERE variable = 'smiley_sets_known'");
 
 	// Second, the names.
 	upgrade_query("
 		UPDATE {$db_prefix}settings
-		SET value = CONCAT(value, '\nAaron\nAkyhne\nPortaMx')
+		SET value = CONCAT(value, '\nFugue\'s Set\nPortaMx Set')
 		WHERE variable = 'smiley_sets_names'");
 
 	// This ain't running twice either.

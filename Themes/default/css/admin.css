@@ -136,6 +136,9 @@ body#chrome #quick_search form input {
 	width: 70%;
 	box-sizing: border-box;
 }
+#live_news > .windowbg, #supportVersionsTable > .windowbg {
+	border-radius: 0 0 6px 6px !important;
+}
 #supportVersionsTable {
 	width: 30%;
 	padding-left: 6px;

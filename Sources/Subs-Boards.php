@@ -450,7 +450,7 @@ function getMsgMemberID($messageID)
  */
 function modifyBoard($board_id, &$boardOptions)
 {
-	global $cat_tree, $boards, $pmxcFunc;
+	global $cat_tree, $boards, $pmxcFunc, $pmxCacheFunc;
 
 	// Get some basic information about all boards and categories.
 	getBoardTree();
@@ -794,7 +794,7 @@ function modifyBoard($board_id, &$boardOptions)
 	if (isset($boardOptions['move_to']))
 		reorderBoards();
 
-	clean_cache('data');
+	$pmxCacheFunc['clean']();
 
 	if (empty($boardOptions['dont_log']))
 		logAction('edit_board', array('board' => $board_id), 'admin');
@@ -811,7 +811,7 @@ function modifyBoard($board_id, &$boardOptions)
  */
 function createBoard($boardOptions)
 {
-	global $boards, $pmxcFunc;
+	global $boards, $pmxcFunc, $pmxCacheFunc;
 
 	// Trigger an error if one of the required values is not set.
 	if (!isset($boardOptions['board_name']) || trim($boardOptions['board_name']) == '' || !isset($boardOptions['move_to']) || !isset($boardOptions['target_category']))
@@ -890,7 +890,7 @@ function createBoard($boardOptions)
 	}
 
 	// Clean the data cache.
-	clean_cache('data');
+	$pmxCacheFunc['clean']();
 
 	// Created it.
 	logAction('add_board', array('board' => $board_id), 'admin');
@@ -913,7 +913,7 @@ function createBoard($boardOptions)
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
-	global $sourcedir, $boards, $pmxcFunc;
+	global $sourcedir, $boards, $pmxcFunc, $pmxCacheFunc;
 
 	// No boards to delete? Return!
 	if (empty($boards_to_remove))
@@ -1044,7 +1044,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 	updateSettings(array('settings_updated' => time()));
 
 	// Clean the cache as well.
-	clean_cache('data');
+	$pmxCacheFunc['clean']();
 
 	// Let's do some serious logging.
 	foreach ($boards_to_remove as $id_board)
@@ -1059,7 +1059,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
  */
 function reorderBoards()
 {
-	global $cat_tree, $boardList, $boards, $pmxcFunc;
+	global $cat_tree, $boardList, $boards, $pmxcFunc, $pmxCacheFunc;
 
 	getBoardTree();
 
@@ -1081,7 +1081,7 @@ function reorderBoards()
 	}
 
 	// Empty the board order cache
-	cache_put_data('board_order', null, -3600);
+	$pmxCacheFunc['put']('board_order', null, -3600);
 }
 
 /**
@@ -1135,7 +1135,7 @@ function fixChildren($parent, $newLevel, $newParent)
  */
 function getTreeOrder()
 {
-	global $pmxcFunc;
+	global $pmxcFunc, $pmxCacheFunc;
 
 	static $tree_order = array(
 		'cats' => array(),
@@ -1145,7 +1145,7 @@ function getTreeOrder()
 	if (!empty($tree_order['boards']))
 		return $tree_order;
 
-	if (($cached = cache_get_data('board_order', 86400)) !== null)
+	if (($cached = $pmxCacheFunc['get']('board_order')) !== null)
 	{
 		$tree_order = $cached;
 		return $cached;
@@ -1165,7 +1165,7 @@ function getTreeOrder()
 	}
 	$pmxcFunc['db_free_result']($request);
 
-	cache_put_data('board_order', $tree_order, 86400);
+	$pmxCacheFunc['put']('board_order', $tree_order, 86400);
 
 	return $tree_order;
 }

@@ -243,7 +243,7 @@ function RemoveOldTopics2()
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false, $updateBoardCount = true)
 {
-	global $sourcedir, $modSettings, $pmxcFunc;
+	global $sourcedir, $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	// Nothing to do?
 	if (empty($topics))
@@ -572,7 +572,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		$updates[] = $stats['id_board'];
 	updateLastMessages($updates);
 
-	clean_cache();
+	$pmxCacheFunc['clean']();
 }
 
 /**
@@ -586,7 +586,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $sourcedir, $modSettings, $user_info, $pmxcFunc;
+	global $board, $sourcedir, $modSettings, $user_info, $pmxcFunc, $pmxCacheFunc;
 
 	if (empty($message) || !is_numeric($message))
 		return false;
@@ -1019,7 +1019,7 @@ function removeMessage($message, $decreasePostCount = true)
 		recountOpenReports('posts');
 	}
 
-	clean_cache();
+	$pmxCacheFunc['clean']();
 	return false;
 }
 
@@ -1028,7 +1028,7 @@ function removeMessage($message, $decreasePostCount = true)
  */
 function RestoreTopic()
 {
-	global $pmxcFunc, $modSettings, $sourcedir;
+	global $pmxcFunc, $modSettings, $sourcedir, $pmxCacheFunc;
 
 	// Check session.
 	checkSession('get');
@@ -1230,7 +1230,7 @@ function RestoreTopic()
 	if (!empty($unfound_messages))
 		fatal_lang_error('restore_not_found', false, array(implode('<br>', $unfound_messages)));
 
-	clean_cache();
+	$pmxCacheFunc['clean']();
 
 	// Just send them to the index if they get here.
 	redirectexit();
@@ -1245,7 +1245,7 @@ function RestoreTopic()
  */
 function mergePosts($msgs, $from_topic, $target_topic)
 {
-	global $pmxcFunc, $sourcedir;
+	global $pmxcFunc, $sourcedir, $pmxCacheFunc;
 
 	//!!! This really needs to be rewritten to take a load of messages from ANY topic, it's also inefficient.
 
@@ -1491,7 +1491,7 @@ function mergePosts($msgs, $from_topic, $target_topic)
 	}
 
 	updateLastMessages(array($from_board, $target_board));
-	clean_cache();
+	$pmxCacheFunc['clean']();
 }
 
 /**

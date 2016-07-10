@@ -156,7 +156,7 @@ function ManageSearchEngineSettings($return_config = false)
  */
 function ViewSpiders()
 {
-	global $context, $txt, $sourcedir, $scripturl, $pmxcFunc, $modSettings;
+	global $context, $txt, $sourcedir, $scripturl, $pmxcFunc, $pmxCacheFunc, $modSettings;
 
 	if (!isset($_SESSION['spider_stat']) || $_SESSION['spider_stat'] < time() - 60)
 	{
@@ -200,7 +200,7 @@ function ViewSpiders()
 			)
 		);
 
-		cache_put_data('spider_search', null, 300);
+		$pmxCacheFunc['put']('spider_search', null, 300);
 		recacheSpiderNames();
 	}
 
@@ -428,7 +428,7 @@ function EditSpider()
 			);
 
 
-		cache_put_data('spider_search', null);
+		$pmxCacheFunc['put']('spider_search', null, 300);
 		recacheSpiderNames();
 
 		redirectexit('action=admin;area=sengines;sa=spiders');
@@ -474,14 +474,14 @@ function EditSpider()
  */
 function SpiderCheck()
 {
-	global $modSettings, $pmxcFunc;
+	global $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	if (isset($_SESSION['id_robot']))
 		unset($_SESSION['id_robot']);
 	$_SESSION['robot_check'] = time();
 
 	// We cache the spider data for ten minutes if we can.
-	if (($spider_data = cache_get_data('spider_search', 600)) === null)
+	if (($spider_data = $pmxCacheFunc['get']('spider_search')) === null)
 	{
 		$request = $pmxcFunc['db_query']('', '
 			SELECT id_spider, user_agent, ip_info
@@ -495,7 +495,7 @@ function SpiderCheck()
 			$spider_data[] = $row;
 		$pmxcFunc['db_free_result']($request);
 
-		cache_put_data('spider_search', $spider_data, 600);
+		$pmxCacheFunc['put']('spider_search', $spider_data, 600);
 	}
 
 	if (empty($spider_data))

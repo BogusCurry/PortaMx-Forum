@@ -22,7 +22,7 @@ if (!defined('PMX'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $db_connection, $_PHPA, $pmxcFunc, $memcached, $modSettings;
+	global $txt, $db_connection, $_PHPA, $pmxcFunc, $cache_memcache, $modSettings;
 
 	loadLanguage('Admin');
 
@@ -72,19 +72,13 @@ function getServerVersions($checkFor)
 		}
 	}
 
-	// If we're using memcache we need the server info.
-	if (empty($memcached) && function_exists('memcache_get') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
-		get_memcached_server();
-
 	// Check to see if we have any accelerators installed...
 	if (in_array('phpa', $checkFor) && isset($_PHPA))
 		$versions['phpa'] = array('title' => 'ionCube PHP-Accelerator', 'version' => $_PHPA['VERSION']);
 	if (in_array('apc', $checkFor) && extension_loaded('apc'))
 		$versions['apc'] = array('title' => 'Alternative PHP Cache', 'version' => phpversion('apc'));
 	if (in_array('memcache', $checkFor) && function_exists('memcache_set'))
-		$versions['memcache'] = array('title' => 'Memcached', 'version' => empty($memcached) ? '???' : memcache_get_version($memcached));
-	if (in_array('xcache', $checkFor) && function_exists('xcache_set'))
-		$versions['xcache'] = array('title' => 'XCache', 'version' => XCACHE_VERSION);
+		$versions['memcache'] = array('title' => 'Memcached', 'version' => phpversion('memcached'));
 
 	if (in_array('php', $checkFor))
 		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION, 'more' => '?action=admin;area=serversettings;sa=phpinfo');
@@ -450,7 +444,7 @@ function updateDbLastError($time)
  */
 function updateAdminPreferences()
 {
-	global $options, $context, $pmxcFunc, $settings, $user_info;
+	global $options, $context, $pmxcFunc, $pmxCacheFunc, $settings, $user_info;
 
 	// This must exist!
 	if (!isset($context['admin_preferences']))
@@ -479,7 +473,7 @@ function updateAdminPreferences()
 	);
 
 	// Make sure we invalidate any cache.
-	cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
+	$pmxCacheFunc['put']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id'], null, 0);
 }
 
 /**

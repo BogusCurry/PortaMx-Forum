@@ -106,11 +106,10 @@ $txt['enable_mentions'] = 'Enable mentions';
 $txt['caching_information'] = 'PortaMx Forum supports caching through the use of accelerators. The currently supported accelerators include:
 <ul class="normallist">
 	<li>APC</li>
-	<li>Memcached</li>
+	<li>Memcache</li>
 	<li>Zend Platform/Performance Suite (Not Zend Optimizer)</li>
-	<li>XCache</li>
 </ul>
-Caching will work best if you have PHP compiled with one of the above optimizers, or have memcached available. If you do not have any optimizer installed PortaMx Forum will do file based caching.';
+Caching will work best if you have PHP compiled with one of the above optimizers, or have memcache available.<br>If you do not have any optimizer installed PortaMx Forum will do file based caching.';
 $txt['detected_no_caching'] = '<strong class="alert">PortaMx Forum has not been able to detect a compatible accelerator on your server. File based caching can be used instead.</strong>';
 $txt['detected_accelerators'] = '<strong class="success">PortaMx Forum has detected the following accelerators: %1$s</strong>';
 
@@ -120,13 +119,12 @@ $txt['cache_off'] = 'No caching';
 $txt['cache_level1'] = 'Level 1 Caching (Recommended)';
 $txt['cache_level2'] = 'Level 2 Caching';
 $txt['cache_level3'] = 'Level 3 Caching (Not Recommended)';
-$txt['cache_memcached'] = 'Memcached settings';
+$txt['cache_memcache'] = 'Memcache settings';
 $txt['cache_accelerator'] = 'Caching Accelerator';
-$txt['default_cache'] = 'PortaMx Forum file based caching';
+$txt['default_cache'] = 'File based caching';
 $txt['apc_cache'] = 'APC';
-$txt['memcached_cache'] = 'Memcached';
+$txt['memcache_cache'] = 'Memcache';
 $txt['zend_cache'] = 'Zend Platform/Performance Suite';
-$txt['xcache_cache'] = 'XCache';
 
 $txt['loadavg_warning'] = '<span class="error">Please note: the settings below are to be edited with care. Setting any of them too low may render your forum <strong>unusable</strong>! The current load average is <strong>%01.2f</strong></span>';
 $txt['loadavg_enable'] = 'Enable load balancing by load averages';

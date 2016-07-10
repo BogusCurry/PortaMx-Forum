@@ -1954,8 +1954,12 @@ VALUES ('smfVersion', '{$pmx_version}'),
 	('time_offset', '0'),
 	('cookieTime', '60'),
 	('lastActive', '15'),
-	('smiley_sets_known', 'portamx,aaron,akyhne,fugue'),
-	('smiley_sets_names', '{$default_portamx_smileyset_name}\n{$default_aaron_smileyset_name}\n{$default_akyhne_smileyset_name}\n{$default_fugue_smileyset_name}'),
+	('smiley_sets_known', 'default,aaron,akyhne,fugue,portamx'),
+	('smiley_sets_names', '{$default_default_smileyset_name}
+{$default_aaron_smileyset_name}
+{$default_akyhne_smileyset_name}
+{$default_fugue_smileyset_name}
+{$default_portamx_smileyset_name}'),
 	('smiley_sets_default', 'portamx'),
 	('cal_days_for_index', '7'),
 	('requireAgreement', '1'),

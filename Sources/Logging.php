@@ -22,7 +22,7 @@ if (!defined('PMX'))
  */
 function writeLog($force = false)
 {
-	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $pmxcFunc, $sourcedir;
+	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $pmxcFunc, $pmxCacheFunc, $sourcedir;
 
 	// If we are showing who is viewing a topic, let's see if we are, and force an update if so - to make it accurate.
 	if (!empty($settings['display_who_viewing']) && ($topic || $board))
@@ -70,7 +70,7 @@ function writeLog($force = false)
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
 	// Grab the last all-of-SMF-specific log_online deletion time.
-	$do_delete = cache_get_data('log_online-update', 30) < time() - 30;
+	$do_delete = $pmxCacheFunc['get']('log_online-update') < time() - 30;
 
 	// If the last click wasn't a long time ago, and there was a last click...
 	if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= time() - $modSettings['lastActive'] * 20)
@@ -88,7 +88,7 @@ function writeLog($force = false)
 			);
 
 			// Cache when we did it last.
-			cache_put_data('log_online-update', time(), 30);
+			$pmxCacheFunc['put']('log_online-update', time(), 30);
 		}
 
 		$pmxcFunc['db_query']('', '
@@ -149,7 +149,7 @@ function writeLog($force = false)
 		updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $_SERVER['BAN_CHECK_IP'], 'total_time_logged_in' => $user_settings['total_time_logged_in']));
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('user_settings-' . $user_info['id'], $user_settings, 60);
+			$pmxCacheFunc['put']('user_settings-' . $user_info['id'], $user_settings, 60);
 
 		$user_info['total_time_logged_in'] += time() - $_SESSION['timeOnlineUpdated'];
 		$_SESSION['timeOnlineUpdated'] = time();

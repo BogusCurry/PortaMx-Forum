@@ -264,13 +264,13 @@ function MaintainFindFixErrors()
  */
 function MaintainCleanCache()
 {
-	global $context, $txt;
+	global $context, $pmxCacheFunc, $txt;
 
 	checkSession();
 	validateToken('admin-maint');
 
 	// Just wipe the whole cache directory!
-	clean_cache();
+	$pmxCacheFunc['clean']();
 
 	$context['maintenance_finished'] = $txt['maintain_cache'];
 }
@@ -1523,7 +1523,7 @@ function MaintainRemoveOldDrafts()
  */
 function MaintainMassMoveTopics()
 {
-	global $pmxcFunc, $sourcedir, $context, $txt;
+	global $pmxcFunc, $pmxCacheFunc, $sourcedir, $context, $txt;
 
 	// Only admins.
 	isAllowedTo('admin_forum');
@@ -1635,8 +1635,8 @@ function MaintainMassMoveTopics()
 			// Just return if we don't have any topics left to move.
 			if (empty($topics))
 			{
-				cache_put_data('board-' . $id_board_from, null, 120);
-				cache_put_data('board-' . $id_board_to, null, 120);
+				$pmxCacheFunc['put']('board-' . $id_board_from, null, 120);
+				$pmxCacheFunc['put']('board-' . $id_board_to, null, 120);
 				redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
 			}
 
@@ -1661,8 +1661,8 @@ function MaintainMassMoveTopics()
 	}
 
 	// Don't confuse admins by having an out of date cache.
-	cache_put_data('board-' . $id_board_from, null, 120);
-	cache_put_data('board-' . $id_board_to, null, 120);
+	$pmxCacheFunc['put']('board-' . $id_board_from, null, 120);
+	$pmxCacheFunc['put']('board-' . $id_board_to, null, 120);
 
 	redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
 }

@@ -509,7 +509,7 @@ function pmx_db_error($db_string, $connection = null)
 	global $txt, $context, $sourcedir, $webmaster_email, $modSettings;
 	global $db_connection, $db_last_error, $db_persist;
 	global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-	global $pmxcFunc;
+	global $pmxcFunc, $pmxCacheFunc, $cache_enable;
 
 	// Get the file and line numbers.
 	list ($file, $line) = pmx_db_error_backtrace('', '', 'return', __FILE__, __LINE__);
@@ -536,13 +536,13 @@ function pmx_db_error($db_string, $connection = null)
 		log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 
 	// Database error auto fixing ;).
-	if (function_exists('cache_get_data') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
+	if (function_exists($pmxCacheFunc['get']) && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 	{
 		// Force caching on, just for the error checking.
-		$old_cache = @$modSettings['cache_enable'];
-		$modSettings['cache_enable'] = '1';
+		$old_cache = $cache_enable;
+		$cache_enable = '1';
 
-		if (($temp = cache_get_data('db_last_error', 600)) !== null)
+		if (($temp = $pmxCacheFunc['get']('db_last_error')) !== null)
 			$db_last_error = max(@$db_last_error, $temp);
 
 		if (@$db_last_error < time() - 3600 * 24 * 3)
@@ -588,8 +588,8 @@ function pmx_db_error($db_string, $connection = null)
 			require_once($sourcedir . '/Subs-Post.php');
 
 			// Make a note of the REPAIR...
-			cache_put_data('db_last_error', time(), 600);
-			if (($temp = cache_get_data('db_last_error', 600)) === null)
+			$pmxCacheFunc['put']('db_last_error', time(), 600);
+			if (($temp = $pmxCacheFunc['get']('db_last_error')) === null)
 				updateSettingsFile(array('db_last_error' => time()));
 
 			// Attempt to find and repair the broken table.

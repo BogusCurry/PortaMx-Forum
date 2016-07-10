@@ -43,12 +43,12 @@ function template_main()
 
 	// Next - Prev
 	echo '
-		<span class="nextlinks floatright">', $context['previous_next'], '</span>';
+			<span class="nextlinks floatright">', $context['previous_next'], '</span>';
 
 	if (!empty($settings['display_who_viewing']))
 	{
 		echo '
-				<p>';
+			<p>';
 
 		// Show just numbers...?
 		if ($settings['display_who_viewing'] == 1)
@@ -59,7 +59,7 @@ function template_main()
 
 		// Now show how many guests are here too.
 		echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_topic'], '
-				</p>';
+			</p>';
 	}
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.

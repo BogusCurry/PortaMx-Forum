@@ -30,7 +30,7 @@ function Display()
 {
 	global $scripturl, $txt, $modSettings, $context, $settings;
 	global $options, $sourcedir, $user_info, $board_info, $topic, $board;
-	global $attachments, $messages_request, $language, $pmxcFunc;
+	global $attachments, $messages_request, $language, $pmxcFunc, $pmxCacheFunc;
 
 	// What are you gonna display if these are empty?!
 	if (empty($topic))
@@ -528,7 +528,7 @@ function Display()
 	$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.' . ($can_show_all ? '0;all' : $context['start']);
 
 	// For quick reply we need a response prefix in the default forum language.
-	if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix', 600)))
+	if (!isset($context['response_prefix']) && !($context['response_prefix'] = $pmxCacheFunc['get']('response_prefix')))
 	{
 		if ($language === $user_info['language'])
 			$context['response_prefix'] = $txt['response_prefix'];
@@ -538,7 +538,7 @@ function Display()
 			$context['response_prefix'] = $txt['response_prefix'];
 			loadLanguage('index');
 		}
-		cache_put_data('response_prefix', $context['response_prefix'], 600);
+		$pmxCacheFunc['put']('response_prefix', $context['response_prefix'], 600);
 	}
 
 	// If we want to show event information in the topic, prepare the data.

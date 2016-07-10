@@ -25,7 +25,7 @@ if (!defined('PMX'))
  */
 function getMembersOnlineStats($membersOnlineOptions)
 {
-	global $pmxcFunc, $scripturl, $user_info, $modSettings, $txt;
+	global $pmxcFunc, $pmxCacheFunc, $scripturl, $user_info, $modSettings, $txt;
 
 	// The list can be sorted in several ways.
 	$allowed_sort_options = array(
@@ -48,7 +48,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		trigger_error('Sort method for getMembersOnlineStats() function is not allowed', E_USER_NOTICE);
 
 	// Get it from the cache and send it back.
-	if (($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
+	if (($temp = $pmxCacheFunc['get']('membersOnlineStats-' . $membersOnlineOptions['sort'])) !== null)
 		return $temp;
 
 	// Initialize the array that'll be returned later on.
@@ -187,7 +187,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	// Hidden and non-hidden members make up all online members.
 	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
 
-	cache_put_data('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+	$pmxCacheFunc['put']('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
 
 	return $membersOnlineStats;
 }

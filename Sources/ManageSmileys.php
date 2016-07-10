@@ -113,7 +113,7 @@ function ManageSmileys()
  */
 function EditSmileySettings($return_config = false)
 {
-	global $modSettings, $context, $txt, $boarddir, $sourcedir, $scripturl;
+	global $modSettings, $context, $txt, $boarddir, $sourcedir, $scripturl, $pmxCacheFunc;
 
 	// The directories...
 	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
@@ -169,8 +169,8 @@ function EditSmileySettings($return_config = false)
 		saveDBSettings($config_vars);
 		$_SESSION['adm-save'] = true;
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$pmxCacheFunc['put']('parsing_smileys', null, 480);
+		$pmxCacheFunc['put']('posting_smileys', null, 480);
 
 		redirectexit('action=admin;area=smileys;sa=settings');
 	}
@@ -187,7 +187,7 @@ function EditSmileySettings($return_config = false)
 function EditSmileySets()
 {
 	global $modSettings, $context, $txt;
-	global $pmxcFunc, $scripturl, $sourcedir;
+	global $pmxcFunc, $pmxCacheFunc, $scripturl, $sourcedir;
 
 	// Set the right tab to be selected.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
@@ -265,8 +265,8 @@ function EditSmileySets()
 			if (!empty($_POST['smiley_sets_import']))
 				ImportSmileys($_POST['smiley_sets_path']);
 		}
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$pmxCacheFunc['put']('parsing_smileys', null, 480);
+		$pmxCacheFunc['put']('posting_smileys', null, 480);
 	}
 
 	// Load all available smileysets...
@@ -545,7 +545,7 @@ function list_getNumSmileySets()
  */
 function AddSmiley()
 {
-	global $modSettings, $context, $txt, $boarddir, $pmxcFunc;
+	global $modSettings, $context, $txt, $boarddir, $pmxcFunc, $pmxCacheFunc;
 
 	// Get a list of all known smiley sets.
 	$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? $boarddir . '/Smileys' : $modSettings['smileys_dir'];
@@ -745,8 +745,8 @@ function AddSmiley()
 			array('id_smiley')
 		);
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$pmxCacheFunc['put']('parsing_smileys', null, 480);
+		$pmxCacheFunc['put']('posting_smileys', null, 480);
 
 		// No errors? Out of here!
 		redirectexit('action=admin;area=smileys;sa=editsmileys');
@@ -795,7 +795,7 @@ function AddSmiley()
 function EditSmileys()
 {
 	global $modSettings, $context, $txt, $boarddir;
-	global $pmxcFunc, $scripturl, $sourcedir;
+	global $pmxcFunc, $pmxCacheFunc, $scripturl, $sourcedir;
 
 	// Force the correct tab to be displayed.
 	$context[$context['admin_menu_name']]['current_subsection'] = 'editsmileys';
@@ -905,8 +905,8 @@ function EditSmileys()
 			}
 		}
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$pmxCacheFunc['put']('parsing_smileys', null, 480);
+		$pmxCacheFunc['put']('posting_smileys', null, 480);
 	}
 
 	// Load all known smiley sets.
@@ -1253,7 +1253,7 @@ function list_getNumSmileys()
  */
 function EditSmileyOrder()
 {
-	global $context, $txt, $pmxcFunc;
+	global $context, $txt, $pmxcFunc, $pmxCacheFunc;
 
 	// Move smileys to another position.
 	if (isset($_REQUEST['reorder']))
@@ -1320,8 +1320,8 @@ function EditSmileyOrder()
 			)
 		);
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$pmxCacheFunc['put']('parsing_smileys', null, 480);
+		$pmxCacheFunc['put']('posting_smileys', null, 480);
 	}
 
 	$request = $pmxcFunc['db_query']('', '
@@ -1405,8 +1405,8 @@ function EditSmileyOrder()
 		}
 	}
 
-	cache_put_data('parsing_smileys', null, 480);
-	cache_put_data('posting_smileys', null, 480);
+	$pmxCacheFunc['put']('parsing_smileys', null, 480);
+	$pmxCacheFunc['put']('posting_smileys', null, 480);
 }
 
 /**
@@ -1627,8 +1627,8 @@ function InstallSmileySet()
 
 		logAction('install_package', array('package' => $pmxcFunc['htmlspecialchars']($smileyInfo['name']), 'version' => $pmxcFunc['htmlspecialchars']($smileyInfo['version'])), 'admin');
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$pmxCacheFunc['put']('parsing_smileys', null, 480);
+		$pmxCacheFunc['put']('posting_smileys', null, 480);
 	}
 
 	if (file_exists($packagesdir . '/temp'))
@@ -1645,7 +1645,7 @@ function InstallSmileySet()
  */
 function ImportSmileys($smileyPath)
 {
-	global $modSettings, $pmxcFunc;
+	global $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
 		fatal_lang_error('smiley_set_unable_to_import');
@@ -1702,8 +1702,8 @@ function ImportSmileys($smileyPath)
 			array('id_smiley')
 		);
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$pmxCacheFunc['put']('parsing_smileys', null, 480);
+		$pmxCacheFunc['put']('posting_smileys', null, 480);
 	}
 }
 

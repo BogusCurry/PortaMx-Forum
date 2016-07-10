@@ -258,7 +258,7 @@ $helptxt['databaseSession_loose'] = 'Turning this on will decrease the bandwidth
 $helptxt['databaseSession_lifetime'] = 'This is the number of seconds for sessions to last after they haven\'t been accessed. If a session is not accessed for too long, it is said to have &quot;timed out&quot;. Anything higher than 2400 is recommended.';
 $helptxt['tfa_mode'] = 'You can add a second level of security to your forum by enabling <a href="http://en.wikipedia.org/wiki/Two_factor_authentication">Two Factor Authentication</a>. 2FA forces your users to add a enter a machine-generated code after the regular login. You need to configure 2FA to yourself before you are able to force it to other users!';
 $helptxt['cache_enable'] = 'PortaMx Forum performs caching at a variety of levels. The higher the level of caching enabled the more CPU time will be spent retrieving cached information. If caching is available on your machine it is recommended that you try caching at level 1 first.';
-$helptxt['cache_memcached'] = 'If you are using memcached you need to provide the server details. This should be entered as a comma separated list as shown in the example below:<br><br>	&quot;server1,server2,server3:port,server4&quot;<br><br>Note that if no port is specified PortaMx Forum will use port 11211 unless the host contains a slash, then it is assumed to be an alternative transport and the port will be set to 0. PortaMx Forum will attempt to perform rough/random load balancing across the specified servers.';
+$helptxt['cache_memcache'] = 'If you are using memcached you need to provide the server details. This should be entered as a comma separated list as shown in the example below:<br><br>	&quot;server1,server2,server3:port,server4&quot;<br><br>Note that if no port is specified PortaMx Forum will use port 11211 unless the host contains a slash, then it is assumed to be an alternative transport and the port will be set to 0. PortaMx Forum will attempt to perform rough/random load balancing across the specified servers.';
 $helptxt['cache_cachedir'] = 'This setting is only for the file-based cache system. It specifies the path to the cache directory. It is recommended that you place this in /tmp/ if you are going to use this, although it will work in any directory';
 $helptxt['enableErrorLogging'] = 'This will log any errors, like a failed login, so you can see what went wrong.';
 $helptxt['enableErrorQueryLogging'] = 'This will include the full query sent to the database in the error log. It requires error logging to be turned on.<br><br><strong>Note:  This will affect the ability to filter the error log by the error message.</strong>';
@@ -609,4 +609,33 @@ $helptxt['force_ssl'] = '<b>Test SSL and HTTPS on your server properly before en
 $helptxt['image_proxy_enabled'] = 'Required for embedding external images when in full SSL';
 $helptxt['image_proxy_secret'] = 'Keep this a secret, protects your forum from hotlinking images. Change it in order to render current hotlinked images useless';
 $helptxt['image_proxy_maxsize'] = 'Maximum image size that the SSL image proxy will cache: bigger images will be not be cached. Cached images are stored in your PortaMx Forum cache folder, so make sure you have enough free space.';
+
+$helptxt['settings_ecl'] = '<center><b>SEF - Seach Engine Friedly URL\'s</b></center><hr><b>The SEF engine requires mod_rewrite support.</b><br><br>You need a <b>.htacces</b> file with follow content:<br>
+<b>RewriteEngine On<br>
+RewriteCond %{REQUEST_FILENAME} !-f<br>
+RewriteCond %{REQUEST_FILENAME} !-d<br>
+RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]<br>
+RewriteBase /subdirectory/</b></br><br>
+If your forum is <b>not</b> installed in a subdirectory, you can remove the entry <b>RewriteBase</b><br><br>
+If you cannot enable the SEF engine, please check if the <b>.htaccess</b> file exist and at the right place.';
+
+$helptxt['sef_lowercase'] = 'If checked all url\'s converted to lower case letters.
+	You should enable this for better results.';
+$helptxt['sef_autosave'] = 'If checked all new actions are automatically saved.
+	It\'s recommeded to disable this option and add new actions manually.';
+$helptxt['sef_spacechar'] = 'Character to be used for spaces in the url (typically _ or -).
+	You should use <b>-</b> for better results. Leave this empty to remove any space.';
+$helptxt['sef_stripchars'] = 'These characters will be stripped out of the url.
+	Each char must be sepatated by a comma. <b>If you change this, it may be that your forum not works properly.</b>';
+$helptxt['sef_single_token'] = 'Token they have no value and need a special handling.
+	Each entry must be sepatated by a comma.
+	<b>If you change this, it may be that your forum not works properly.</b>';
+$helptxt['sef_actions'] = 'These are all of the actions of your forum and normally you do not have to modify this, because the SEF engine add not listed actions automatically.
+	Each entry must be sepatated by a comma.
+	<b>If you change this, it may be that your forum not works properly.</b>';
+$helptxt['sef_ignoreactions'] =  'Actions they not converted by the SEF engine. Each entry must be sepatated by a comma.';
+$helptxt['sef_aliasactions'] =  'You can define a alias for any actions. Each alias must be in the format <b>action=alias</b>. Each action=alias pair must be sepatated by a comma.';
+$helptxt['sef_ignorerequests'] =  'Parts of a URL they not converted by the SEF engine. Each part must be in the format <b>name=value</b>. Each name=value pair must be sepatated by a comma.';
+
+';'
 ?>

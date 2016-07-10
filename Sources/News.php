@@ -33,7 +33,7 @@ if (!defined('PMX'))
 function ShowXmlFeed()
 {
 	global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-	global $query_this_board, $pmxcFunc, $forum_version;
+	global $query_this_board, $pmxcFunc, $pmxCacheFunc, $forum_version;
 
 	// If it's not enabled, die.
 	if (empty($modSettings['xmlnews_enable']))
@@ -196,7 +196,7 @@ function ShowXmlFeed()
 
 	// Get the associative array representing the xml.
 	if (!empty($modSettings['cache_enable']) && (!$user_info['is_guest'] || $modSettings['cache_enable'] >= 3))
-		$xml = cache_get_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, 240);
+		$xml = $pmxCacheFunc['get']('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey);
 	if (empty($xml))
 	{
 		$call = call_helper($subActions[$_GET['sa']][0], true);
@@ -206,7 +206,7 @@ function ShowXmlFeed()
 
 		if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
 		|| (!$user_info['is_guest'] && (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $cache_t)) > 0.2))))
-			cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
+			$pmxCacheFunc['put']('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 	}
 
 	$feed_title = $pmxcFunc['htmlspecialchars'](strip_tags($context['forum_name'])) . (isset($feed_title) ? $feed_title : '');

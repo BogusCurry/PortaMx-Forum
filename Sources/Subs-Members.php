@@ -124,7 +124,7 @@ function deleteMembers($users, $check_not_admin = false)
 
 		// Remove any cached data if enabled.
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('user_settings-' . $user[0], null, 60);
+			$pmxCacheFunc['put']('user_settings-' . $user[0], null, 60);
 	}
 
 	// Make these peoples' posts guest posts.
@@ -1245,7 +1245,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  */
 function BuddyListToggle()
 {
-	global $user_info, $pmxcFunc;
+	global $user_info, $pmxcFunc, $pmxCacheFunc;
 
 	checkSession('get');
 
@@ -1267,7 +1267,7 @@ function BuddyListToggle()
 		$user_info['buddies'][] = $userReceiver;
 
 		// And add a nice alert. Don't abuse though!
-		if ((cache_get_data('Buddy-sent-'. $user_info['id'] .'-'. $userReceiver, 86400)) == null)
+		if (($pmxCacheFunc['get']('Buddy-sent-'. $user_info['id'] .'-'. $userReceiver)) == null)
 		{
 			$pmxcFunc['db_insert']('insert',
 				'{db_prefix}background_tasks',
@@ -1282,7 +1282,7 @@ function BuddyListToggle()
 			);
 
 			// Store this in a cache entry to avoid creating multiple alerts. Give it a long life cycle.
-			cache_put_data('Buddy-sent-'. $user_info['id'] .'-'. $userReceiver, '1', 86400);
+			$pmxCacheFunc['put']('Buddy-sent-'. $user_info['id'] .'-'. $userReceiver, '1', 86400);
 		}
 	}
 

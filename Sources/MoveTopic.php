@@ -135,7 +135,7 @@ function MoveTopic()
 function MoveTopic2()
 {
 	global $txt, $board, $topic, $scripturl, $sourcedir, $modSettings, $context;
-	global $board, $language, $user_info, $pmxcFunc;
+	global $board, $language, $user_info, $pmxcFunc, $pmxCacheFunc;
 
 	if (empty($topic))
 		fatal_lang_error('no_access', false);
@@ -231,7 +231,7 @@ function MoveTopic2()
 			if (isset($_POST['enforce_subject']))
 			{
 				// Get a response prefix, but in the forum's default language.
-				if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
+				if (!isset($context['response_prefix']) && !($context['response_prefix'] = $pmxCacheFunc['get']('response_prefix')))
 				{
 					if ($language === $user_info['language'])
 						$context['response_prefix'] = $txt['response_prefix'];
@@ -241,7 +241,7 @@ function MoveTopic2()
 						$context['response_prefix'] = $txt['response_prefix'];
 						loadLanguage('index');
 					}
-					cache_put_data('response_prefix', $context['response_prefix'], 600);
+					$pmxCacheFunc['put']('response_prefix', $context['response_prefix'], 600);
 				}
 
 				$pmxcFunc['db_query']('', '
@@ -385,7 +385,7 @@ function MoveTopic2()
  */
 function moveTopics($topics, $toBoard)
 {
-	global $sourcedir, $user_info, $modSettings, $pmxcFunc;
+	global $sourcedir, $user_info, $modSettings, $pmxcFunc, $pmxCacheFunc;
 
 	// Empty array?
 	if (empty($topics))
@@ -689,7 +689,7 @@ function moveTopics($topics, $toBoard)
 	// Update the cache?
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
 		foreach ($topics as $topic_id)
-			cache_put_data('topic_board-' . $topic_id, null, 120);
+			$pmxCacheFunc['put']('topic_board-' . $topic_id, null, 120);
 
 	require_once($sourcedir . '/Subs-Post.php');
 

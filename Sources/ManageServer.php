@@ -448,12 +448,10 @@ function ModifyCacheSettings($return_config = false)
 		$detected['apc'] = $txt['apc_cache'];
 	if (function_exists('output_cache_put') || function_exists('zend_shm_cache_store'))
 		$detected['zend'] = $txt['zend_cache'];
-	if (function_exists('memcache_set') || function_exists('memcached_set'))
-		$detected['memcached'] = $txt['memcached_cache'];
-	if (function_exists('xcache_set'))
-		$detected['xcache'] = $txt['xcache_cache'];
+	if (function_exists('memcache_set'))
+		$detected['memcache'] = $txt['memcache_cache'];
 	if (function_exists('file_put_contents'))
-		$detected['smf'] = $txt['default_cache'];
+		$detected['file'] = $txt['default_cache'];
 
 	// set our values to show what, if anything, we found
 	if (empty($detected))
@@ -474,7 +472,7 @@ function ModifyCacheSettings($return_config = false)
 		array('', $txt['cache_settings_message'], '', 'desc'),
 		array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 		array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected),
-		array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
+		array('cache_memcache', $txt['cache_memcache'], 'file', 'text', $txt['cache_memcache'], 'cache_memcache'),
 		array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
 	);
 
@@ -829,7 +827,7 @@ function prepareDBSettingContext(&$config_vars)
 				'label' => isset($config_var['text_label']) ? $config_var['text_label'] : (isset($txt[$config_var[1]]) ? $txt[$config_var[1]] : (isset($config_var[3]) && !is_array($config_var[3]) ? $config_var[3] : '')),
 				'help' => isset($helptxt[$config_var[1]]) ? $config_var[1] : '',
 				'type' => $config_var[0],
-				'size' => !empty($config_var[2]) && !is_array($config_var[2]) ? $config_var[2] : (in_array($config_var[0], array('int', 'float')) ? 6 : 0),
+				'size' => !empty($config_var['size']) ? $config_var['size'] : (!empty($config_var[2]) && !is_array($config_var[2]) ? $config_var[2] : (in_array($config_var[0], array('int', 'float')) ? 6 : 0)),
 				'data' => array(),
 				'name' => $config_var[1],
 				'value' => $value,
@@ -1013,7 +1011,7 @@ function saveSettings(&$config_vars)
 		'webmaster_email',
 		'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
 		'boarddir', 'sourcedir',
-		'cachedir', 'cache_accelerator', 'cache_memcached',
+		'cachedir', 'cache_accelerator', 'cache_memcache',
 		'image_proxy_secret',
 	);
 

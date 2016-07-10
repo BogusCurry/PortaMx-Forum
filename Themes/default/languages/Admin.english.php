@@ -616,6 +616,7 @@ $txt['cookies_sessions_settings'] = 'Cookies and Sessions';
 $txt['security_settings'] = 'Security';
 $txt['caching_settings'] = 'Caching';
 $txt['load_balancing_settings'] = 'Load Balancing';
+$txt['sef_settings'] = 'SEF Settings';
 $txt['phpinfo_settings'] = 'PHP Info';
 $txt['phpinfo_localsettings'] = 'Local Settings';
 $txt['phpinfo_defaultsettings'] = 'Default Settings';
@@ -747,5 +748,18 @@ $txt['mention'] = 'Membergroups allowed to mention users';
 $txt['notifications'] = 'Notifications';
 $txt['notify_settings'] = 'Notification Settings';
 $txt['notifications_desc'] = 'This page allows you to set the default notification options for users.';
+
+// sef settings
+$txt['sef_enable'] = 'Enable the SEF engine:';
+$txt['sef_lowercase'] = 'Lowercase alls URLs:';
+$txt['sef_autosave'] = 'Save new actions automatically:';
+$txt['sef_spacechar'] = 'Character to used for spaces:';
+$txt['sef_stripchars'] = 'Character they removed from the url:';
+$txt['sef_single_token'] = 'All single token:';
+$txt['sef_actions'] =  'All actions of your forum:';
+$txt['sef_ignoreactions'] =  'Actions they ignored:';
+$txt['sef_aliasactions'] =  'Alias for actions:';
+$txt['sef_ignorerequests'] =  'Parts of a URL they ignored:';
+$txt['sef_engine_disabled'] = 'The SEF engine is currently switched off.';
 
 ?>

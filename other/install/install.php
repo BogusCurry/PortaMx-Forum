@@ -328,7 +328,7 @@ function load_lang_file()
 function load_database()
 {
 	global $db_prefix, $db_connection, $sourcedir;
-	global $pmxcFunc, $modSettings, $db_type, $db_name, $db_user, $db_persist;
+	global $pmxcFunc, $pmxCacheFunc, $modSettings, $db_type, $db_name, $db_user, $db_persist;
 
 	if (empty($sourcedir))
 		$sourcedir = dirname(__FILE__) . '/Sources';
@@ -377,7 +377,7 @@ function load_database()
 // This is called upon exiting the installer, for template etc.
 function installExit($fallThrough = false)
 {
-	global $incontext, $installurl, $txt;
+	global $incontext, $installurl, $pmxCacheFunc, $txt;
 
 	// Send character set.
 	header('Content-Type: text/html; charset=' . (isset($txt['lang_character_set']) ? $txt['lang_character_set'] : 'UTF-8'));
@@ -411,7 +411,7 @@ function installExit($fallThrough = false)
 
 function Welcome()
 {
-	global $incontext, $txt, $databases, $installurl;
+	global $incontext, $txt, $databases, $installurl, $pmxCacheFunc;
 
 	$incontext['page_title'] = $txt['install_welcome'];
 	$incontext['sub_template'] = 'welcome_message';
@@ -487,7 +487,7 @@ function Welcome()
 
 function CheckFilesWritable()
 {
-	global $txt, $incontext;
+	global $txt, $incontext, $pmxCacheFunc;
 
 	$incontext['page_title'] = $txt['ftp_checking_writable'];
 	$incontext['sub_template'] = 'chmod_files';
@@ -684,7 +684,7 @@ function CheckFilesWritable()
 
 function DatabaseSettings()
 {
-	global $txt, $databases, $incontext, $pmxcFunc, $sourcedir;
+	global $txt, $databases, $incontext, $pmxcFunc, $pmxCacheFunc, $sourcedir;
 
 	$incontext['sub_template'] = 'database_settings';
 	$incontext['page_title'] = $txt['db_settings'];
@@ -892,7 +892,7 @@ function DatabaseSettings()
 // Let's start with basic forum type settings.
 function ForumSettings()
 {
-	global $txt, $incontext, $databases, $db_type, $db_connection;
+	global $txt, $incontext, $databases, $db_type, $db_connection, $pmxCacheFunc;
 
 	$incontext['sub_template'] = 'forum_settings';
 	$incontext['page_title'] = $txt['install_settings'];
@@ -975,7 +975,7 @@ function ForumSettings()
 // Step one: Do the SQL thang.
 function DatabasePopulation()
 {
-	global $db_character_set, $txt, $db_connection, $pmxcFunc, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
+	global $db_character_set, $txt, $db_connection, $pmxcFunc, $pmxCacheFunc, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 	$incontext['sub_template'] = 'populate_database';
 	$incontext['page_title'] = $txt['db_populate'];
@@ -1295,7 +1295,7 @@ function DatabasePopulation()
 // Ask for the administrator login information.
 function AdminAccount()
 {
-	global $txt, $db_type, $db_connection, $pmxcFunc, $incontext, $db_prefix, $db_passwd, $sourcedir, $db_character_set;
+	global $txt, $db_type, $db_connection, $pmxcFunc, $pmxCacheFunc, $incontext, $db_prefix, $db_passwd, $sourcedir, $db_character_set;
 
 	$incontext['sub_template'] = 'admin_account';
 	$incontext['page_title'] = $txt['user_settings'];
@@ -1310,7 +1310,6 @@ function AdminAccount()
 	load_database();
 
 	require_once($sourcedir . '/Subs-Auth.php');
-	
 	require_once($sourcedir . '/Subs.php');
 
 	// We need this to properly hash the password for Admin
@@ -1483,7 +1482,7 @@ function AdminAccount()
 function DeleteInstall()
 {
 	global $txt, $incontext;
-	global $pmxcFunc, $db_character_set, $context, $cookiename;
+	global $pmxcFunc, $pmxCacheFunc, $db_character_set, $context, $cookiename;
 	global $current_pmx_version, $databases, $sourcedir, $forum_version, $modSettings, $user_info, $db_type, $boardurl;
 
 	$incontext['page_title'] = $txt['congratulations'];
@@ -1498,6 +1497,7 @@ function DeleteInstall()
 	require_once($sourcedir . '/Errors.php');
 	require_once($sourcedir . '/Logging.php');
 	require_once($sourcedir . '/Subs.php');
+	require_once($sourcedir . '/Subs-Cache.php');
 	require_once($sourcedir . '/Load.php');
 	require_once($sourcedir . '/Security.php');
 	require_once($sourcedir . '/Subs-Auth.php');
@@ -1976,6 +1976,8 @@ class ftp_connection
 
 function updateSettingsFile($vars)
 {
+	global $pmxCacheFunc;
+
 	// Modify Settings.php.
 	$settingsArray = file(dirname(__FILE__) . '/Settings.php');
 

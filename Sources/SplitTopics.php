@@ -979,7 +979,7 @@ function MergeIndex()
 function MergeExecute($topics = array())
 {
 	global $user_info, $txt, $context, $scripturl, $sourcedir;
-	global $pmxcFunc, $language, $modSettings;
+	global $pmxcFunc, $pmxCacheFunc, $language, $modSettings;
 
 	// Check the session.
 	checkSession('request');
@@ -1408,7 +1408,7 @@ function MergeExecute($topics = array())
 	}
 
 	// Grab the response prefix (like 'Re: ') in the default forum language.
-	if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
+	if (!isset($context['response_prefix']) && !($context['response_prefix'] = $pmxCacheFunc['get']('response_prefix')))
 	{
 		if ($language === $user_info['language'])
 			$context['response_prefix'] = $txt['response_prefix'];
@@ -1418,7 +1418,7 @@ function MergeExecute($topics = array())
 			$context['response_prefix'] = $txt['response_prefix'];
 			loadLanguage('index');
 		}
-		cache_put_data('response_prefix', $context['response_prefix'], 600);
+		$pmxCacheFunc['put']('response_prefix', $context['response_prefix'], 600);
 	}
 
 	// Change the topic IDs of all messages that will be merged.  Also adjust subjects if 'enforce subject' was checked.

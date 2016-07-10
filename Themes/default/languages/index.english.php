@@ -484,6 +484,16 @@ $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
 $forum_copyright = '<a href="' . $scripturl . '?action=credits" title="License" target="_blank" class="new_win">%1$s &copy; %2$s</a>, <a href="http://portamx.com" title="PortaMx Forum" target="_blank" class="new_win">PortaMx</a>';
+$txt['cache'] = 'Cache: ';
+$txt['cachestats'] = array(
+	'mode' => '',
+	'loaded' => ', Loaded: ',
+	'saved' => ', Saved: ',
+	'time' => ', Time: '
+);
+$txt['cache_sec'] = ' seconds';
+$txt['cache_msec'] = ' msec';
+$txt['cache_kb'] = ' kb';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';

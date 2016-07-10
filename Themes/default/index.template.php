@@ -356,7 +356,7 @@ function template_body_above()
  */
 function template_body_below()
 {
-	global $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings, $pmxCache;
 
 	echo '
 			</div>
@@ -376,10 +376,26 @@ function template_body_below()
 			<li class="copyright">', theme_copyright(), '</li>
 		</ul>';
 
+		echo '
+		<p>';
+	
 	// Show the load time?
 	if ($context['show_load_time'])
+	{
 		echo '
-		<p>', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '</p>';
+		<p>';
+		if(!empty($pmxCache['vals']['enabled']))
+		{
+			$values = $pmxCache['vals'];
+			$values['time'] = sprintf("%0.3F", $values['time'] * 1000) . $txt['cache_msec'];
+			echo $txt['cache'];
+			foreach($txt['cachestats'] as $key => $keytxt)
+				echo $keytxt . (in_array($key, array('loaded', 'saved')) ? sprintf("%0.3F", $values[$key] / 1024) . $txt['cache_kb'] : $values[$key]);
+			echo '<br />';
+		}
+		echo '
+		', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '</p>';
+	}
 
 	echo '
 	</div>';
@@ -414,7 +430,7 @@ function theme_linktree($force_show = false)
 
 	echo '
 				<div class="navigate_section">
-					<ul>';
+					<ul'. (!empty(checkECL_Cookie()) ? ' id="topic"' : '') .'>';
 
 	if ($context['user']['is_logged'])
 	echo '

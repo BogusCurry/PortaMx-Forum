@@ -562,7 +562,7 @@ function ModifyWarningSettings($return_config = false)
  */
 function ModifyAntispamSettings($return_config = false)
 {
-	global $txt, $scripturl, $context, $modSettings, $pmxcFunc, $language, $sourcedir;
+	global $txt, $scripturl, $context, $modSettings, $pmxcFunc, $pmxCacheFunc, $language, $sourcedir;
 
 	loadLanguage('Help');
 	loadLanguage('ManageSettings');
@@ -813,7 +813,7 @@ function ModifyAntispamSettings($return_config = false)
 		saveDBSettings($save_vars);
 		$_SESSION['adm-save'] = true;
 
-		cache_put_data('verificationQuestions', null, 300);
+		$pmxCacheFunc['put']('verificationQuestions', null, 300);
 
 		redirectexit('action=admin;area=antispam');
 	}

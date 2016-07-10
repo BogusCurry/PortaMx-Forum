@@ -44,6 +44,7 @@ if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/c
 	$cachedir = $boarddir . '/cache';
 
 // Without those we can't go anywhere
+require_once($sourcedir . '/Subs-Cache.php');
 require_once($sourcedir . '/QueryString.php');
 require_once($sourcedir . '/Subs.php');
 require_once($sourcedir . '/Subs-Auth.php');
@@ -155,7 +156,7 @@ function pmx_main()
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
 		fatal_lang_error('not_a_topic', false);
 
-	$no_stat_actions = array('clock', 'dlattach', 'findmember', 'jsoption', 'likes', 'loadeditorlocale', 'modifycat', 'requestmembers', 'smstats', 'suggest', 'about:unknown', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewpmxfile');
+	$no_stat_actions = array('clock', 'dlattach', 'findmember', 'jsoption', 'likes', 'loadeditorlocale', 'modifycat', 'requestmembers', 'suggest', 'about:unknown', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewpmxfile');
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions))
@@ -195,7 +196,7 @@ function pmx_main()
 			return 'InMaintenance';
 	}
 	// If guest access is off, a guest can only do one of the very few following actions.
-	elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('coppa', 'login', 'login2', 'logintfa', 'reminder', 'activate', 'help', 'helpadmin', 'smstats', 'verificationcode', 'signup', 'signup2'))))
+	elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('coppa', 'login', 'login2', 'logintfa', 'reminder', 'activate', 'help', 'helpadmin', 'verificationcode', 'signup', 'signup2'))))
 		return 'KickGuest';
 	elseif (empty($_REQUEST['action']))
 	{

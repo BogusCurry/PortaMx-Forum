@@ -1495,7 +1495,7 @@ function loadLocale()
  */
 function getMessageIcons($board_id)
 {
-	global $modSettings, $txt, $settings, $pmxcFunc;
+	global $modSettings, $txt, $settings, $pmxcFunc, $pmxCacheFunc;
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
@@ -1526,7 +1526,7 @@ function getMessageIcons($board_id)
 	// Otherwise load the icons, and check we give the right image too...
 	else
 	{
-		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
+		if (($temp = $pmxCacheFunc['get']('posting_icons-' . $board_id)) == null)
 		{
 			$request = $pmxcFunc['db_query']('', '
 				SELECT title, filename
@@ -1553,7 +1553,7 @@ function getMessageIcons($board_id)
 				);
 			}
 
-			cache_put_data('posting_icons-' . $board_id, $icons, 480);
+			$pmxCacheFunc['put']('posting_icons-' . $board_id, $icons, 480);
 		}
 		else
 			$icons = $temp;
@@ -1582,7 +1582,7 @@ function theme_postbox($msg)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, $pmxcFunc, $editortxt;
+	global $txt, $modSettings, $options, $pmxcFunc, $pmxCacheFunc, $editortxt;
 	global $context, $settings, $user_info, $scripturl;
 
 	// Load the Post language file... for the moment at least.
@@ -1973,7 +1973,7 @@ function create_control_richedit($editorOptions)
 			);
 		elseif ($user_info['smiley_set'] != 'none')
 		{
-			if (($temp = cache_get_data('posting_smileys', 480)) == null)
+			if (($temp = $pmxCacheFunc['get']('posting_smileys')) == null)
 			{
 				$request = $pmxcFunc['db_query']('', '
 					SELECT code, filename, description, smiley_row, hidden
@@ -2001,7 +2001,7 @@ function create_control_richedit($editorOptions)
 						$context['smileys'][$section][count($smileyRows) - 1]['isLast'] = true;
 				}
 
-				cache_put_data('posting_smileys', $context['smileys'], 480);
+				$pmxCacheFunc['put']('posting_smileys', $context['smileys'], 480);
 			}
 			else
 				$context['smileys'] = $temp;
@@ -2020,7 +2020,7 @@ function create_control_richedit($editorOptions)
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	global $modSettings, $pmxcFunc;
+	global $modSettings, $pmxcFunc, $pmxCacheFunc;
 	global $context, $user_info, $scripturl, $language;
 
 	// First verification means we need to set up some bits...
@@ -2073,7 +2073,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	// If we want questions do we have a cache of all the IDs?
 	if (!empty($thisVerification['number_questions']) && empty($modSettings['question_id_cache']))
 	{
-		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestions', 300)) == null)
+		if (($modSettings['question_id_cache'] = $pmxCacheFunc['get']('verificationQuestions')) == null)
 		{
 			$request = $pmxcFunc['db_query']('', '
 				SELECT id_question, lngfile, question, answers
@@ -2099,7 +2099,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 			}
 			$pmxcFunc['db_free_result']($request);
 
-			cache_put_data('verificationQuestions', $modSettings['question_id_cache'], 300);
+			$pmxCacheFunc['put']('verificationQuestions', $modSettings['question_id_cache'], 300);
 		}
 	}
 

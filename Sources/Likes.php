@@ -301,7 +301,7 @@ class Likes
 	 */
 	protected function insert()
 	{
-		global $pmxcFunc;
+		global $pmxcFunc, $pmxCacheFunc;
 
 		// Any last minute changes? Temporarily turn the passed properties to normal vars to prevent unexpected behaviour with other methods using these properties.
 		$type = $this->_type;
@@ -424,7 +424,7 @@ class Likes
 		// This way a like handler doesn't need to explicitly declare anything in integrate_issue_like, but do so
 		// in integrate_valid_likes where it absolutely has to exist.
 		if (!empty($this->_validLikes['flush_cache']))
-			cache_put_data($this->_validLikes['flush_cache'], null);
+			$pmxCacheFunc['put']($this->_validLikes['flush_cache'], null);
 
 		// All done, start building the data to pass as response.
 		$this->_data = array(

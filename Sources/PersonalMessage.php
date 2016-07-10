@@ -23,7 +23,7 @@ if (!defined('PMX'))
  */
 function MessageMain()
 {
-	global $txt, $scripturl, $sourcedir, $context, $user_info, $user_settings, $pmxcFunc, $modSettings;
+	global $txt, $scripturl, $sourcedir, $context, $user_info, $user_settings, $pmxcFunc, $pmxCacheFunc, $modSettings;
 
 	// No guests!
 	is_not_guest();
@@ -42,7 +42,7 @@ function MessageMain()
 	// Load up the members maximum message capacity.
 	if ($user_info['is_admin'])
 		$context['message_limit'] = 0;
-	elseif (($context['message_limit'] = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
+	elseif (($context['message_limit'] = $pmxCacheFunc['get']('msgLimit:' . $user_info['id'])) === null)
 	{
 		// @todo Why do we do this?  It seems like if they have any limit we should use it.
 		$request = $pmxcFunc['db_query']('', '
@@ -59,7 +59,7 @@ function MessageMain()
 		$context['message_limit'] = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		cache_put_data('msgLimit:' . $user_info['id'], $context['message_limit'], 360);
+		$pmxCacheFunc['put']('msgLimit:' . $user_info['id'], $context['message_limit'], 360);
 	}
 
 	// Prepare the context for the capacity bar.
@@ -83,7 +83,7 @@ function MessageMain()
 	$context['labels'] = array();
 
 	// Load the label data.
-	if ($user_settings['new_pm'] || ($context['labels'] = cache_get_data('labelCounts:' . $user_info['id'], 720)) === null)
+	if ($user_settings['new_pm'] || ($context['labels'] = $pmxCacheFunc['get']('labelCounts:' . $user_info['id'])) === null)
 	{
 		// Looks like we need to reseek!
 
@@ -144,7 +144,7 @@ function MessageMain()
 		$pmxcFunc['db_free_result']($result);
 
 		// Store it please!
-		cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
+		$pmxCacheFunc['put']('labelCounts:' . $user_info['id'], $context['labels'], 720);
 	}
 
 	// Now we have the labels, and assuming we have unsorted mail, apply our rules!
@@ -1719,7 +1719,7 @@ function MessageSearch2()
 function MessagePost()
 {
 	global $txt, $sourcedir, $scripturl, $modSettings;
-	global $context, $pmxcFunc, $language, $user_info;
+	global $context, $pmxcFunc, $pmxCacheFunc, $language, $user_info;
 
 	isAllowedTo('pm_send');
 
@@ -1814,7 +1814,7 @@ function MessagePost()
 		censorText($row_quoted['body']);
 
 		// Add 'Re: ' to it....
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
+		if (!isset($context['response_prefix']) && !($context['response_prefix'] = $pmxCacheFunc['get']('response_prefix')))
 		{
 			if ($language === $user_info['language'])
 				$context['response_prefix'] = $txt['response_prefix'];
@@ -1824,7 +1824,7 @@ function MessagePost()
 				$context['response_prefix'] = $txt['response_prefix'];
 				loadLanguage('index');
 			}
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
+			$pmxCacheFunc['put']('response_prefix', $context['response_prefix'], 600);
 		}
 		$form_subject = $row_quoted['subject'];
 		if ($context['reply'] && trim($context['response_prefix']) != '' && $pmxcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
@@ -2879,7 +2879,7 @@ function MessagePrune()
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
-	global $user_info, $pmxcFunc;
+	global $user_info, $pmxcFunc, $pmxCacheFunc;
 
 	if ($owner === null)
 		$owner = array($user_info['id']);
@@ -3045,7 +3045,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	cache_put_data('labelCounts:' . $user_info['id'], null, 720);
+	$pmxCacheFunc['put']('labelCounts:' . $user_info['id'], null, 720);
 }
 
 /**
@@ -3165,7 +3165,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 		$pmxcFunc['db_free_result']($result);
 
 		// Need to store all this.
-		cache_put_data('labelCounts:' . $owner, $context['labels'], 720);
+		$pmxCacheFunc['put']('labelCounts:' . $owner, $context['labels'], 720);
 		updateMemberData($owner, array('unread_messages' => $total_unread));
 
 		// If it was for the current member, reflect this in the $user_info array too.
@@ -3179,7 +3179,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
  */
 function ManageLabels()
 {
-	global $txt, $context, $user_info, $scripturl, $pmxcFunc;
+	global $txt, $context, $user_info, $scripturl, $pmxcFunc, $pmxCacheFunc;
 
 	// Build the link tree elements...
 	$context['linktree'][] = array(
@@ -3409,7 +3409,7 @@ function ManageLabels()
 		}
 
 		// Make sure we're not caching this!
-		cache_put_data('labelCounts:' . $user_info['id'], null, 720);
+		$pmxCacheFunc['put']('labelCounts:' . $user_info['id'], null, 720);
 
 		// To make the changes appear right away, redirect.
 		redirectexit('action=pm;sa=manlabels');

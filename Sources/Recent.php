@@ -74,7 +74,7 @@ function getLastPost()
  */
 function RecentPosts()
 {
-	global $txt, $scripturl, $user_info, $context, $modSettings, $board, $pmxcFunc;
+	global $txt, $scripturl, $user_info, $context, $modSettings, $board, $pmxcFunc, $pmxCacheFunc;
 
 	loadTemplate('Recent');
 	$context['page_title'] = $txt['recent_posts'];
@@ -272,7 +272,7 @@ function RecentPosts()
 		$messages = 0;
 
 	$key = 'recent-' . $user_info['id'] . '-' . md5(json_encode(array_diff_key($query_parameters, array('max_id_msg' => 0)))) . '-' . (int) $_REQUEST['start'];
-	if (!$context['is_redirect'] && (empty($modSettings['cache_enable']) || ($messages = cache_get_data($key, 120)) == null))
+	if (!$context['is_redirect'] && (empty($modSettings['cache_enable']) || ($messages = $pmxCacheFunc['get']($key)) == null))
 	{
 		$done = false;
 		while (!$done)
@@ -309,7 +309,7 @@ function RecentPosts()
 			$messages[] = $row['id_msg'];
 		$pmxcFunc['db_free_result']($request);
 		if (!empty($cache_results))
-			cache_put_data($key, $messages, 120);
+			$pmxCacheFunc['put']($key, $messages, 120);
 	}
 
 	// Nothing here... Or at least, nothing you can see...

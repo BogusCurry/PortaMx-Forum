@@ -20,7 +20,7 @@ if (!defined('PMX'))
  */
 function showAttachment()
 {
-	global $pmxcFunc, $modSettings, $maintenance, $context;
+	global $pmxcFunc, $pmxCacheFunc, $modSettings, $maintenance, $context;
 
 	// Some defaults that we need.
 	$context['character_set'] = empty($modSettings['global_character_set']) ? (empty($txt['lang_character_set']) ? 'ISO-8859-1' : $txt['lang_character_set']) : $modSettings['global_character_set'];
@@ -70,7 +70,7 @@ function showAttachment()
 	}
 
 	// Use cache when possible.
-	if (($cache = cache_get_data('attachment_lookup_id-'. $attachId)) != null)
+	if (($cache = $pmxCacheFunc['get']('attachment_lookup_id-'. $attachId)) != null)
 		list($file, $thumbFile) = $cache;
 
 	// Get the info from the DB.
@@ -176,7 +176,7 @@ function showAttachment()
 
 		// Cache it.
 		if(!empty($file) || !empty($thumbFile))
-			cache_put_data('attachment_lookup_id-'. $file['id_attach'], array($file, $thumbFile), mt_rand(850, 900));
+			$pmxCacheFunc['put']('attachment_lookup_id-'. $file['id_attach'], array($file, $thumbFile), mt_rand(850, 900));
 	}
 
 	// Update the download counter (unless it's a thumbnail).

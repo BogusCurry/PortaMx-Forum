@@ -25,7 +25,7 @@ if (!defined('PMX'))
  */
 function DisplayStats()
 {
-	global $txt, $scripturl, $modSettings, $context, $pmxcFunc;
+	global $txt, $scripturl, $modSettings, $context, $pmxcFunc, $pmxCacheFunc;
 
 	isAllowedTo('view_stats');
 	// Page disabled - redirect them out
@@ -157,7 +157,7 @@ function DisplayStats()
 	$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 	if (!in_array('gender', $disabled_fields))
 	{
-		if (($context['gender'] = cache_get_data('stats_gender', 240)) == null)
+		if (($context['gender'] = $pmxCacheFunc['get']('stats_gender')) == null)
 		{
 			$result = $pmxcFunc['db_query']('', '
 				SELECT COUNT(id_member) AS total_members, value AS gender
@@ -175,7 +175,7 @@ function DisplayStats()
 			}
 			$pmxcFunc['db_free_result']($result);
 
-			cache_put_data('stats_gender', $context['gender'], 240);
+			$pmxCacheFunc['put']('stats_gender', $context['gender'], 240);
 		}
 	}
 
@@ -410,7 +410,7 @@ function DisplayStats()
 	}
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
-	if (($members = cache_get_data('stats_top_starters', 360)) == null)
+	if (($members = $pmxCacheFunc['get']('stats_top_starters')) == null)
 	{
 		$request = $pmxcFunc['db_query']('', '
 			SELECT id_member_started, COUNT(*) AS hits
@@ -428,7 +428,7 @@ function DisplayStats()
 			$members[$row['id_member_started']] = $row['hits'];
 		$pmxcFunc['db_free_result']($request);
 
-		cache_put_data('stats_top_starters', $members, 360);
+		$pmxCacheFunc['put']('stats_top_starters', $members, 360);
 	}
 
 	if (empty($members))
@@ -470,7 +470,7 @@ function DisplayStats()
 	}
 
 	// Time online top 10.
-	$temp = cache_get_data('stats_total_time_members', 600);
+	$temp = $pmxCacheFunc['get']('stats_total_time_members');
 	$members_result = $pmxcFunc['db_query']('', '
 		SELECT id_member, real_name, total_time_logged_in
 		FROM {db_prefix}members' . (!empty($temp) ? '
@@ -521,7 +521,7 @@ function DisplayStats()
 
 	// Cache the ones we found for a bit, just so we don't have to look again.
 	if ($temp !== $temp2)
-		cache_put_data('stats_total_time_members', $temp2, 480);
+		$pmxCacheFunc['put']('stats_total_time_members', $temp2, 480);
 
 	// Likes.
 	if (!empty($modSettings['enable_likes']))
@@ -734,88 +734,6 @@ function getDailyStats($condition_string, $condition_parameters = array())
 			'hits' => comma_format($row_days['hits'])
 		);
 	$pmxcFunc['db_free_result']($days_result);
-}
-
-/**
- * This is the function which returns stats to simplemachines.org IF enabled!
- * called by simplemachines.org.
- * only returns anything if stats was enabled during installation.
- * can also be accessed by the admin, to show what stats sm.org collects.
- * does not return any data directly to sm.org, instead starts a new request for security.
- *
- * @link http://www.simplemachines.org/about/stats.php for more info.
- * Note: This functionality is currently broken
- */
-function SMStats()
-{
-	global $modSettings, $user_info, $forum_version, $sourcedir;
-
-	// First, is it disabled?
-	if (empty($modSettings['allow_sm_stats']))
-		die();
-
-	// Are we saying who we are, and are we right? (OR an admin)
-	if (!$user_info['is_admin'] && (!isset($_GET['sid']) || $_GET['sid'] != $modSettings['allow_sm_stats']))
-		die();
-
-	// Verify the referer...
-	if (!$user_info['is_admin'] && (!isset($_SERVER['HTTP_REFERER']) || md5($_SERVER['HTTP_REFERER']) != '746cb59a1a0d5cf4bd240e5a67c73085'))
-		die();
-
-	// Get some server versions.
-	require_once($sourcedir . '/Subs-Admin.php');
-	$checkFor = array(
-		'php',
-		'db_server',
-	);
-	$serverVersions = getServerVersions($checkFor);
-
-	// Get the actual stats.
-	$stats_to_send = array(
-		'UID' => $modSettings['allow_sm_stats'],
-		'time_added' => time(),
-		'members' => $modSettings['totalMembers'],
-		'messages' => $modSettings['totalMessages'],
-		'topics' => $modSettings['totalTopics'],
-		'boards' => 0,
-		'php_version' => $serverVersions['php']['version'],
-		'database_type' => strtolower($serverVersions['db_server']['title']),
-		'database_version' => $serverVersions['db_server']['version'],
-		'pmx_version' => $forum_version,
-		'smfd_version' => $modSettings['smfVersion'],
-	);
-
-	// Encode all the data, for security.
-	foreach ($stats_to_send as $k => $v)
-		$stats_to_send[$k] = urlencode($k) . '=' . urlencode($v);
-
-	// Turn this into the query string!
-	$stats_to_send = implode('&', $stats_to_send);
-
-	// If we're an admin, just plonk them out.
-	if ($user_info['is_admin'])
-		echo $stats_to_send;
-	else
-	{
-		// Connect to the collection script.
-		$fp = @fsockopen('www.simplemachines.org', 80, $errno, $errstr);
-		if ($fp)
-		{
-			$length = strlen($stats_to_send);
-
-			$out = 'POST /smf/stats/collect_stats.php HTTP/1.1' . "\r\n";
-			$out .= 'Host: www.simplemachines.org' . "\r\n";
-			$out .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
-			$out .= 'Content-Length: ' . $length . "\r\n\r\n";
-			$out .= $stats_to_send . "\r\n";
-			$out .= 'Connection: Close' . "\r\n\r\n";
-			fwrite($fp, $out);
-			fclose($fp);
-		}
-	}
-
-	// Die.
-	die('OK');
 }
 
 ?>

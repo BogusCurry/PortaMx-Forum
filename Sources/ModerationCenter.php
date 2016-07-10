@@ -292,9 +292,9 @@ function ModerationHome()
  */
 function ModBlockWatchedUsers()
 {
-	global $context, $pmxcFunc, $scripturl, $modSettings;
+	global $context, $pmxcFunc, $pmxCacheFunc, $scripturl, $modSettings;
 
-	if (($watched_users = cache_get_data('recent_user_watches', 240)) === null)
+	if (($watched_users = $pmxCacheFunc['get']('recent_user_watches')) === null)
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $pmxcFunc['db_query']('', '
@@ -312,7 +312,7 @@ function ModBlockWatchedUsers()
 			$watched_users[] = $row;
 		$pmxcFunc['db_free_result']($request);
 
-		cache_put_data('recent_user_watches', $watched_users, 240);
+		$pmxCacheFunc['put']('recent_user_watches', $watched_users, 240);
 	}
 
 	$context['watched_users'] = array();
@@ -335,7 +335,7 @@ function ModBlockWatchedUsers()
  */
 function ModBlockNotes()
 {
-	global $context, $pmxcFunc, $scripturl, $txt, $user_info;
+	global $context, $pmxcFunc, $pmxCacheFunc, $scripturl, $txt, $user_info;
 
 	// Set a nice and informative message.
 	$context['report_post_action'] = !empty($_SESSION['rc_confirmation']) ? $_SESSION['rc_confirmation'] : array();
@@ -365,8 +365,8 @@ function ModBlockNotes()
 			);
 
 			// Clear the cache.
-			cache_put_data('moderator_notes', null, 240);
-			cache_put_data('moderator_notes_total', null, 240);
+			$pmxCacheFunc['put']('moderator_notes', null, 240);
+			$pmxCacheFunc['put']('moderator_notes_total', null, 240);
 		}
 
 		// Everything went better than expected!
@@ -416,8 +416,8 @@ function ModBlockNotes()
 		);
 
 		// Clear the cache.
-		cache_put_data('moderator_notes', null, 240);
-		cache_put_data('moderator_notes_total', null, 240);
+		$pmxCacheFunc['put']('moderator_notes', null, 240);
+		$pmxCacheFunc['put']('moderator_notes_total', null, 240);
 
 		// Tell them the message was deleted.
 		$_SESSION['rc_confirmation'] = 'message_deleted';
@@ -426,7 +426,7 @@ function ModBlockNotes()
 	}
 
 	// How many notes in total?
-	if (($moderator_notes_total = cache_get_data('moderator_notes_total', 240)) === null)
+	if (($moderator_notes_total = $pmxCacheFunc['get']('moderator_notes_total')) === null)
 	{
 		$request = $pmxcFunc['db_query']('', '
 			SELECT COUNT(*)
@@ -439,12 +439,12 @@ function ModBlockNotes()
 		list ($moderator_notes_total) = $pmxcFunc['db_fetch_row']($request);
 		$pmxcFunc['db_free_result']($request);
 
-		cache_put_data('moderator_notes_total', $moderator_notes_total, 240);
+		$pmxCacheFunc['put']('moderator_notes_total', $moderator_notes_total, 240);
 	}
 
 	// Grab the current notes. We can only use the cache for the first page of notes.
 	$offset = isset($_GET['notes']) && isset($_GET['start']) ? $_GET['start'] : 0;
-	if ($offset != 0 || ($moderator_notes = cache_get_data('moderator_notes', 240)) === null)
+	if ($offset != 0 || ($moderator_notes = $pmxCacheFunc['get']('moderator_notes')) === null)
 	{
 		$request = $pmxcFunc['db_query']('', '
 			SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
@@ -464,7 +464,7 @@ function ModBlockNotes()
 		$pmxcFunc['db_free_result']($request);
 
 		if ($offset == 0)
-			cache_put_data('moderator_notes', $moderator_notes, 240);
+			$pmxCacheFunc['put']('moderator_notes', $moderator_notes, 240);
 	}
 
 	// Lets construct a page index.
@@ -498,7 +498,7 @@ function ModBlockNotes()
  */
 function ModBlockReportedPosts()
 {
-	global $context, $user_info, $scripturl, $pmxcFunc;
+	global $context, $user_info, $scripturl, $pmxcFunc, $pmxCacheFunc;
 
 	// Got the info already?
 	$cachekey = md5(json_encode($user_info['mod_cache']['bq']));
@@ -506,7 +506,7 @@ function ModBlockReportedPosts()
 	if ($user_info['mod_cache']['bq'] == '0=1')
 		return 'reported_posts_block';
 
-	if (($reported_posts = cache_get_data('reported_posts_' . $cachekey, 90)) === null)
+	if (($reported_posts = $pmxCacheFunc['get']('reported_posts_' . $cachekey)) === null)
 	{
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $pmxcFunc['db_query']('', '
@@ -533,7 +533,7 @@ function ModBlockReportedPosts()
 		$pmxcFunc['db_free_result']($request);
 
 		// Cache it.
-		cache_put_data('reported_posts_' . $cachekey, $reported_posts, 90);
+		$pmxCacheFunc['put']('reported_posts_' . $cachekey, $reported_posts, 90);
 	}
 
 	$context['reported_posts'] = array();
@@ -612,7 +612,7 @@ function ModBlockGroupRequests()
  */
 function ModBlockReportedMembers()
 {
-	global $context, $scripturl, $pmxcFunc;
+	global $context, $scripturl, $pmxcFunc, $pmxCacheFunc;
 
 	// Got the info already?
 	$cachekey = md5(json_encode((int) allowedTo('moderate_forum')));
@@ -620,7 +620,7 @@ function ModBlockReportedMembers()
 	if (!allowedTo('moderate_forum'))
 		return 'reported_users_block';
 
-	if (($reported_users = cache_get_data('reported_users_' . $cachekey, 90)) === null)
+	if (($reported_users = $pmxCacheFunc['get']('reported_users_' . $cachekey)) === null)
 	{
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $pmxcFunc['db_query']('', '
@@ -646,7 +646,7 @@ function ModBlockReportedMembers()
 		$pmxcFunc['db_free_result']($request);
 
 		// Cache it.
-		cache_put_data('reported_users_' . $cachekey, $reported_users, 90);
+		$pmxCacheFunc['put']('reported_users_' . $cachekey, $reported_users, 90);
 	}
 
 	$context['reported_users'] = array();
