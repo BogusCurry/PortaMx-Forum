@@ -437,10 +437,10 @@ function template_single_post($message)
 		$context['ignoredMsgs'][] = $message['id'];
 	}
 
-	// Show the message anchor and a "new" anchor if this message is new.
+	// Show the message anchor
 	echo '
 				<div class="', $message['css_class'] ,'">
-					<a class="msg_id_link" id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a class="msg_id_link" id="new"></a>' : ''), '
+					<a class="msg_id_link" id="msg' . $message['id'] . '"></a>
 					<div class="post_wrapper">';
 
 	// Show information about the poster of this message.
@@ -640,14 +640,14 @@ function template_single_post($message)
 	// Show "<< Last Edit: Time by Person >>" if this post was edited. But we need the div even if it wasn't modified!
 	// Because we insert into it through AJAX and we don't want to stop themers moving it around if they so wish so they can put it where they want it.
 	echo '
-									<div class="smalltext modified" id="modified_', $message['id'], '">';
+									<span class="smalltext modified" id="modified_', $message['id'], '">';
 
 	if (!empty($modSettings['show_modify']) && !empty($message['modified']['name']))
 		echo
 										$message['modified']['last_edit_text'];
 
 	echo '
-									</div>
+									</span>
 									<script>
 										window.addEventListener("resize", TitleResize);
 										function TitleResize(){

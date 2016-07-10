@@ -428,9 +428,17 @@ function theme_linktree($force_show = false)
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
 		return;
 
-	echo '
+	if(!isset($context['linktree_first_call']))
+	{
+		echo '
 				<div class="navigate_section">
 					<ul'. (!empty(checkECL_Cookie()) ? ' id="topic"' : '') .'>';
+		$context['linktree_first_call'] = true;
+	}
+	else
+		echo '
+				<div class="navigate_section">
+					<ul>';
 
 	if ($context['user']['is_logged'])
 	echo '
