@@ -34,13 +34,8 @@ $pmxCacheFunc = array(
 	'drop' =>  'pmxCacheDrop'
 );
 
-// chache enabled ?
-$accelerator = $cache_accelerator;
-if(empty($cache_enable))
-	$accelerator = '';
-
-// Create a Functio for each cache function
-switch ($accelerator)
+// Create Functions for the selected accelerator
+switch ($cache_accelerator)
 {
 	/**
 	* memCached
@@ -224,10 +219,7 @@ switch ($accelerator)
 		// Clear the cache
 		function pmxCacheClean()
 		{
-			global $pmxCache, $cache_enable;
-
-			if(empty($cache_enable))
-				return null;
+			global $pmxCache;
 
 			zend_shm_cache_clear('PMX');
 
@@ -292,10 +284,7 @@ switch ($accelerator)
 		// Clear the cache
 		function pmxCacheClean()
 		{
-			global $pmxCache, $cache_enable;
-
-			if(empty($cache_enable))
-				return null;
+			global $pmxCache;
 
 			apc_clear_cache('user');
 
