@@ -337,7 +337,7 @@ function Display()
 	}
 
 	// Create a previous next string if the selected theme has it as a selected option.
-	$context['previous_next'] = $modSettings['enablePreviousNext'] ? '<a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=prev#topic">' . $txt['previous_next_back'] . '</a> - <a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=next#topic">' . $txt['previous_next_forward'] . '</a>' : '';
+	$context['previous_next'] = $modSettings['enablePreviousNext'] ? '<a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=prev#top">' . $txt['previous_next_back'] . '</a> - <a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=next#top">' . $txt['previous_next_forward'] . '</a>' : '';
 
 	// Check if spellchecking is both enabled and actually working. (for quick reply.)
 	$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && (function_exists('pspell_new') || (function_exists('enchant_broker_init') && ($txt['lang_charset'] == 'UTF-8' || function_exists('iconv'))));
@@ -441,7 +441,7 @@ function Display()
 		$_REQUEST['start'] = -1;
 
 	// Construct the page index, allowing for the .START method...
-	$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $_REQUEST['start'], $context['total_visible_posts'], $context['messages_per_page'], true);
+	$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d#top', $_REQUEST['start'], $context['total_visible_posts'], $context['messages_per_page'], true);
 	$context['start'] = $_REQUEST['start'];
 
 	// This is information about which page is current, and which page we're on - in case you don't like the constructed page index. (again, wireles..)
@@ -1286,7 +1286,7 @@ function Display()
 	loadJavascriptFile('topic.js', array('defer' => false), 'pmx_topic');
 
 	// quotedText.js
-	loadJavascriptFile('quotedText.js', array('defer' => true), 'pmx_quotedText');
+//	loadJavascriptFile('quotedText.js', array('defer' => true), 'pmx_quotedText');
 
 	// Mentions
 	if (!empty($modSettings['enable_mentions']) && allowedTo('mention'))

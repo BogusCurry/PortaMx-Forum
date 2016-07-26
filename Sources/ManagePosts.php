@@ -183,7 +183,7 @@ function SetCensor()
  */
 function ModifyPostSettings($return_config = false)
 {
-	global $context, $txt, $modSettings, $scripturl, $sourcedir, $pmxcFunc, $db_type;
+	global $context, $txt, $modSettings, $scripturl, $sourcedir, $pmxcFunc, $pmxCacheFunc, $db_type;
 
 	// Make an inline conditional a little shorter...
 	$can_spell_check = false;

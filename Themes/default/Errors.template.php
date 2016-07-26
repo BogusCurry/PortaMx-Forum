@@ -44,8 +44,9 @@ function template_fatal_error()
 
 		// Show a back button (using javascript.)
 		echo '
-	<div class="centertext">
-		<a class="button_link" style="float:none" href="javascript:document.location=document.referrer.length == 0 ? pmx_scripturl : document.referrer">', $txt['back'], '</a>
+	<script>function GoBack(){document.location=document.referrer.length == 0 ? pmx_scripturl : document.referrer;}</script>
+	<div class="centertext" >
+		<input type="button" class="button_link" style="float:none;font-weight:bold;" onclick="GoBack()" name="" value="     ', $txt['back'], '     ">
 	</div>';
 	}
 }

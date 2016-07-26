@@ -667,7 +667,7 @@ function updateSettings($changeArray, $update = false)
 		}
 
 		// Clean out the cache and make sure the cobwebs are gone too.
-		$pmxCacheFunc['put']('modSettings', null, 90);
+		$pmxCacheFunc['put']('modSettings', null, 60);
 
 		return;
 	}
@@ -698,7 +698,7 @@ function updateSettings($changeArray, $update = false)
 	);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	$pmxCacheFunc['put']('modSettings', null, 90);
+	$pmxCacheFunc['put']('modSettings', null, 10);
 }
 
 /**
@@ -2899,6 +2899,9 @@ function redirectexit($setLocation = '', $refresh = false, $permanent = false)
 				}, $setLocation);
 	}
 
+	// call sef ..
+	pmxsef_Redirect($setLocation);
+
 	// Maybe integrations want to change where we are heading?
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh, &$permanent));
 
@@ -2973,6 +2976,9 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 					ob_start($call);
 			}
 
+		if(!empty($modSettings['sef_enabled']))
+			ob_start('ob_pmxsef');
+
 		// Display the screen in the logical order.
 		template_header();
 		$header_done = true;
@@ -3003,6 +3009,9 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 
 	// For session check verification.... don't switch browsers...
 	$_SESSION['USER_AGENT'] = empty($_SERVER['HTTP_USER_AGENT']) ? '' : $_SERVER['HTTP_USER_AGENT'];
+
+	// call the SEF function
+	pmxsef_XMLOutput($do_footer);
 
 	// Hand off the output to the portal, etc. we're integrated with.
 	call_integration_hook('integrate_exit', array($do_footer));
@@ -3715,7 +3724,7 @@ function custMinify($data, $type, $do_deferred = false)
 	{
 		loadLanguage('Errors');
 		log_error(sprintf($txt['file_not_created'], $toCreate), 'general');
-		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null);
+		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null, 60);
 
 		// The process failed so roll back to print each individual file.
 		return $data;
@@ -3750,7 +3759,7 @@ function custMinify($data, $type, $do_deferred = false)
 	{
 		loadLanguage('Errors');
 		log_error(sprintf($txt['file_not_created'], $toCreate), 'general');
-		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null);
+		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null, 60);
 
 		// The process failed so roll back to print each individual file.
 		return $data;

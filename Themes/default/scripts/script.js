@@ -316,7 +316,7 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 		return false;
 
 	// check the ecl cookie
-	var eclcook = smfCookie('test', 'eclauth', '', 'ecl');
+	var eclcook = pmxCookie('test', 'eclauth', '', 'ecl');
 
 	// Set up our div details
 	var sAjax_indicator = '<div class="centertext"><img src="' + pmx_images_url + '/loading_sm.gif"></div>';
@@ -773,7 +773,7 @@ pmxc_Toggle.prototype.init = function ()
 	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
 	{
 		// Check if the cookie is set.
-		var cookieValue = smfCookie('get', this.opt.oCookieOptions.sCookieName);
+		var cookieValue = pmxCookie('get', this.opt.oCookieOptions.sCookieName);
 		this.opt.bCurrentlyCollapsed = cookieValue == '1';
 	}
 
@@ -924,7 +924,7 @@ pmxc_Toggle.prototype.changeState = function(bCollapse, bInit)
 
 	// Update the cookie, if desired.
 	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
-		smfCookie('set', this.opt.oCookieOptions.sCookieName, this.bCollapsed | 0);
+		pmxCookie('set', this.opt.oCookieOptions.sCookieName, this.bCollapsed | 0, '', true);
 
 	if (!bInit && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
 		pmx_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed | 0, 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, pmx_session_id, pmx_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
@@ -1245,11 +1245,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 
 		var oMessage = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
 		if (oMessage.getElementsByTagName('error').length == 0)
-		{
-			if (this.opt.bShowModify && oMessage.getElementsByTagName('modified').length != 0)
-				setInnerHTML(document.getElementById('modified_' + this.iCurMessageId), oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
 			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
-		}
 	}
 }
 
@@ -1611,11 +1607,12 @@ $(function()
 // 1. value on set with type ecl is ignored
 // 2. test returns a value of '1' if true, empty string if false
 // 3. test check if cookie exist, if a value given this is also tested
-function smfCookie(sMode, sName, sValue, sType)
+function pmxCookie(sMode, sName, sValue, sType, bAsync)
 {
 	sType = sType == undefined ? '' : sType;
 	sValue = sValue == undefined ? '' : sValue;
+	bAsync = bAsync == undefined ? false : bAsync;
 	var sResult = '';
-	$.ajax({type: 'GET', async:false, url:pmx_scripturl +'?jscook', data:{mode:sMode, name:sName, value:sValue, type:sType}, success:function(data){sResult = data;}});
+	$.ajax({type: 'GET', async:bAsync, url:pmx_scripturl +'?jscook', data:{mode:sMode, name:sName, value:sValue, type:sType}, success:function(data){sResult = data;}});
 	return sResult;
 }

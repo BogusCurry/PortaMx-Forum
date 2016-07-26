@@ -31,10 +31,10 @@ function createWaveFile($word)
 	global $settings, $user_info, $pmxCacheFunc;
 
 	// Allow max 2 requests per 20 seconds.
-	if (($ip = $pmxCacheFunc['get']('wave_file/' . $user_info['ip'])) > 2 || ($ip2 = $pmxCacheFunc['get']('wave_file/' . $user_info['ip2'])) > 2)
+	if (($ip = $pmxCacheFunc['get']('wave_file-' . $user_info['ip'])) > 2 || ($ip2 = $pmxCacheFunc['get']('wave_file-' . $user_info['ip2'])) > 2)
 		die(header('HTTP/1.1 400 Bad Request'));
-	$pmxCacheFunc['put']('wave_file/' . $user_info['ip'], $ip ? $ip + 1 : 1, 20);
-	$pmxCacheFunc['put']('wave_file/' . $user_info['ip2'], $ip2 ? $ip2 + 1 : 1, 20);
+	$pmxCacheFunc['put']('wave_file-' . $user_info['ip'], $ip ? $ip + 1 : 1, 20);
+	$pmxCacheFunc['put']('wave_file-' . $user_info['ip2'], $ip2 ? $ip2 + 1 : 1, 20);
 
 	// Fixate randomization for this word.
 	mt_srand(end(unpack('n', md5($word . session_id()))));

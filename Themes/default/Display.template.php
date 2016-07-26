@@ -179,7 +179,7 @@ function template_main()
 	$haveButtons = template_button_strip($context['normal_buttons'], 'right', array(), true);
 	if(!empty($haveButtons))
 		echo '
-			<div class="pagesection top" id="pagetop">
+			<div class="pagesection top" id="top">
 				', $haveButtons, '
 				', $context['menu_separator'], '<a href="#bot" class="topbottom floatleft">', $txt['go_down'], '</a>
 				<div class="pagelinks floatleft">
@@ -188,7 +188,7 @@ function template_main()
 			</div>';
 	else
 		echo '
-			<div class="pagesection top" id="pagetop">
+			<div class="pagesection top" id="top">
 				<a href="#bot" class="topbottom floatleft">', $txt['go_down'], '</a>
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
@@ -225,7 +225,7 @@ function template_main()
 	echo '
 			<div class="pagesection bot" id="bot">
 				', $haveButtons, '
-				', $context['menu_separator'], '<a href="#pagetop" class="topbottom floatleft">', $txt['go_up'], '</a>
+				', $context['menu_separator'], '<a href="#top" class="topbottom floatleft">', $txt['go_up'], '</a>
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -233,7 +233,7 @@ function template_main()
 	else
 		echo '
 			<div class="pagesection bot" id="bot">
-				<a href="#pagetop" class="topbottom floatleft">', $txt['go_up'], '</a>
+				<a href="#top" class="topbottom floatleft">', $txt['go_up'], '</a>
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
 				</div>
@@ -362,7 +362,7 @@ function template_main()
 										<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" class="button_submit">&nbsp;&nbsp;<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" class="button_submit">&nbsp;&nbsp;' . ($context['show_spellchecking'] ? '<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\');" class="button_submit">&nbsp;&nbsp;' : '') . '
 									</div>
 								</div>'), ',
-							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text">'), ',
+							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" readonly="readonly">'), ',
 							sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
 							sTemplateSubjectNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a>'), ',
 							sTemplateTopSubject: ', JavaScriptEscape('%subject%'), ',
@@ -440,7 +440,7 @@ function template_single_post($message)
 	// Show the message anchor
 	echo '
 				<div class="', $message['css_class'] ,'">
-					<a class="msg_id_link" id="msg' . $message['id'] . '"></a>
+					<a class="msg_id_link" id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : ''), '
 					<div class="post_wrapper">';
 
 	// Show information about the poster of this message.
@@ -831,7 +831,7 @@ function template_single_post($message)
 		// Can the user modify the contents of this post? Show the modify inline image.
 		if ($message['can_modify'])
 			echo '
-									<li class="quick_edit"><a title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\', \'', !empty($modSettings['toggle_subject']), '\')"><span class="generic_icons quick_edit_button"></span>', $txt['quick_edit'], '</a></li>';
+										<li><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '"><span class="generic_icons modify_button"></span>', $txt['modify'], '</a></li>';
 
 		if ($message['can_approve'] || $message['can_unapprove'] || $message['can_modify'] || $message['can_remove'] || $context['can_split'] || $context['can_restore_msg'])
 			echo '
@@ -839,11 +839,6 @@ function template_single_post($message)
 
 		echo '
 										<ul>';
-
-		// Can the user modify the contents of this post?
-		if ($message['can_modify'])
-			echo '
-											<li><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '"><span class="generic_icons modify_button"></span>', $txt['modify'], '</a></li>';
 
 		// How about... even... remove it entirely?!
 		if ($context['can_delete'] && ($context['topic_first_message'] == $message['id']))
@@ -947,7 +942,7 @@ function template_single_post($message)
 
 /**
  * The template for displaying the quick reply box.
- */
+*/
 function template_quickreply()
 {
 	global $context, $modSettings, $scripturl, $options, $txt;
@@ -955,6 +950,7 @@ function template_quickreply()
 	if(!empty($modSettings['disable_quick_reply']))
 		echo '
 		<div style="display:none;">';
+
 	echo '
 		<a id="quickreply"></a>
 		<div class="tborder" id="quickreplybox">
@@ -1006,9 +1002,9 @@ function template_quickreply()
 							function insertQuoteFast(messageid)
 							{
 								if (window.XMLHttpRequest)
-									getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), onDocReceived);
+									getXMLDocument(smf_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), onDocReceived);
 								else
-									reqWin(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), 240, 90);
+									reqWin(smf_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), 240, 90);
 								return false;
 							}
 							function onDocReceived(XMLDoc)
@@ -1053,7 +1049,7 @@ function template_quickreply()
 	if (!empty($context['drafts_autosave']))
 		echo '
 			<script>
-				var oDraftAutoSave = new pmx_DraftAutoSave({
+				var oDraftAutoSave = new smf_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',', !empty($context['post_box_name']) ? '

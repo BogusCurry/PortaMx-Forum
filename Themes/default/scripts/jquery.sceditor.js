@@ -600,7 +600,7 @@ $.sceditor.plugins.bbcode.bbcode.set(
 
 			var sDate = '';
 			if (typeof(attrs.date) !== "undefined" && attrs.date !== "undefined")
-				sDate = '<date timestamp="' + attrs.date + '">' +  smfCookie('get', 'time', attrs.date, 'format') + '</date>';
+				sDate = '<date timestamp="' + attrs.date + '">' +  pmxCookie('get', 'time', attrs.date, 'format') + '</date>';
 			else
 				attrs.date = '';
 

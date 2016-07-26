@@ -98,6 +98,7 @@ function ModifySettings()
 		'cookie' => 'ModifyCookieSettings',
 		'security' => 'ModifyGeneralSecuritySettings',
 		'cache' => 'ModifyCacheSettings',
+		'sef' => 'ModifySefSettings',
 		'loads' => 'ModifyLoadBalancingSettings',
 		'phpinfo' => 'ShowPHPinfoSettings',
 	);
@@ -433,6 +434,54 @@ function ModifyGeneralSecuritySettings($return_config = false)
 }
 
 /**
+ * SEF (Search Engine Friendly URL's)
+ */
+function ModifySefSettings($return_config = false)
+{
+	global $context, $txt, $scripturl, $cache_enable, $pmxCacheFunc;
+
+	$context['settings_message'] = $txt['sef_settings_description'];
+
+	$config_vars = array(
+		array('sef_enabled', $txt['sef_enabled'], 'db', 'check', null, 'sef_enabled', 'disabled' => empty($cache_enable)),
+		array('sef_lowercase', $txt['sef_lowercase'], 'db', 'check', null, 'sef_lowercase'),
+		array('sef_autosave', $txt['sef_autosave'], 'db', 'check', null, 'sef_autosave'),
+		array('sef_spacechar', $txt['sef_spacechar'], 'db', 'text', 1, 'sef_spacechar'),
+		array('sef_actions', $txt['sef_actions'], 'db', 'large_text', 12, 'sef_actions'),
+		array('sef_ignoreactions', $txt['sef_ignoreactions'], 'db', 'large_text', 1, 'sef_ignoreactions'),
+		array('sef_stripchars', $txt['sef_stripchars'], 'db', 'text', 40, 'sef_stripchars')
+	);
+
+	if ($return_config)
+		return $config_vars;
+
+	// Saving again?
+	if (isset($_GET['save']))
+	{
+		saveSettings($config_vars);
+		$_SESSION['adm-save'] = true;
+
+		// clear the SEF caches
+		$pmxCacheFunc['put']('sef_settings', null, 60);
+		$pmxCacheFunc['put']('sef_boardlist', null, 60);
+		$pmxCacheFunc['put']('sef_categorielist', null, 60);
+		$pmxCacheFunc['put']('sef_topiclist', null, 60);
+		$pmxCacheFunc['put']('sef_userlist', null, 60);
+
+		// exit so we reload our new settings on the page
+		redirectexit('action=admin;area=serversettings;sa=sef;' . $context['session_var'] . '=' . $context['session_id']);
+	}
+
+	loadLanguage('ManageMaintenance');
+	createToken('admin-sef');
+	$context['post_url'] = $scripturl . '?action=admin;area=serversettings;save;sa=sef';
+	$context['settings_title'] = $txt['sef_settings'];
+
+	// Prepare the template.
+	prepareServerSettingsContext($config_vars);
+}
+
+/**
  * Simply modifying cache functions
  *
  * @param bool $return_config Whether or not to return the config_vars array (used for admin search)
@@ -440,7 +489,7 @@ function ModifyGeneralSecuritySettings($return_config = false)
  */
 function ModifyCacheSettings($return_config = false)
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $pmxCacheFunc;
 
 	// Detect all available optimizers
 	$detected = array();
@@ -491,6 +540,9 @@ function ModifyCacheSettings($return_config = false)
 	// Saving again?
 	if (isset($_GET['save']))
 	{
+		// clean the cache
+		$pmxCacheFunc['clean']();
+
 		call_integration_hook('integrate_save_cache_settings');
 
 		saveSettings($config_vars);
@@ -1012,7 +1064,7 @@ function saveSettings(&$config_vars)
 		'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
 		'boarddir', 'sourcedir',
 		'cachedir', 'cache_accelerator', 'cache_memcache',
-		'image_proxy_secret',
+		'image_proxy_secret'
 	);
 
 	// All the numeric variables.

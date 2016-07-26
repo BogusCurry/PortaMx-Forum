@@ -26,7 +26,7 @@ function template_eclmain_above()
 				'. $txt['ecl_needAccept'] . $txt['ecl_device'][$modSettings['isMobile']] .'
 			</div>
 			<div class="ecl_accept">
-				<input type="button" name="accept" value="'. $txt['ecl_button'] .'" onclick="smfCookie(\'set\', \'eclauth\', \'\', \'ecl\');window.location.href=pmx_scripturl;" />&nbsp;
+				<input type="button" name="accept" value="'. $txt['ecl_button'] .'" onclick="pmxCookie(\'set\', \'eclauth\', \'\', \'ecl\');window.location.href=pmx_scripturl;" />&nbsp;
 				<input id="privbut" class="eclbutclose" type="button" name="accept" value="'. $txt['ecl_privacy'] .'" title="'. $txt['ecl_privacy_ttlopen'] .'" onclick="show_eclprivacy()" />';
 
 	if(empty($modSettings['ecl_nomodal']) || (!empty($modSettings['isMobile']) && empty($modSettings['ecl_nomodal_mobile'])))

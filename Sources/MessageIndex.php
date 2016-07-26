@@ -93,9 +93,9 @@ function MessageIndex()
 
 	// Make sure the starting place makes sense and construct the page index.
 	if (isset($_REQUEST['sort']))
-		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc#top' : '#top'), $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
 	else
-		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d', $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d#top', $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
 	$context['start'] = &$_REQUEST['start'];
 
 	// Set a canonical URL for this page.
@@ -416,7 +416,7 @@ function MessageIndex()
 			{
 				// We can't pass start by reference.
 				$start = -1;
-				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d', $start, $row['num_replies'] + 1, $context['messages_per_page'], true, false);
+				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d#top', $start, $row['num_replies'] + 1, $context['messages_per_page'], true, false);
 
 				// If we can use all, show all.
 				if (!empty($modSettings['enableAllMessages']) && $row['num_replies'] + 1 < $modSettings['enableAllMessages'])
@@ -741,9 +741,6 @@ function MessageIndex()
 			),
 		),
 	);
-
-	// Javascript for inline editing.
-	loadJavascriptFile('topic.js', array('defer' => false), 'pmx_topic');
 
 	// Allow adding new buttons easily.
 	// Note: $context['normal_buttons'] is added for backward compatibility with 2.0, but is deprecated and should not be used

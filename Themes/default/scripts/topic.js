@@ -522,7 +522,8 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 
 		// Show new subject, but only if we want to...
 		var oSubject = message.getElementsByTagName('subject')[0];
-		var sSubjectText = this.opt.bshowSubject ? oSubject.childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}') : '';
+		var sSubjectText = oSubject.childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}');
+
 		var sTopSubjectText = oSubject.childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}');
 		this.sSubjectBuffer = this.opt.sTemplateSubjectNormal.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g,'$');
 		setInnerHTML(this.oCurSubjectDiv, this.sSubjectBuffer);

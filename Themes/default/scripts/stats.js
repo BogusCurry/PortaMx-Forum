@@ -171,11 +171,10 @@ pmx_StatsCenter.prototype.onBeforeCollapseMonth = function (oToggle)
 	}
 }
 
-
 pmx_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
 {
 	// Ignore if we're still loading the previous batch.
-	if (this.bIsLoading)
+	if (this.bIsLoading || pmxCookie('get', 'eclauth') == '')
 		return;
 
 	if (oToggle.opt.aSwappableContainers.length == 0)

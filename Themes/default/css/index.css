@@ -599,6 +599,15 @@ dl.settings dt.windowbg {
 	padding: 0 0 5px 0;
 	clear: both;
 }
+dl#mlist_search dt {
+	width: 40%;
+}
+dl#mlist_search dd {
+	width: 56%;
+	float: right;
+	overflow: auto;
+	margin: 0 0 3px 0;
+}
 dl.settings dd {
 	width: 42%;
 	float: right;
@@ -2526,7 +2535,6 @@ dl.addrules dt.floatleft {
 }
 #advanced_search dl#search_options {
 	margin: 0 auto;
-	width: 600px;
 	padding-top: 12px;
 	overflow: hidden;
 }

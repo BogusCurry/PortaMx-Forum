@@ -2032,7 +2032,14 @@ VALUES ('smfVersion', '{$pmx_version}'),
 	('json_done', '1'),
 	('minimize_files', '1'),
 	('ecl_topofs', 39),
-	('pmx_docserver', 'http://docserver.portamx.com/pmxforum/');
+	('pmx_docserver', 'http://docserver.portamx.com/pmxforum/'),
+	('sef_actions', 'about:mozilla,about:unknown,activate,announce,attachapprove,buddy,calendar,clock,collapse,community,coppa,credits,deletemsg,display,dlattach,editpoll,editpoll2,emailuser,findmember,groups,help,helpadmin,im,jseditor,jsmodify,jsoption,keepalive,language,lock,lockvoting,login,login2,logout,markasread,mergetopics,mlist,moderate,modifycat,modifykarma,movetopic,movetopic2,notify,notifyboard,openidreturn,pm,post,post2,printpage,profile,promote,quotefast,quickmod,quickmod2,recent,register,register2,reminder,removepoll,removetopic2,reporttm,requestmembers,restoretopic,search,search2,sendtopic,signup,signup2,smstats,suggest,spellcheck,splittopics,theme,stats,sticky,trackip,unread,unreadreplies,verificationcode,viewprofile,vote,viewquery,viewsmfile,who,.xml,xmlhttp,theme,notifytopic,likes,signup,loadeditorlocale,xml'),
+	('sef_autosave', '0'),
+	('sef_enabled', '0'),
+	('sef_ignoreactions', ''),
+	('sef_lowercase', '1'),
+	('sef_spacechar', '-'),
+	('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',",/,?,\,|');
 
 # --------------------------------------------------------
 

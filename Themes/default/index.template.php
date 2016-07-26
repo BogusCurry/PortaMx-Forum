@@ -87,7 +87,8 @@ function template_html_above()
 	echo '<!DOCTYPE html>
 	<html', $context['right_to_left'] ? ' dir="rtl"' : '', !empty($txt['lang_locale']) ? ' lang="' . str_replace("_", "-", substr($txt['lang_locale'], 0, strcspn($txt['lang_locale'], "."))) . '"' : '' , '>
 <head>
-	<meta charset="', $context['character_set'], '">';
+	<meta http-equiv="Content-type" content="text/html; charset=', $context['character_set'], '" />';
+//	<meta charset="', $context['character_set'], '">';
 
 	// You don't need to manually load index.css, this will be set up for you. You can, of course, add
 	// any other files you want, after template_css() has been run. Note that RTL will also be loaded for you.
@@ -179,7 +180,7 @@ function template_body_above()
 
 	// Wrapper div now echoes permanently for better layout options. h1 a is now target for "Go up" links.
 	echo '
-	<div id="top_section">';
+	<div id="top_section"><span id="head"></span>';
 
 	// If the user is logged in, display some things that might be useful.
 	if ($context['user']['is_logged'])
@@ -293,7 +294,7 @@ function template_body_above()
 	echo '
 	<div id="header">
 		<h1 class="forumtitle">
-			<a id="top" href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name_html_safe'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name_html_safe'] . '">', '</a>
+			<a href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name_html_safe'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name_html_safe'] . '">', '</a>
 		</h1>';
 
 	echo '
@@ -372,7 +373,7 @@ function template_body_below()
 	// There is now a global "Go to top" link at the right.
 		echo '
 		<ul>
-			<li class="floatright">', (!empty($modSettings['requireAgreement'])) ? '<a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a>' : '', ' | <a href="#top_section">', $txt['go_up'], ' &#9650;</a></li>
+			<li class="floatright">', (!empty($modSettings['requireAgreement'])) ? '<a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a>' : '', ' | <a href="#head">', $txt['go_up'], ' &#9650;</a></li>
 			<li class="copyright">', theme_copyright(), '</li>
 		</ul>';
 
@@ -432,7 +433,7 @@ function theme_linktree($force_show = false)
 	{
 		echo '
 				<div class="navigate_section">
-					<ul'. (!empty(checkECL_Cookie()) ? ' id="topic"' : '') .'>';
+					<ul'. (!empty(checkECL_Cookie()) ? ' id="top"' : '') .'>';
 		$context['linktree_first_call'] = true;
 	}
 	else

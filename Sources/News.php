@@ -196,7 +196,7 @@ function ShowXmlFeed()
 
 	// Get the associative array representing the xml.
 	if (!empty($modSettings['cache_enable']) && (!$user_info['is_guest'] || $modSettings['cache_enable'] >= 3))
-		$xml = $pmxCacheFunc['get']('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey);
+		$xml = $pmxCacheFunc['get']('xmlfeed-' . $xml_format . '-' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey);
 	if (empty($xml))
 	{
 		$call = call_helper($subActions[$_GET['sa']][0], true);
@@ -206,7 +206,7 @@ function ShowXmlFeed()
 
 		if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
 		|| (!$user_info['is_guest'] && (array_sum(explode(' ', microtime())) - array_sum(explode(' ', $cache_t)) > 0.2))))
-			$pmxCacheFunc['put']('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
+			$pmxCacheFunc['put']('xmlfeed-' . $xml_format . '-' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 	}
 
 	$feed_title = $pmxcFunc['htmlspecialchars'](strip_tags($context['forum_name'])) . (isset($feed_title) ? $feed_title : '');
@@ -338,6 +338,9 @@ function fix_possible_url($val)
 
 	if (substr($val, 0, strlen($scripturl)) != $scripturl)
 		return $val;
+
+	// call SEF ..
+	pmxsef_fixurl($val);
 
 	call_integration_hook('integrate_fix_url', array(&$val));
 

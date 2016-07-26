@@ -16,7 +16,7 @@ if (!defined('PMX'))
 /**
 * Init the cache functions array
 */
-global $pmxCache, $pmxCacheFunc, $cache_enable, $cachedir, $boardurl, $boarddir;
+global $pmxCache, $pmxCacheFunc, $cache_enable, $cachedir, $boardurl, $cache_accelerator;
 
 $pmxCache['key'] = md5($boardurl . filemtime(__FILE__)) .'-pmx_';
 $pmxCache['vals'] = array(
@@ -45,7 +45,7 @@ switch ($cache_accelerator)
 		$pmxCache['vals']['mode'] = 'Memcache';
 
 		// Get key data from cache
-		function pmxCacheGet($key, $useMember = false, $null_array = false)
+		function pmxCacheGet($key, $null_array = false, $useMember = false)
 		{
 			global $pmxCache, $cache_enable, $mcache;
 
@@ -70,7 +70,7 @@ switch ($cache_accelerator)
 				}
 			}
 			$pmxCache['vals']['time'] += microtime(true) - $st;;
-			return empty($null_array) ? null : array();
+			return null;
 		}
 
 		// Put key data to cache
@@ -79,7 +79,7 @@ switch ($cache_accelerator)
 			global $pmxCache, $cache_enable, $mcache;
 
 			if(empty($cache_enable))
-				return null;
+				return;
 
 			$st = microtime(true);
 			$ckey = $pmxCache['key'] . $key . (!empty($useMember) ? pmxCacheMemGroupAcs() : '');
@@ -103,9 +103,6 @@ switch ($cache_accelerator)
 		function pmxCacheClean()
 		{
 			global $pmxCache, $cache_enable, $mcache;
-
-			if(empty($cache_enable))
-				return null;
 
 			// connected?
 			if(empty($mcache))
@@ -132,7 +129,6 @@ switch ($cache_accelerator)
 			$servers = explode(',', $cache_memcache);
 			$server = trim($servers[array_rand($servers)]);
 			$port = 0;
-			
 
 			// Normal host names do not contain slashes, while e.g. unix sockets do. Assume alternative transport pipe with port 0.
 			if(strpos($server,'/') !== false)
@@ -167,7 +163,7 @@ switch ($cache_accelerator)
 		$pmxCache['vals']['mode'] = 'Zend';
 
 		// Get key data from cache
-		function pmxCacheGet($key, $useMember = false, $null_array = false)
+		function pmxCacheGet($key, $useMember = false)
 		{
 			global $pmxCache, $cache_enable, $user_info;
 
@@ -190,7 +186,7 @@ switch ($cache_accelerator)
 				return $value;
 			}
 			$pmxCache['vals']['time'] += microtime(true) - $st;
-			return empty($null_array) ? null : array();
+			return null;
 		}
 
 		// Put key data to cache
@@ -199,7 +195,7 @@ switch ($cache_accelerator)
 			global $pmxCache, $cache_enable, $user_info;
 
 			if(empty($cache_enable))
-				return null;
+				return;
 
 			$st = microtime(true);
 			$ckey = $pmxCache['key'] . $key . ($useMember ? pmxCacheMemGroupAcs() : '');
@@ -238,7 +234,7 @@ switch ($cache_accelerator)
 		$pmxCache['vals']['mode'] = 'APC';
 
 		// Get key data from cache
-		function pmxCacheGet($key, $useMember = false, $null_array = false)
+		function pmxCacheGet($key, $useMember = false)
 		{
 			global $pmxCache, $cache_enable;
 
@@ -256,7 +252,7 @@ switch ($cache_accelerator)
 				return $value;
 			}
 			$pmxCache['vals']['time'] += microtime(true) - $st;
-			return empty($null_array) ? null : array();
+			return null;
 		}
 
 		// Put key data to cache
@@ -265,7 +261,7 @@ switch ($cache_accelerator)
 			global $pmxCache, $cache_enable;
 
 			if(empty($cache_enable))
-				return null;
+				return;
 
 			$st = microtime(true);
 			if($value !== null)
@@ -303,28 +299,28 @@ switch ($cache_accelerator)
 		$pmxCache['vals']['mode'] = 'File';
 
 		// Get key data from cache
-		function pmxCacheGet($key, $useMember = false, $null_array = false)
+		function pmxCacheGet($key, $useMember = false)
 		{
 			global $pmxCache, $cache_enable, $cachedir;
 
 			if(!is_dir($cachedir) || empty($cache_enable))
-				return empty($null_array) ? null : array();
+				return null;
 
 			$st = microtime(true);
 			$fname = $cachedir .'/data-'. $pmxCache['key']. $key . ($useMember ? pmxCacheMemGroupAcs() : '');
-			if(file_exists($fname) && is_readable($fname) && time() <= filemtime($fname))
+			if(file_exists($fname) && is_readable($fname) && time() <= @filemtime($fname))
 			{
 				$value = file_get_contents($fname);
 				$pmxCache['vals']['loaded'] += strlen($value);
 				$value = pmx_json_decode($value, true);
 				$pmxCache['vals']['time'] += microtime(true) - $st;
-				return $value;
+
+				return !empty($value) ? $value : null;
 			}
 			else
 			{
 				@unlink($fname);
 				$pmxCache['vals']['time'] += microtime(true) - $st;
-				return empty($null_array) ? null : array();
 			}
 		}
 
@@ -334,7 +330,7 @@ switch ($cache_accelerator)
 			global $pmxCache, $cache_enable, $cachedir;
 
 			if(!is_dir($cachedir) || empty($cache_enable))
-				return null;
+				return;
 
 			$st = microtime(true);
 			$fname = $cachedir .'/data-'. $pmxCache['key']. $key . ($useMember ? pmxCacheMemGroupAcs() : '');
@@ -348,28 +344,30 @@ switch ($cache_accelerator)
 					@unlink($fname);
 				else
 				{
-					$newTime = filemtime($fname) + $ttl;
+					$newTime = time() + $ttl;
 					@touch($fname, $newTime, $newTime);
 					$pmxCache['vals']['saved'] += $cache_bytes;
 				}
+				$pmxCache['vals']['time'] += microtime(true) - $st;
 			}
 			else
-				@unlink($fname);
-
-			$pmxCache['vals']['time'] += microtime(true) - $st;
+			{
+ 				@unlink($fname);
+				$pmxCache['vals']['time'] += microtime(true) - $st;
+			}
 		}
 
 		// Clear the cache
 		function pmxCacheClean()
 		{
-			global $pmxCache, $cache_enable, $cachedir;
+			global $pmxCache, $cachedir;
 
 			if(is_dir($cachedir))
 			{
 				$dh = opendir($cachedir);
 				while ($file = readdir($dh))
 				{
-					if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess')
+					if(!in_array($file, array('.', '..', 'index.php', '.htaccess')))
 						@unlink($cachedir . '/' . $file);
 				}
 				closedir($dh);
@@ -386,17 +384,17 @@ switch ($cache_accelerator)
 	// dummy function they do nothing
 	default:
 	{
-		function pmxCacheGet($key, $useMember = false, $null_array = false)
-		{
-			return empty($null_array) ? null : array();
-		}
-		function pmxCachePut($key, $value, $ttl = 0, $useMember = false, $cleaner = null)
+		function pmxCacheGet($key, $useMember = false)
 		{
 			return null;
+		}
+		function pmxCachePut($key, $value, $ttl = 0, $cleaner = null)
+		{
+			return;
 		}
 		function pmxCacheClean()
 		{
-			return null;
+			return;
 		}
 	}
 }
@@ -429,7 +427,7 @@ function pmxCacheUsedGroups($groups = true)
 {
 	global $pmxCacheFunc;
 
-	$havit = $pmxCacheFunc['get']('usedgroups', false);
+	$havit = $pmxCacheFunc['get']('usedgroups');
 	$havit = !empty($havit) ? explode(',', $havit) : array();
 	if(!in_array($groups, $havit))
 	{
@@ -454,11 +452,11 @@ function pmxCacheDrop($key, $usegroups = false)
 		if(!empty($cgrps) && is_array($cgrps))
 		{
 			foreach($cgrps as $grp)
-				$pmxCacheFunc['put']($key .'_'. $grp, null, false);
+				$pmxCacheFunc['put']($key .'_'. $grp, null);
 		}
 	}
 	else
-		$pmxCacheFunc['put']($key, null, false);
+		$pmxCacheFunc['put']($key, null);
 }
 
 /**

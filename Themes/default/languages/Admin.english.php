@@ -617,6 +617,11 @@ $txt['security_settings'] = 'Security';
 $txt['caching_settings'] = 'Caching';
 $txt['load_balancing_settings'] = 'Load Balancing';
 $txt['sef_settings'] = 'SEF Settings';
+$txt['sef_settings_description'] = 'This section allows you to edit the SEF (Serach Engine Friendly) URL Settings.<br>
+	The SEF engine convert all request like ?action=search, ?topic=1.0, ?board=1 etc. to the name of the action, topicname, boardname etc.<br>
+	A request like <b>/index.php?topic=2.5</b> is converted to <b>/subject-of-the-topic/5/</b> and a request like <b>/index.php?action=search</b> is converted to <b>/search/</b><br>
+	Duplicate names are detected automatically, so if you have a topic with the subject "Search", this is converted to "search#", where # is the dupe number (1 to n).';
+
 $txt['phpinfo_settings'] = 'PHP Info';
 $txt['phpinfo_localsettings'] = 'Local Settings';
 $txt['phpinfo_defaultsettings'] = 'Default Settings';
@@ -750,16 +755,12 @@ $txt['notify_settings'] = 'Notification Settings';
 $txt['notifications_desc'] = 'This page allows you to set the default notification options for users.';
 
 // sef settings
-$txt['sef_enable'] = 'Enable the SEF engine:';
-$txt['sef_lowercase'] = 'Lowercase alls URLs:';
+$txt['sef_enabled'] = 'Enable the SEF engine:';
+$txt['sef_lowercase'] = 'Lowercase all URL\'s:';
 $txt['sef_autosave'] = 'Save new actions automatically:';
 $txt['sef_spacechar'] = 'Character to used for spaces:';
 $txt['sef_stripchars'] = 'Character they removed from the url:';
-$txt['sef_single_token'] = 'All single token:';
 $txt['sef_actions'] =  'All actions of your forum:';
 $txt['sef_ignoreactions'] =  'Actions they ignored:';
-$txt['sef_aliasactions'] =  'Alias for actions:';
-$txt['sef_ignorerequests'] =  'Parts of a URL they ignored:';
-$txt['sef_engine_disabled'] = 'The SEF engine is currently switched off.';
 
 ?>

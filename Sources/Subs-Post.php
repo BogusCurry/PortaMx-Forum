@@ -568,6 +568,10 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$headers .= 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $message_id . strstr(empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from'], '@') . '>' . $line_break;
 	$headers .= 'X-Mailer: PMX^' . $line_break;
 
+	// call SEF..
+	if(pmxsef_EmailOutput($subject, $message, $header) === false)
+		return false;
+
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
 	if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers)), true))
 		return false;

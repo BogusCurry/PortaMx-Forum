@@ -1264,7 +1264,7 @@ function Post($post_errors = array())
 function Post2()
 {
 	global $board, $topic, $txt, $modSettings, $sourcedir, $context;
-	global $user_info, $board_info, $pmxcFunc, $settings;
+	global $user_info, $board_info, $pmxcFunc, $pmxCacheFunc, $settings;
 
 	// Sneaking off, are we?
 	if (empty($_POST) && empty($topic))
@@ -2164,7 +2164,7 @@ function Post2()
 	if (isset($_REQUEST['msg']) && !empty($_REQUEST['goback']))
 		redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'], isBrowser('ie'));
 	elseif (!empty($_REQUEST['goback']))
-		redirectexit('topic=' . $topic . '.new#new', isBrowser('ie'));
+		redirectexit('topic=' . $topic . '.msg'. $modSettings['maxMsgID'] .'#msg' . $modSettings['maxMsgID'], isBrowser('ie'));
 	// Dut-dut-duh-duh-DUH-duh-dut-duh-duh!  *dances to the Final Fantasy Fanfare...*
 	else
 		redirectexit('board=' . $board . '.0');
@@ -2463,6 +2463,7 @@ function getTopic()
 	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Censor, BBC, ...
+        $context['lbimage_data'] = array('lightbox_id' => (!empty($modSettings['dont_use_lightbox']) ? null : 'topic-'. $topic .'-msg-'. $row['id_msg']));
 		censorText($row['body']);
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 

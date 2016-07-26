@@ -910,13 +910,13 @@ function parseAttachBBC($attachID = 0)
 		$attachContext = $attachLoaded[$attachID];
 
 		// Fix the url to point out to showAvatar().
-		$attachContext['href'] = $scripturl . '?action=dlattach;attach=' . $attachID .';type=preview';
+		$attachContext['href'] = $scripturl . '?action=dlattach;attach=' . $attachID .'';
 
-		$attachContext['link'] = '<a href="' . $scripturl . '?action=dlattach;attach=' . $attachID .';type=preview'. (empty($attachContext['is_image']) ? ';file' : ';image') .'">' . $pmxcFunc['htmlspecialchars']($attachContext['name']) . '</a>';
+		$attachContext['link'] = '<a href="' . $scripturl . '?action=dlattach;attach=' . $attachID .''. (empty($attachContext['is_image']) ? ';file' : ';image') .'">' . $pmxcFunc['htmlspecialchars']($attachContext['name']) . '</a>';
 
 		// Fix the thumbnail too, if the image has one.
 		if (!empty($attachContext['thumbnail']) && !empty($attachContext['thumbnail']['has_thumb']))
-			$attachContext['thumbnail']['href'] = $scripturl . '?action=dlattach;attach=' . $attachContext['thumbnail']['id'] . ';image;type=preview';
+			$attachContext['thumbnail']['href'] = $scripturl . '?action=dlattach;attach=' . $attachContext['thumbnail']['id'] . ';image';
 
 		return $attachContext;
 	}

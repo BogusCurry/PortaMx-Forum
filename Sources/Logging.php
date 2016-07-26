@@ -260,26 +260,6 @@ function displayDebug()
 	if (isset($_SESSION['token']))
 		echo $txt['debug_tokens'] . '<em>' . implode(',</em> <em>', array_keys($_SESSION['token'])), '</em>.<br>';
 
-	if (!empty($modSettings['cache_enable']) && !empty($cache_hits))
-	{
-		$entries = array();
-		$total_t = 0;
-		$total_s = 0;
-		foreach ($cache_hits as $cache_hit)
-		{
-			$entries[] = $cache_hit['d'] . ' ' . $cache_hit['k'] . ': ' . sprintf($txt['debug_cache_seconds_bytes'], comma_format($cache_hit['t'], 5), $cache_hit['s']);
-			$total_t += $cache_hit['t'];
-			$total_s += $cache_hit['s'];
-		}
-
-		echo '
-	', $txt['debug_cache_hits'], $cache_count, ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_cache_info\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_cache_info" style="display: none;"><em>', implode('</em>, <em>', $entries), '</em></span>)<br>';
-	}
-
-	echo '
-	<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', $warnings == 0 ? sprintf($txt['debug_queries_used'], (int) $db_count) : sprintf($txt['debug_queries_used_and_warnings'], (int) $db_count, $warnings), '</a><br>
-	<br>';
-
 	if ($_SESSION['view_queries'] == 1 && !empty($db_cache))
 		foreach ($db_cache as $q => $qq)
 		{

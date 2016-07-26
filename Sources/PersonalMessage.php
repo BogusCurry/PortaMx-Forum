@@ -42,7 +42,7 @@ function MessageMain()
 	// Load up the members maximum message capacity.
 	if ($user_info['is_admin'])
 		$context['message_limit'] = 0;
-	elseif (($context['message_limit'] = $pmxCacheFunc['get']('msgLimit:' . $user_info['id'])) === null)
+	elseif (($context['message_limit'] = $pmxCacheFunc['get']('msgLimit-' . $user_info['id'])) === null)
 	{
 		// @todo Why do we do this?  It seems like if they have any limit we should use it.
 		$request = $pmxcFunc['db_query']('', '
@@ -59,7 +59,7 @@ function MessageMain()
 		$context['message_limit'] = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		$pmxCacheFunc['put']('msgLimit:' . $user_info['id'], $context['message_limit'], 360);
+		$pmxCacheFunc['put']('msgLimit-' . $user_info['id'], $context['message_limit'], 360);
 	}
 
 	// Prepare the context for the capacity bar.
@@ -83,7 +83,7 @@ function MessageMain()
 	$context['labels'] = array();
 
 	// Load the label data.
-	if ($user_settings['new_pm'] || ($context['labels'] = $pmxCacheFunc['get']('labelCounts:' . $user_info['id'])) === null)
+	if ($user_settings['new_pm'] || ($context['labels'] = $pmxCacheFunc['get']('labelCounts-' . $user_info['id'])) === null)
 	{
 		// Looks like we need to reseek!
 
@@ -144,7 +144,7 @@ function MessageMain()
 		$pmxcFunc['db_free_result']($result);
 
 		// Store it please!
-		$pmxCacheFunc['put']('labelCounts:' . $user_info['id'], $context['labels'], 720);
+		$pmxCacheFunc['put']('labelCounts-' . $user_info['id'], $context['labels'], 720);
 	}
 
 	// Now we have the labels, and assuming we have unsorted mail, apply our rules!
@@ -3045,7 +3045,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	$pmxCacheFunc['put']('labelCounts:' . $user_info['id'], null, 720);
+	$pmxCacheFunc['put']('labelCounts-' . $user_info['id'], null, 720);
 }
 
 /**
@@ -3057,7 +3057,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
-	global $user_info, $context, $pmxcFunc;
+	global $user_info, $context, $pmxcFunc, $pmxCacheFunc;
 
 	if ($owner === null)
 		$owner = $user_info['id'];
@@ -3165,13 +3165,15 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 		$pmxcFunc['db_free_result']($result);
 
 		// Need to store all this.
-		$pmxCacheFunc['put']('labelCounts:' . $owner, $context['labels'], 720);
+		$pmxCacheFunc['put']('labelCounts-' . $owner, $context['labels'], 720);
 		updateMemberData($owner, array('unread_messages' => $total_unread));
 
 		// If it was for the current member, reflect this in the $user_info array too.
 		if ($owner == $user_info['id'])
 			$user_info['unread_messages'] = $total_unread;
 	}
+	else
+		$user_info['unread_messages'] = 0;
 }
 
 /**
@@ -3409,7 +3411,7 @@ function ManageLabels()
 		}
 
 		// Make sure we're not caching this!
-		$pmxCacheFunc['put']('labelCounts:' . $user_info['id'], null, 720);
+		$pmxCacheFunc['put']('labelCounts-' . $user_info['id'], null, 720);
 
 		// To make the changes appear right away, redirect.
 		redirectexit('action=pm;sa=manlabels');

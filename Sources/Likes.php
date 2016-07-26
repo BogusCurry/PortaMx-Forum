@@ -424,7 +424,7 @@ class Likes
 		// This way a like handler doesn't need to explicitly declare anything in integrate_issue_like, but do so
 		// in integrate_valid_likes where it absolutely has to exist.
 		if (!empty($this->_validLikes['flush_cache']))
-			$pmxCacheFunc['put']($this->_validLikes['flush_cache'], null);
+			$pmxCacheFunc['put']($this->_validLikes['flush_cache'], null, 90);
 
 		// All done, start building the data to pass as response.
 		$this->_data = array(

@@ -33,7 +33,10 @@ function cleanRequest()
 	global $board, $topic, $boardurl, $scripturl, $modSettings, $pmxcFunc;
 
 	// Makes it easier to refer to things this way.
-	$scripturl = $boardurl . '/' . (!empty($modSettings['queryless_urls']) ? 'index.php' : '');
+	if(empty($modSettings['sef_enabled']))
+		$scripturl = $boardurl . '/' . (!empty($modSettings['queryless_urls']) ? 'index.php' : '');
+	else
+		$scripturl = $boardurl . '/index.php';
 
 	// What function to use to reverse magic quotes - if sybase is on we assume that the database sensibly has the right unescape function!
 	$removeMagicQuoteFunction = ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on' ? 'unescapestring__recursive' : 'stripslashes__recursive';

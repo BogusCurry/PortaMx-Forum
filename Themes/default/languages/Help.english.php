@@ -610,15 +610,14 @@ $helptxt['image_proxy_enabled'] = 'Required for embedding external images when i
 $helptxt['image_proxy_secret'] = 'Keep this a secret, protects your forum from hotlinking images. Change it in order to render current hotlinked images useless';
 $helptxt['image_proxy_maxsize'] = 'Maximum image size that the SSL image proxy will cache: bigger images will be not be cached. Cached images are stored in your PortaMx Forum cache folder, so make sure you have enough free space.';
 
-$helptxt['settings_ecl'] = '<center><b>SEF - Seach Engine Friedly URL\'s</b></center><hr><b>The SEF engine requires mod_rewrite support.</b><br><br>You need a <b>.htacces</b> file with follow content:<br>
+$helptxt['sef_enabled'] = '<center><b>SEF - Seach Engine Friedly URL\'s</b></center><hr><b>The SEF engine requires mod_rewrite support.</b><br><br>You need a <b>.htacces</b> file with follow content:<br>
 <b>RewriteEngine On<br>
 RewriteCond %{REQUEST_FILENAME} !-f<br>
 RewriteCond %{REQUEST_FILENAME} !-d<br>
 RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]<br>
 RewriteBase /subdirectory/</b></br><br>
-If your forum is <b>not</b> installed in a subdirectory, you can remove the entry <b>RewriteBase</b><br><br>
-If you cannot enable the SEF engine, please check if the <b>.htaccess</b> file exist and at the right place.';
-
+If your forum is <b>not</b> installed in a subdirectory, you must remove the entry <b>RewriteBase</b><br><br>
+If you cannot enable the SEF engine, please check if the <b>.htaccess</b> file exist and at the right place. <b>Also check if the cache enabled!</b>';
 $helptxt['sef_lowercase'] = 'If checked all url\'s converted to lower case letters.
 	You should enable this for better results.';
 $helptxt['sef_autosave'] = 'If checked all new actions are automatically saved.
@@ -627,15 +626,10 @@ $helptxt['sef_spacechar'] = 'Character to be used for spaces in the url (typical
 	You should use <b>-</b> for better results. Leave this empty to remove any space.';
 $helptxt['sef_stripchars'] = 'These characters will be stripped out of the url.
 	Each char must be sepatated by a comma. <b>If you change this, it may be that your forum not works properly.</b>';
-$helptxt['sef_single_token'] = 'Token they have no value and need a special handling.
-	Each entry must be sepatated by a comma.
-	<b>If you change this, it may be that your forum not works properly.</b>';
-$helptxt['sef_actions'] = 'These are all of the actions of your forum and normally you do not have to modify this, because the SEF engine add not listed actions automatically.
+$helptxt['sef_actions'] = 'These are all of the actions of your forum and normally you do not have to modify this, because the SEF engine add not listed actions automatically (if enabled).
 	Each entry must be sepatated by a comma.
 	<b>If you change this, it may be that your forum not works properly.</b>';
 $helptxt['sef_ignoreactions'] =  'Actions they not converted by the SEF engine. Each entry must be sepatated by a comma.';
-$helptxt['sef_aliasactions'] =  'You can define a alias for any actions. Each alias must be in the format <b>action=alias</b>. Each action=alias pair must be sepatated by a comma.';
-$helptxt['sef_ignorerequests'] =  'Parts of a URL they not converted by the SEF engine. Each part must be in the format <b>name=value</b>. Each name=value pair must be sepatated by a comma.';
 
 ';'
 ?>

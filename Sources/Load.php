@@ -260,6 +260,9 @@ function reloadSettings()
 			add_integration_function($hook, $function, '', false);
 	}
 
+	// Load SEF Module
+	require_once($sourcedir .'/Subs-Sef.php');
+
 	// Any files to pre include?
 	if (!empty($modSettings['integrate_pre_include']))
 	{
@@ -337,6 +340,9 @@ function reloadSettings()
 
 	// Call pre load integration functions.
 	call_integration_hook('integrate_pre_load');
+
+	// call SEF ..
+	pmxsef_convertSEF();
 }
 
 /**
@@ -401,9 +407,6 @@ function loadUserSettings($checkOnly = false)
 	// Only load this stuff if the user isn't a guest.
 	if ($id_member != 0)
 	{
-		if(!checkECL_Cookie())
-			setECL_Cookie();
-
 		// Is the member data cached?
 		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = $pmxCacheFunc['get']('user_settings-' . $id_member)) == null)
 		{
@@ -529,6 +532,9 @@ function loadUserSettings($checkOnly = false)
 	// Found 'im, let's set up the variables.
 	if ($id_member != 0)
 	{
+		if(!checkECL_Cookie())
+			setECL_Cookie();
+
 		// Let's not update the last visit time in these cases...
 		// 1. SSI doesn't count as visiting the forum.
 		// 2. RSS feeds and XMLHTTP requests don't count either.
