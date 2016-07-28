@@ -1085,6 +1085,7 @@ function Post($post_errors = array())
 		'value' => $context['message'],
 		'labels' => array(
 			'post_button' => $context['submit_label'],
+			'cancel_button' => $txt['modify_cancel'], 
 		),
 		// add height and width for the editor
 		'height' => '275px',
@@ -1184,9 +1185,6 @@ function Post($post_errors = array())
 		loadJavascriptFile('jquery.atwho.min.js', array('defer' => true), 'pmx_atwho');
 		loadJavascriptFile('mentions.js', array('defer' => true), 'pmx_mentions');
 	}
-
-	// quotedText.js
-	loadJavascriptFile('quotedText.js', array('defer' => true), 'pmx_quotedText');
 
 	// Mock files to show already attached files.
 	addInlineJavascript('

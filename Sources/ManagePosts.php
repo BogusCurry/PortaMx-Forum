@@ -204,7 +204,7 @@ function ModifyPostSettings($return_config = false)
 		'',
 			array('check', 'add_favicon_to_links'),
 			array('check', 'dont_use_lightbox'),
-			array('check', 'disable_quick_reply'),
+			array('check', 'enable_quick_reply'),
 		'',
 			// Posting limits...
 			array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),

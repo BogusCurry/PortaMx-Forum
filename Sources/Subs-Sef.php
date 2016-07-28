@@ -22,14 +22,18 @@ if (!defined('PMX'))
 ***************************************/
 function pmxsef_convertSEF()
 {
-	global $boardurl, $modSettings, $scripturl, $sourcedir, $cache_enable, $pmxSEF, $pmxCacheFunc;
+	global $boardurl, $modSettings, $scripturl, $cache_enable, $pmxSEF, $pmxCacheFunc;
 
 	// if cache disabled, disable SEF
 	if(empty($cache_enable))
 		$modSettings['sef_enabled'] = 0;
 
 	if(empty($modSettings['sef_enabled']))
+	{
+		if(isset($_GET['q']))
+			unset($_GET['q']);
 		return;
+	}
 
 	pmxsef_LoadSettings();
 
@@ -48,19 +52,32 @@ function pmxsef_convertSEF()
 	if(strpos($_SERVER['REQUEST_URL'], 'index.php') === false && strpos($_SERVER['REQUEST_URL'], $boardurl .'/?') !== false)
 		$_SERVER['REQUEST_URL'] = str_replace($boardurl .'/?', $scripturl .'?', $_SERVER['REQUEST_URL']);
 
-	// exit here if on Admin and other they not need to convert sef url
+	// exit here if a other they not need to convert sef url
 	if(strpos($_SERVER['REQUEST_URL'], $scripturl) !== false)
 		return;
 
 	// convert the query
 	if(!empty($_GET['q']))
 	{
-		$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
+		// special handling for likes
+		if(isset($_GET['js']) && isset($_GET['_']))
+			$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('/js/', '/_/'), $_SERVER['REQUEST_URL']);
+
+		// convert the SEF query
+ 		$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
 		$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET);
 
-		// if a topic edit, clear topic cache
+		// check if a topic subject changed
 		if(isset($_GET['action']) && $_GET['action'] == 'post2' && isset($_GET['msg']) && !empty($_POST) && !isset($_POST['preview']))
-			$pmxCacheFunc['put']('sef_topiclist', null, 10);
+		{
+			$pmxSEF['TopicNameList'] = $pmxCacheFunc['get']('sef_topiclist');
+			if(isset($pmxSEF['TopicNameList'][$_POST['topic']]))
+			{
+				$temp = CheckDupe($_POST['subject'], array('Topic', 'Categorie', 'Board'));
+				$pmxSEF['TopicNameList'][$_POST['topic']] = $temp;
+				$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
+			}
+		}
 	}
 }
 
@@ -75,7 +92,7 @@ function pmxsef_LoadSettings()
 	{
 		$pmxSEF = array(
 			'actions' => array_unique(explode(',', $modSettings['sef_actions'])),
-			'ignoreactions' => array_unique(array_merge(array('admin', 'portamx', 'openidreturn', 'viewpmxfile'), explode(',', $modSettings['sef_ignoreactions']))),
+			'ignoreactions' => array_unique(array_merge(array('admin', 'viewpmxfile'), explode(',', $modSettings['sef_ignoreactions']))),
 			'ignorerequests' => array('type' => 'preview'),
 			'stripchars' => array_diff(explode(',', $modSettings['sef_stripchars']), array(trim($modSettings['sef_spacechar']))),
 			'spacechar' => trim($modSettings['sef_spacechar']),
@@ -105,8 +122,7 @@ function pmxsef_query($query)
 		// check the actions
 		if(array_search(current($url_array), $pmxSEF['allactions'], true) !== false)
 		{
-			$querystring['action'] = $url_array[0];
-			$tmp = array_shift($url_array);
+			$querystring['action'] = array_shift($url_array);
 
 			// check for subaction
 			$fnd = array_search('sa', $url_array, true);
@@ -134,7 +150,7 @@ function pmxsef_query($query)
 				array_shift($url_array);
 			}
 
-			// not a category .. check board or topic
+			// not a category .. check actions, board or topic
 			elseif(!empty($url_array) && array_search(current($url_array), $pmxSEF['allactions'], true) === false)
 			{
 				// board ?
@@ -152,7 +168,7 @@ function pmxsef_query($query)
 					getTopicNameList();
 					if(($value = array_search(current($url_array), $pmxSEF['TopicNameList'], true)) !== false)
 					{
-						$page = isset($url_array[1]) && preg_match('/msg([0-9]+)|[0-9]+/', $url_array[1], $msgPage) > 0 ? strval($msgPage[0]) : '0';
+						$page = isset($url_array[1]) && preg_match('/msg([0-9]+)|[0-9]+/', $url_array[1], $msgPage) > 0 && $msgPage[0] == $url_array[1] ? strval($msgPage[0]) : '0';
 						$querystring['topic'] = $value .'.'. $page;
 						array_splice($url_array, 0, 1 + intval(!empty($page)));
 					}
@@ -472,6 +488,10 @@ function getCategorieName($id)
 	return '';
 }
 
+/**
+* convert categorie names to SEF
+* called from: getCategorieName, pmxsef_query
+**/
 function getCategorieNameList()
 {
 	global $pmxSEF, $pmxcFunc, $pmxCacheFunc;
@@ -721,7 +741,7 @@ function pmxsef_build_query($data, $prefix = '', $sep = ';')
 **/
 function pmxsef_encode($string)
 {
-	global $modSettings, $sourcedir, $pmxSEF, $txt, $isWin;
+	global $modSettings, $sourcedir, $pmxSEF, $txt;
 	static $utf8_db = array();
 	static $isWindows = null;
 
@@ -735,13 +755,16 @@ function pmxsef_encode($string)
 
 	// make all strings to ISO-8859-1 or UTF-8 and if not, convert to UTF-8
 	$char_set = empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set'];
+	setlocale(LC_CTYPE, $txt['lang_locale']);
+
 	if($char_set != 'ISO-8859-1' || $char_set != 'UTF-8')
 	{
-		$string = $isWindows ? utf8_encode($string) : $string;
 		if(function_exists('mb_convert_encoding'))
-			$string = mb_convert_encoding($string, 'UTF-8', mb_detect_encoding($string, 'UTF-8, ISO-8859-1, ISO-8859-15', true));
+			$string = mb_convert_encoding($string, 'UTF-8', mb_detect_encoding($string, 'UTF-8, ISO-8859-1, ISO-8859-15, Windows-1251, Windows-1252, Windows-1254', true));
+
 		elseif(function_exists('iconv'))
-			$string = iconv($char_set, 'UTF-8//TRANSLIT//IGNORE', $string);
+			$string = iconv($char_set, 'UTF-8//TRANSLIT//IGNORE', $isWindows ? utf8_encode($string) : $string);
+
 		elseif(function_exists('unicode_decode'))
 			$string = unicode_decode($string, $char_set);
 	}
@@ -816,10 +839,6 @@ function pmxsef_encode($string)
 	$result = str_replace(array('%2F','%2C','%27','%60', ','), '', $result);
 	$result = str_replace(array($pmxSEF['spacechar'], '.'), '+', $result);
 	$result = preg_replace('~(\+)+~', $pmxSEF['spacechar'], $result);
-	$result = preg_replace('~(\+)+~', $pmxSEF['spacechar'], $result);
-	if(!empty($pmxSEF['lowercase']))
-		$result = strtolower($result);
-
-	return $result;
+	return !empty($pmxSEF['lowercase']) ? strtolower($result) : $result;
 }
 ?>

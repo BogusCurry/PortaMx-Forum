@@ -154,35 +154,11 @@ function template_control_richedit_buttons($editor_id)
 	elseif ($context['show_spellchecking'])
 		$tempTab++;
 
-	// add a cancel button for these actions
-	if(!empty($_SERVER['HTTP_REFERER']) && isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('post', 'post2', 'calendar', 'pm')))
-	{
-		if($_REQUEST['action'] == 'pm' && isset($_REQUEST['sa']) && ($_REQUEST['sa'] == 'send' || $_REQUEST['sa'] == 'send2'))
-			$_SESSION['post_cancel_link'] = $scripturl .'?action=pm';
-		else if(!isset($_REQUEST['preview']))
-		{
-			$_SESSION['post_cancel_link'] = preg_replace(array('/prev_next=next/', '/prev_next=prev/'), '', $_SERVER['HTTP_REFERER']);
-			preg_match('/\.msg([0-9]+)/', $_SERVER['HTTP_REFERER'], $msg);
-			if(isset($msg[1]))
-				$_SESSION['post_cancel_link'] .='#msg'. $msg[1];
-			else
-			{
-				preg_match('/(quote=)([0-9]+)/', $_SERVER['QUERY_STRING'], $msg);
-				if(isset($msg[2]))
-				{
-					if(strpos($_SESSION['post_cancel_link'], '.msg') === false)
-						$_SESSION['post_cancel_link'] = str_replace('.0', '.msg'. $msg[2], $_SESSION['post_cancel_link']);
-					$_SESSION['post_cancel_link'] .= '#msg'. $msg[2];
-				}
-			}
-		}
-
-		$tempTab++;
-		echo '
-			<input type="button" value="'. $txt['modify_cancel'] .'" name="'. $txt['modify_cancel'] .'" tabindex="', $tempTab, '" onclick="window.location.href=\'', $_SESSION['post_cancel_link'] ,'\'" accesskey="c" class="button_submit">';
-	}
-
 	$context['tabindex'] = $tempTab;
+	// cancel button
+	if (isset($editor_context['cancel_link']) && $editor_context['id'] != 'quickReply')
+		echo '
+		<input type="button" value="', $txt['modify_cancel'] ,'" name="', $txt['modify_cancel'] ,'" tabindex="', --$tempTab, '" onclick="window.location.href=\''. $editor_context['cancel_link'] .'\'" accesskey="c" class="button_submit">';
 
 	if (!empty($context['drafts_pm_save']))
 		echo '
@@ -201,7 +177,6 @@ function template_control_richedit_buttons($editor_id)
 	if ($editor_context['preview_type'])
 		echo '
 		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', --$tempTab, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewPost();' : 'return submitThisOnce(this);', '" accesskey="p" class="button_submit">';
-
 
 	echo '
 		<input type="submit" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" name="post" tabindex="', --$tempTab, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit">';

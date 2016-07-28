@@ -1649,7 +1649,21 @@ function create_control_richedit($editorOptions)
 		'labels' => !empty($editorOptions['labels']) ? $editorOptions['labels'] : array(),
 		'locale' => !empty($txt['lang_locale']) && substr($txt['lang_locale'], 0, 5) != 'en_US' ? $txt['lang_locale'] : '',
 		'required' => !empty($editorOptions['required']),
-	);
+ 	);
+
+	// prepare the cancel link
+	if($editorOptions['id'] == 'quickReply' || (isset($_GET['action']) && $_GET['action'] != 'pm'))
+	{
+		if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'post2')
+			$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'];
+		else
+		{
+			$fromWhere = $editorOptions['id'] == 'quickReply' ? $_SERVER['REQUEST_URL'] : $_SERVER['HTTP_REFERER'];
+			if(strpos($fromWhere, 'showposts') == false)
+				preg_match('/(msg[0-9]+)/', $fromWhere, $fragment);
+			$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'] = $fromWhere . (isset($fragment[0]) ? '#'. $fragment[0] : '#top');
+		}
+	}
 
 	if (empty($context['bbc_tags']))
 	{

@@ -1285,9 +1285,6 @@ function Display()
 	// topic.js
 	loadJavascriptFile('topic.js', array('defer' => false), 'pmx_topic');
 
-	// quotedText.js
-//	loadJavascriptFile('quotedText.js', array('defer' => true), 'pmx_quotedText');
-
 	// Mentions
 	if (!empty($modSettings['enable_mentions']) && allowedTo('mention'))
 	{

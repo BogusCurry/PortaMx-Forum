@@ -947,7 +947,7 @@ function template_quickreply()
 {
 	global $context, $modSettings, $scripturl, $options, $txt;
 
-	if(!empty($modSettings['disable_quick_reply']))
+	if(empty($modSettings['enable_quick_reply']))
 		echo '
 		<div style="display:none;">';
 
@@ -1041,7 +1041,7 @@ function template_quickreply()
 		</div>
 		<br class="clear">';
 
-	if(!empty($modSettings['disable_quick_reply']))
+	if(empty($modSettings['enable_quick_reply']))
 		echo '
 		</div>';
 

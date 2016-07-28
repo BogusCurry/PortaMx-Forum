@@ -373,7 +373,7 @@ class Likes
 	 */
 	protected function like()
 	{
-		global $pmxcFunc;
+		global $pmxcFunc, $pmxCacheFunc;
 
 		// Safety first!
 		if (empty($this->_type) || empty($this->_content))

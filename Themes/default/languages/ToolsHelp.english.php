@@ -4,8 +4,8 @@
 global $helptxt;
 
 // Admin help messages
-$helptxt['dont_use_lightbox'] = 'If enabled, images and attaches in messages can be displayed enlarged. If you have more than one image in a message, it will be shown in a gallery.<br>You can also disable any image or attach by adding a <b>expand=off</b> to the IMG or ATTACH bbc code, like [img expand=off] or [attach expand=off]';
-$helptxt['disable_quick_reply'] = 'This setting disallows all users from using the Quick Reply box on the post page.';
+$helptxt['dont_use_lightbox'] = 'If <b>enabled</b>, images and attaches in messages can be displayed enlarged.<br>If you have more than one image in a message, it will be shown like a gallery.<br>You can also disable any image or attach by adding a <b>expand=off</b> to the IMG or ATTACH bbc code, like [img expand=off] or [attach expand=off]';
+$helptxt['enable_quick_reply'] = 'This setting allows all users to using the Quick Reply box on the message index page.';
 $helptxt['add_favicon_to_links'] = 'This settings add a favicon (if the site have one) to each link with the class "bbc_link".';
 
 $helptxt['ecl_enabled'] = 'This make your PortaMx Forum compatible with the <b>EU Cookie Law</b>.<br>

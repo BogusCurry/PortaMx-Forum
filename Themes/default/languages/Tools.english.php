@@ -14,6 +14,6 @@ $txt['ecl_nomodal_mobile'] = 'Use ECL none modal mode also for Mobile devices';
 $txt['ecl_topofs'] = 'ECL overlay top position';
 
 $txt['dont_use_lightbox'] = 'Disable the Lightbox image viewer';
-$txt['disable_quick_reply'] = 'Disable Quick Reply';
+$txt['enable_quick_reply'] = 'Enable Quick Reply';
 $txt['add_favicon_to_links'] = 'Add favicon to links';
 ?>
