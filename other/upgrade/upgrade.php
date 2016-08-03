@@ -7,12 +7,12 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 // Version information...
-define('SMF_VERSION', '2.1 Beta 4');
-define('SMF_LANG_VERSION', '2.1 Beta 4');
+define('SMF_VERSION', '2.1 Beta 5');
+define('SMF_LANG_VERSION', '2.1 Beta 5');
 define('PMX', 1);
 
 $GLOBALS['required_php_version'] = '5.3.8';
@@ -4676,14 +4676,14 @@ function template_welcome_message()
 		<script src="http://docserver.portamx.com/pmxforum/infofiles/current-version.js"></script>
 		<script>document.cookie = "currentVersion=\'"+window.smfVersion+"\'";</script>';
 
-$forum_version = 'PortaMx-Forum 2.1 Beta 4';
+$forum_version = 'PortaMx-Forum 2.1 Beta 5';
 
 	$temp = file_get_contents(dirname(__FILE__) .'/index.php');
 	preg_match('/\$forum_version\s=\s\'([a-zA-Z0-9\.\s]+)\'/', $temp, $match);
 	if(isset($match[1]) && $match[1] == $_COOKIE['currentVersion'])
 	{
 		echo '
-			<h3>Your Forum is allready up to date.<br>The current version is <b>PortaMx-Forum 2.1 Beta 4</b></h3>';
+			<h3>Your Forum is allready up to date.<br>The current version is <b>PortaMx-Forum 2.1 Beta 5</b></h3>';
 			setcookie('currentVersion', '');
 		exit;
 	}

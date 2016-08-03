@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1 Beta 4; Admin
+// Version: 2.1 Beta 5; Admin
 
 global $settings, $scripturl;
 
@@ -619,7 +619,7 @@ $txt['load_balancing_settings'] = 'Load Balancing';
 $txt['sef_settings'] = 'SEF Settings';
 $txt['sef_settings_description'] = 'This section allows you to edit the SEF (Serach Engine Friendly) URL Settings.<br>
 	The SEF engine convert all request like ?action=search, ?topic=1.0, ?board=1 etc. to the name of the action, topicname, boardname etc.<br>
-	A request like <b>/index.php?topic=2.5</b> is converted to <b>/subject-of-the-topic/5/</b> and a request like <b>/index.php?action=search</b> is converted to <b>/search/</b><br>
+	A request like <b>/index.php?topic=2.5</b> is converted to <b>/board-name/first-topic-subject/5/</b> and a request like <b>/index.php?action=search</b> is converted to <b>/search/</b><br>
 	Duplicate names are detected automatically, so if you have a topic with the subject "Search", this is converted to "search#", where # is the dupe number (1 to n).';
 
 $txt['phpinfo_settings'] = 'PHP Info';

@@ -7,7 +7,7 @@
  * @author PortaMx
  * @copyright 2016 PortaMx
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  *
  * Developer of the Original Code is Matt Zuba.
  * License: MPL 1.1
@@ -28,7 +28,7 @@ function pmxsef_convertSEF()
 	if(empty($cache_enable))
 		$modSettings['sef_enabled'] = 0;
 
-	if(empty($modSettings['sef_enabled']))
+	if(empty($modSettings['sef_enabled']) || PMX == 'SSI')
 	{
 		if(isset($_GET['q']))
 			unset($_GET['q']);
@@ -60,23 +60,18 @@ function pmxsef_convertSEF()
 	if(!empty($_GET['q']))
 	{
 		// special handling for likes
-		if(isset($_GET['js']) && isset($_GET['_']))
-			$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('/js/', '/_/'), $_SERVER['REQUEST_URL']);
+		if(strpos($_GET['q'], 'likes') !== false && isset($_GET['_']))
+			$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('js/', '/_/'), $_SERVER['REQUEST_URL']);
 
 		// convert the SEF query
  		$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
 		$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET);
 
 		// check if a topic subject changed
-		if(isset($_GET['action']) && $_GET['action'] == 'post2' && isset($_GET['msg']) && !empty($_POST) && !isset($_POST['preview']))
+		if(isset($_GET['action']) && $_GET['action'] == 'post2' && !empty($_POST) && !isset($_POST['preview']) && isset($pmxSEF['TopicNameList'][$_POST['topic']]))
 		{
-			$pmxSEF['TopicNameList'] = $pmxCacheFunc['get']('sef_topiclist');
-			if(isset($pmxSEF['TopicNameList'][$_POST['topic']]))
-			{
-				$temp = CheckDupe($_POST['subject'], array('Topic', 'Categorie', 'Board'));
-				$pmxSEF['TopicNameList'][$_POST['topic']] = $temp;
-				$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
-			}
+			unset($pmxSEF['TopicNameList'][$_POST['topic']]);
+			$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
 		}
 	}
 }
@@ -102,6 +97,7 @@ function pmxsef_LoadSettings()
 		$pmxCacheFunc['put']('sef_settings', $pmxSEF, 86400);
 	}
 	$pmxSEF['allactions'] = array_filter(array_unique(array_merge($pmxSEF['actions'], $pmxSEF['ignoreactions'])));
+	$modSettings['queryless_urls'] = 0;
 }
 
 /**************************************
@@ -150,26 +146,32 @@ function pmxsef_query($query)
 				array_shift($url_array);
 			}
 
-			// not a category .. check actions, board or topic
-			elseif(!empty($url_array) && array_search(current($url_array), $pmxSEF['allactions'], true) === false)
+			// not a category .. check board or topic
+			else
 			{
-				// board ?
-				getBoardNameList();
-				if(($value = array_search(current($url_array), $pmxSEF['BoardNameList'], true)) !== false)
+				// topic ?
+				$value = false;
+				if(count($url_array) >= 2)
 				{
-					$page = isset($url_array[1]) && is_numeric($url_array[1]) ? $url_array[1] : '0';
-					$querystring['board'] = $value .'.'. $page;
-					array_splice($url_array, 0, 1 + intval(!empty($page)));
+					if(empty($pmxSEF['TopicNameList']))
+						getTopicNameList();
+					if(($value = array_search($url_array[0] .'/'. $url_array[1], $pmxSEF['TopicNameList'], true)) !== false)
+					{
+						$page = isset($url_array[2]) && preg_match('/msg([0-9]+)|[0-9]+/', $url_array[2], $msgPage) > 0 && $msgPage[0] == $url_array[2] ? strval($msgPage[0]) : '0';
+						$querystring['topic'] = $value .'.'. $page;
+						array_splice($url_array, 0, 2 + intval(!empty($page)));
+					}
 				}
 
-				else
+				// board ?
+				if(empty($value) && count($url_array) >= 1)
 				{
-					// topic ?
-					getTopicNameList();
-					if(($value = array_search(current($url_array), $pmxSEF['TopicNameList'], true)) !== false)
+					if(empty($pmxSEF['BoardNameList']))
+						getBoardNameList();
+					if(($value = array_search(current($url_array), $pmxSEF['BoardNameList'], true)) !== false)
 					{
-						$page = isset($url_array[1]) && preg_match('/msg([0-9]+)|[0-9]+/', $url_array[1], $msgPage) > 0 && $msgPage[0] == $url_array[1] ? strval($msgPage[0]) : '0';
-						$querystring['topic'] = $value .'.'. $page;
+						$page = isset($url_array[1]) && is_numeric($url_array[1]) ? $url_array[1] : '0';
+						$querystring['board'] = $value .'.'. $page;
 						array_splice($url_array, 0, 1 + intval(!empty($page)));
 					}
 				}
@@ -179,7 +181,8 @@ function pmxsef_query($query)
 		// username ?
 		if(count($url_array) > 0)
 		{
-			getUserNameList();
+			if(empty($pmxSEF['UserNameList']))
+				getUserNameList();
 			if(($user = array_search(current($url_array), $pmxSEF['UserNameList'], true)) !== false)
 			{
 				$querystring['u'] = $user;
@@ -218,7 +221,7 @@ function pmxsef_Redirect(&$setLocation)
 		{
 			$changeArray['sef_actions'] = implode(',', array_filter(array_unique($pmxSEF['actions'])));
 			updateSettings($changeArray);
-			$pmxCacheFunc['clean']('sef_settings');
+			$pmxCacheFunc['drop']('sef_settings');
 		}
 	}
 }
@@ -294,24 +297,18 @@ function ob_pmxsef($buffer)
 	$buffer = str_replace('/index.php\'+\'?', '/index.php?', $buffer);
 
 	// Get all categories..
-	$matches = array();
-	preg_match_all('~\b' . preg_quote($scripturl) . '.*?c=([0-9]+)~', $buffer, $matches);
-	if(!empty($matches[1]))
-		getCategorieNameList(array_unique($matches[1]));
+	getCategorieNameList();
 
 	// Get all bords..
-	$matches = array();
-	preg_match_all('~\b' . preg_quote($scripturl) . '.*?board=([0-9\.]+)~', $buffer, $matches);
-	if(!empty($matches[1]))
-		getBoardNameList(array_unique($matches[1]));
+	getBoardNameList();
 
-	// Get all topics..
+	// Get topics..
 	$matches = array();
 	preg_match_all('~\b' . preg_quote($scripturl) . '.*?topic=([0-9\.]+)~', $buffer, $matches);
 	if(!empty($matches[1]))
 		getTopicNameList(array_unique($matches[1]));
 
-	// Get all user..
+	// Get user..
 	$matches = array();
 	preg_match_all('~\b'. preg_quote($scripturl) .'.*?u=([0-9]+)~', $buffer, $matches);
 	if(!empty($matches[1]))
@@ -350,7 +347,7 @@ function ob_pmxsef($buffer)
 		foreach($matches as $id => $data)
 		{
 			$data[5] = str_replace('.', '/', $data[5]);
-			$replacements[$data[0]] = $data[1] . str_replace('?', '', $data[2]) . getTopicName(intval($data[4]) .'.') . $data[5];
+			$replacements[$data[0]] = $data[1] . str_replace('?', '', $data[2]) . getTopicName(intval($data[4]) .'.') . $data[5] .'/';
 		}
 		$buffer = str_replace(array_keys($replacements), array_values($replacements), $buffer);
 	}
@@ -360,7 +357,7 @@ function ob_pmxsef($buffer)
 	{
 		$changeArray['sef_actions'] = implode(',', array_filter(array_unique($pmxSEF['actions'])));
 		updateSettings($changeArray);
-		$pmxCacheFunc['put']('sef_settings', null, 60);
+		$pmxCacheFunc['drop']('sef_settings');
 	}
 
 	// done
@@ -392,7 +389,6 @@ function create_sefurl($url)
 
 	// Init..
 	$sefstring = $sefstring1 = $sefstring2 = '';
-	$query_parts = array();
 
 	// Get the query string
 	$params = array();
@@ -462,12 +458,9 @@ function create_sefurl($url)
 		}
 
 		// Build the URL
-		if(isset($query_parts['action']))
-			$sefstring .= $query_parts['action'] .'/';
-
 		$sefstring .= $sefstring1 . $sefstring2;
 	}
-	return $boardurl .'/'. rtrim($sefstring, '/') . (!empty($url_parts['fragment']) ? '#' . $url_parts['fragment'] : '');
+	return $boardurl .'/'. (!empty($sefstring) ? rtrim($sefstring, '/') .'/' : '') . (!empty($url_parts['fragment']) ? '#' . $url_parts['fragment'] : '');
 }
 
 /**
@@ -505,7 +498,7 @@ function getCategorieNameList()
 			array()
 		);
 		while ($row = $pmxcFunc['db_fetch_assoc']($request))
-			$pmxSEF['CategorieNameList'][$row['id_cat']] = CheckDupe($row['name'], array('Categorie', 'Board', 'Topic'));
+			$pmxSEF['CategorieNameList'][$row['id_cat']] = CheckDupe('', $row['name'], array('Categorie', 'Board', 'Topic'));
 
 		$pmxcFunc['db_free_result']($request);
 		$pmxCacheFunc['put']('sef_categorielist', $pmxSEF['CategorieNameList'], 3600);
@@ -529,7 +522,7 @@ function getBoardNameList()
 			array()
 		);
 		while ($row = $pmxcFunc['db_fetch_assoc']($request))
-			$pmxSEF['BoardNameList'][$row['id_board']] = CheckDupe($row['name'], array('Board', 'Categorie', 'Topic'));
+			$pmxSEF['BoardNameList'][$row['id_board']] = CheckDupe('', $row['name'], array('Board', 'Categorie', 'Topic'));
 
 		$pmxcFunc['db_free_result']($request);
 		$pmxCacheFunc['put']('sef_boardlist', $pmxSEF['BoardNameList'], 3600);
@@ -565,33 +558,27 @@ function getTopicNameList($seftopics = array())
 	global $pmxSEF, $pmxcFunc, $pmxCacheFunc, $boarddir;
 
 	// make integers
-	array_walk($seftopics, create_function('&$v,$k', '$v = intval(trim($v));'));
+	array_walk($seftopics, create_function('&$v, $k', '$v = intval(trim($v));'));
 	$pmxSEF['TopicNameList'] = $pmxCacheFunc['get']('sef_topiclist');
 	if(empty($pmxSEF['TopicNameList']))
 		$pmxSEF['TopicNameList'] = array();
 
 	$notcached = array_diff($seftopics, array_keys($pmxSEF['TopicNameList']));
 	if(!empty($notcached))
+	{
 		$request = $pmxcFunc['db_query']('', '
-			SELECT t.id_topic, m.subject
+			SELECT t.id_topic, m.subject, t.id_board
 			FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			WHERE t.id_topic IN ({array_int:topics})',
 			array('topics' => $notcached)
 		);
-	elseif(empty($pmxSEF['TopicNameList']))
-		$request = $pmxcFunc['db_query']('', '
-			SELECT t.id_topic, m.subject
-			FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)',
-			array()
-		);
 
-	if(isset($request))
-	{
 		while($row = $pmxcFunc['db_fetch_assoc']($request))
-			$pmxSEF['TopicNameList'][$row['id_topic']] = CheckDupe($row['subject'], array('Topic', 'Categorie', 'Board'));
-
+		{
+			$board = getBoardName($row['id_board']);
+			$pmxSEF['TopicNameList'][$row['id_topic']] = CheckDupe($board, $row['subject'], array('Topic'));
+		}
 		$pmxcFunc['db_free_result']($request);
 		$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
 	}
@@ -669,7 +656,7 @@ function getUserName($id)
 * Dupe check
 * called from xxxNameList
 */
-function CheckDupe($search, $listNames)
+function CheckDupe($prefix, $search, $listNames)
 {
 	global $pmxSEF;
 
@@ -683,7 +670,7 @@ function CheckDupe($search, $listNames)
 		{
 			$done = false;
 			do {
-				$searchName = empty($dupes) ? $name : $name . strval($dupes);
+				$searchName = (empty($prefix) ? '' : $prefix) . (empty($dupes) ? $name : $name . strval($dupes));
 				if(($key = array_search($searchName, $pmxSEF[$LName . 'NameList'], true)) !== false && $pmxSEF[$LName . 'NameList'][$key] == $searchName)
 					$dupes = ++$pmxSEF['#dupes#'];
 				else
@@ -692,7 +679,7 @@ function CheckDupe($search, $listNames)
 		}
 	}
 	$pmxSEF['#dupes#'] = $dupes > $pmxSEF['#dupes#'] ? $dupes : $pmxSEF['#dupes#'];
-	return empty($dupes) ? $name : $name . strval($dupes);
+	return $prefix . (empty($dupes) ? $name : $name . strval($dupes));
 }
 
 /**

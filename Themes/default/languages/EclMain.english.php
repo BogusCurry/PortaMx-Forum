@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1 Beta 4; EclMain
+// Version: 2.1 Beta 5; EclMain
 
 global $forum_copyright, $webmaster_email, $scripturl, $context, $boardurl;
 

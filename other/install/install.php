@@ -7,10 +7,10 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
-$GLOBALS['current_pmx_version'] = 'PortaMx Forum 2.1 Beta 4';
+$GLOBALS['current_pmx_version'] = 'PortaMx Forum 2.1 Beta 5';
 $GLOBALS['db_script_version'] = '2-1';
 
 $GLOBALS['required_php_version'] = '5.3.8';

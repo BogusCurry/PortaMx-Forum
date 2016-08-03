@@ -8,7 +8,7 @@
  * @copyright 2016 Portamx
  * @license BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 function template_eclmain_above()

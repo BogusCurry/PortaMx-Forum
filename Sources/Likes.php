@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -424,7 +424,7 @@ class Likes
 		// This way a like handler doesn't need to explicitly declare anything in integrate_issue_like, but do so
 		// in integrate_valid_likes where it absolutely has to exist.
 		if (!empty($this->_validLikes['flush_cache']))
-			$pmxCacheFunc['put']($this->_validLikes['flush_cache'], null, 90);
+			$pmxCacheFunc['drop']($this->_validLikes['flush_cache']);
 
 		// All done, start building the data to pass as response.
 		$this->_data = array(

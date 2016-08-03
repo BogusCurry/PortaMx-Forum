@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title> &lt;&lt; :: PortaMx Forum SSI.php 2.1 Beta 4 :: &gt;&gt; </title>
+		<title> &lt;&lt; :: PortaMx Forum SSI.php 2.1 Beta 5 :: &gt;&gt; </title>
 	</head>
 	<body style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;">
 			<h1>PortaMx Forum SSI.php Functions</h1>
-			Current Version 2.1 Beta 4<br>
+			Current version 2.1 Beta 5<br>
 			<br>
 			This file is used to demonstrate the capabilities of SSI.php using SHTML include functions.<br>
 			The examples the include tag, then the results of it. Examples are separated by horizontal rules.<br>

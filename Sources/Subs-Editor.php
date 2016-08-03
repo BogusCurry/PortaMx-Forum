@@ -10,7 +10,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -2474,7 +2474,7 @@ function AutoSuggest_Search_SMFVersions()
 
 	// Just in case we don't have ANYthing.
 	if (empty($versions))
-		$versions = array('PortaMx-Forum 2.1 Beta 4');
+		$versions = array('PortaMx-Forum 2.1 Beta 5');
 
 	foreach ($versions as $id => $version)
 		if (strpos($version, strtoupper($_REQUEST['search'])) !== false)

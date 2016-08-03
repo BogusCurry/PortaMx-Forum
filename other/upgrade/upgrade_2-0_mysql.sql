@@ -764,7 +764,15 @@ upgrade_query("
 	VALUES
 		('pm_spam_settings', '$modSettings[pm_spam_settings]'),
 		('ecl_topofs', 39),
-		('pmx_docserver', 'http://docserver.portamx.com/pmxforum/')");
+		('pmx_docserver', 'http://docserver.portamx.com/pmxforum/'),
+		('sef_actions', 'about:mozilla,about:unknown,activate,announce,attachapprove,buddy,calendar,clock,collapse,community,coppa,credits,deletemsg,display,dlattach,editpoll,editpoll2,emailuser,findmember,groups,help,helpadmin,im,jseditor,jsmodify,jsoption,keepalive,language,lock,lockvoting,login,login2,logout,markasread,mergetopics,mlist,moderate,modifycat,modifykarma,movetopic,movetopic2,notify,notifyboard,openidreturn,pm,post,post2,printpage,profile,promote,quotefast,quickmod,quickmod2,recent,register,register2,reminder,removepoll,removetopic2,reporttm,requestmembers,restoretopic,search,search2,sendtopic,signup,signup2,smstats,suggest,spellcheck,splittopics,theme,stats,sticky,trackip,unread,unreadreplies,verificationcode,viewprofile,vote,viewquery,viewsmfile,who,.xml,xmlhttp,theme,notifytopic,likes,signup,loadeditorlocale,xml'),
+		('sef_autosave', '0'),
+		('sef_enabled', '0'),
+		('sef_ignoreactions', ''),
+		('sef_lowercase', '1'),
+		('sef_spacechar', '-'),
+		('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',\",/,?,\,|'),
+		('news', 'PortaMx Forum - Just Installed!')");
 
 upgrade_query("
 	DELETE FROM {$db_prefix}settings
@@ -1064,7 +1072,7 @@ upgrade_query("
 	SET private = 2
 	WHERE private = 1");
 }
-if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < '2.0 Beta 4')
+if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < '2.0 Beta 5')
 {
 upgrade_query("
 	UPDATE {$db_prefix}custom_fields
@@ -3030,6 +3038,14 @@ if (empty($modSettings['installed_new_smiley_sets_20']))
 		UPDATE {$db_prefix}settings
 		SET value = CONCAT(value, '\nFugue\'s Set\nPortaMx Set')
 		WHERE variable = 'smiley_sets_names'");
+
+	upgrade_query("
+		UPDATE {$db_prefix}smileys
+		SET code = ':>(' WHERE code = '>:('");
+
+	upgrade_query("
+		UPDATE {$db_prefix}smileys
+		SET code = ':>D' WHERE code = '>:D'");
 
 	// This ain't running twice either.
 	upgrade_query("

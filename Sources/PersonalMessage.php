@@ -11,7 +11,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -3045,7 +3045,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	$pmxCacheFunc['put']('labelCounts-' . $user_info['id'], null, 720);
+	$pmxCacheFunc['drop']('labelCounts-' . $user_info['id']);
 }
 
 /**
@@ -3411,7 +3411,7 @@ function ManageLabels()
 		}
 
 		// Make sure we're not caching this!
-		$pmxCacheFunc['put']('labelCounts-' . $user_info['id'], null, 720);
+		$pmxCacheFunc['drop']('labelCounts-' . $user_info['id']);
 
 		// To make the changes appear right away, redirect.
 		redirectexit('action=pm;sa=manlabels');

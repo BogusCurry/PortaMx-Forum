@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -124,7 +124,7 @@ function deleteMembers($users, $check_not_admin = false)
 
 		// Remove any cached data if enabled.
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			$pmxCacheFunc['put']('user_settings-' . $user[0], null, 60);
+			$pmxCacheFunc['drop']('user_settings-' . $user[0]);
 	}
 
 	// Make these peoples' posts guest posts.

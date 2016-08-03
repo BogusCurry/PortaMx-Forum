@@ -11,7 +11,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -1060,7 +1060,7 @@ function makeThemeChanges($memID, $id_theme)
 		// Admins can choose any theme, even if it's not enabled...
 		$themes = allowedTo('admin_forum') ? explode(',', $modSettings['knownThemes']) : explode(',', $modSettings['enableThemes']);
 		foreach ($themes as $t)
-			$pmxCacheFunc['put']('theme_settings-' . $t . '-' . $memID, null, 60);
+			$pmxCacheFunc['drop']('theme_settings-' . $t . '-' . $memID);
 	}
 }
 

@@ -55,7 +55,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -462,11 +462,11 @@ function ModifySefSettings($return_config = false)
 		$_SESSION['adm-save'] = true;
 
 		// clear the SEF caches
-		$pmxCacheFunc['put']('sef_settings', null, 60);
-		$pmxCacheFunc['put']('sef_boardlist', null, 60);
-		$pmxCacheFunc['put']('sef_categorielist', null, 60);
-		$pmxCacheFunc['put']('sef_topiclist', null, 60);
-		$pmxCacheFunc['put']('sef_userlist', null, 60);
+		$pmxCacheFunc['drop']('sef_settings');
+		$pmxCacheFunc['drop']('sef_boardlist');
+		$pmxCacheFunc['drop']('sef_categorielist');
+		$pmxCacheFunc['drop']('sef_topiclist');
+		$pmxCacheFunc['drop']('sef_userlist');
 
 		// exit so we reload our new settings on the page
 		redirectexit('action=admin;area=serversettings;sa=sef;' . $context['session_var'] . '=' . $context['session_id']);

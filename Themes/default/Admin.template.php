@@ -6,7 +6,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 /**
@@ -274,7 +274,10 @@ function template_credits()
 								var currentVersion = getInnerHTML(yourVer);
 								if (currentVersion != window.smfVersion)
 									setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
+								else
+									setInnerHTML(smfVer, window.smfVersion);
 							}
+
 							addLoadEvent(smfCurrentVersion)
 						</script>';
 }
@@ -321,7 +324,7 @@ function template_view_versions()
 											<em id="yourSMF">', $context['forum_version'], '</em>
 										</td>
 										<td class="quarter_table">
-											<em id="currentSMF">??</em>
+											<em id="yourVersion">??</em>
 										</td>
 									</tr>';
 

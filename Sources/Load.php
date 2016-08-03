@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -2165,7 +2165,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		addInlineJavascript('
 	var Lightbox_help = \''. $txt['lightbox_help'] .'\';
 	var Lightbox_label = \''. $txt['lightbox_label'] .'\';');
-		loadCSSFile('lightbox.css', array('defer' => false), 'lightbox');
+		loadCSSFile('lightbox.css', array(), 'lightbox');
 		loadJavascriptFile('lightbox.js', array(), 'lightbox');
 	}
 	// add favicon?
@@ -2387,6 +2387,10 @@ function loadCSSFile($fileName, $params = array(), $id = '')
 {
 	global $settings, $context, $modSettings, $pmxCacheFunc;
 
+	if(!empty($id))
+		$params['seed'] = $id;
+	$id = '';
+
 	$params['seed'] = (!array_key_exists('seed', $params) || (array_key_exists('seed', $params) && $params['seed'] === true)) ? (array_key_exists('browser_cache', $modSettings) ? $modSettings['browser_cache'] : '') : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
 	$params['force_current'] = isset($params['force_current']) ? $params['force_current'] : false;
 	$themeRef = !empty($params['default_theme']) ? 'default_theme' : 'theme';
@@ -2495,6 +2499,10 @@ function addInlineCss($css)
 function loadJavascriptFile($fileName, $params = array(), $id = '')
 {
 	global $settings, $context, $modSettings;
+
+	if(!empty($id))
+		$params['seed'] = $id;
+	$id = '';
 
 	$params['seed'] = (!array_key_exists('seed', $params) || (array_key_exists('seed', $params) && $params['seed'] === true)) ? (array_key_exists('browser_cache', $modSettings) ? $modSettings['browser_cache'] : '') : (is_string($params['seed']) ? ($params['seed'] = $params['seed'][0] === '?' ? $params['seed'] : '?' . $params['seed']) : '');
 	$params['force_current'] = isset($params['force_current']) ? $params['force_current'] : false;

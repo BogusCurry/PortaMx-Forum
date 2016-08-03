@@ -7,7 +7,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 // Special thanks to Spaceman-Spiff for his contributions to this page.
@@ -32,7 +32,7 @@ if (isset($_GET['view']) && $_GET['view'] == 'home1')
 template_ssi_above();
 ?>
 			<h2>PortaMx Forum SSI.php Functions</h2>
-			<p><strong>Current Version:</strong> 2.1 Beta 4</p>
+			<p><strong>Current Version:</strong> 2.1 Beta 5</p>
 			<p>This file is used to demonstrate the capabilities of SSI.php using PHP include functions. The examples show the include tag, then the results of it.</p>
 
 			<h2>Include Code</h2>
@@ -404,7 +404,7 @@ function template_ssi_above()
 	echo '<!DOCTYPE html>
 <html>
 	<head>
-		<title>PortaMx Forum 2.1 Beta 4 SSI.php Examples</title>
+		<title>PortaMx Forum 2.1 Beta 5 SSI.php Examples</title>
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?alp21">
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style>
@@ -490,7 +490,7 @@ function template_ssi_above()
 	</head>
 	<body>
 		<div id="header">
-			<h1 class="forumtitle">PortaMx Forum 2.1 Beta 4 SSI.php Examples</h1>
+			<h1 class="forumtitle">PortaMx Forum 2.1 Beta 5 SSI.php Examples</h1>
 			<img id="smflogo" src="Themes/default/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
 		</div>
 		<div id="wrapper">

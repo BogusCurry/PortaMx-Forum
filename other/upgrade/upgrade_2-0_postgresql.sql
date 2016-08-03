@@ -58,7 +58,7 @@ upgrade_query("
 	SET private = 2
 	WHERE private = 1");
 }
-if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < '2.0 Beta 4')
+if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < '2.0 Beta 5')
 {
 upgrade_query("
 	UPDATE {$db_prefix}custom_fields
@@ -373,12 +373,31 @@ if (!isset($modSettings['birthday_email']))
 		INSERT INTO {$db_prefix}settings
 			(variable, value)
 		VALUES
-			('birthday_email', 'happy_birthday'),
-			('ecl_topofs', 39),
-			('pmx_docserver', 'http://docserver.portamx.com/pmxforum/')");
+			('birthday_email', 'happy_birthday')");
 }
 ---}
 ---#
+
+---# Add setting for ecl and other...
+---{
+	upgrade_query("
+		INSERT IGNORE INTO {$db_prefix}settings
+			(variable, value)
+		VALUES
+			('pm_spam_settings', '$modSettings[pm_spam_settings]'),
+			('ecl_topofs', 39),
+			('pmx_docserver', 'http://docserver.portamx.com/pmxforum/'),
+			('sef_actions', 'about:mozilla,about:unknown,activate,announce,attachapprove,buddy,calendar,clock,collapse,community,coppa,credits,deletemsg,display,dlattach,editpoll,editpoll2,emailuser,findmember,groups,help,helpadmin,im,jseditor,jsmodify,jsoption,keepalive,language,lock,lockvoting,login,login2,logout,markasread,mergetopics,mlist,moderate,modifycat,modifykarma,movetopic,movetopic2,notify,notifyboard,openidreturn,pm,post,post2,printpage,profile,promote,quotefast,quickmod,quickmod2,recent,register,register2,reminder,removepoll,removetopic2,reporttm,requestmembers,restoretopic,search,search2,sendtopic,signup,signup2,smstats,suggest,spellcheck,splittopics,theme,stats,sticky,trackip,unread,unreadreplies,verificationcode,viewprofile,vote,viewquery,viewsmfile,who,.xml,xmlhttp,theme,notifytopic,likes,signup,loadeditorlocale,xml'),
+			('sef_autosave', '0'),
+			('sef_enabled', '0'),
+			('sef_ignoreactions', ''),
+			('sef_lowercase', '1'),
+			('sef_spacechar', '-'),
+			('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',\",/,?,\,|'),
+			('news', 'PortaMx Forum - Just Installed!')");
+---}
+---#
+
 
 /******************************************************************************/
 --- Adding log pruning.
@@ -1180,6 +1199,14 @@ if (empty($modSettings['installed_new_smiley_sets_20']))
 Fugue\'s Set
 PortaMx Set')
 		WHERE variable = 'smiley_sets_names'");
+
+	upgrade_query("
+		UPDATE {$db_prefix}smileys
+		SET code = ':>(' WHERE code = '>:('");
+
+	upgrade_query("
+		UPDATE {$db_prefix}smileys
+		SET code = ':>D' WHERE code = '>:D'");
 
 	// This ain't running twice either.
 	$pmxcFunc['db_insert']('replace',

@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -473,7 +473,7 @@ function updateAdminPreferences()
 	);
 
 	// Make sure we invalidate any cache.
-	$pmxCacheFunc['put']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id'], null, 0);
+	$pmxCacheFunc['drop']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id']);
 }
 
 /**

@@ -11,7 +11,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -716,7 +716,7 @@ function ModifyProfile($post_errors = array())
 			$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : sprintf($txt['profile_updated_else'], $cur_profile['member_name']);
 
 			// Invalidate any cached data.
-			$pmxCacheFunc['put']('member_data-profile-' . $memID, null, 0);
+			$pmxCacheFunc['drop']('member_data-profile-' . $memID);
 		}
 	}
 

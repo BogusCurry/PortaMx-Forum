@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -365,8 +365,8 @@ function ModBlockNotes()
 			);
 
 			// Clear the cache.
-			$pmxCacheFunc['put']('moderator_notes', null, 240);
-			$pmxCacheFunc['put']('moderator_notes_total', null, 240);
+			$pmxCacheFunc['drop']('moderator_notes');
+			$pmxCacheFunc['drop']('moderator_notes_total');
 		}
 
 		// Everything went better than expected!
@@ -416,8 +416,8 @@ function ModBlockNotes()
 		);
 
 		// Clear the cache.
-		$pmxCacheFunc['put']('moderator_notes', null, 240);
-		$pmxCacheFunc['put']('moderator_notes_total', null, 240);
+		$pmxCacheFunc['drop']('moderator_notes');
+		$pmxCacheFunc['drop']('moderator_notes_total');
 
 		// Tell them the message was deleted.
 		$_SESSION['rc_confirmation'] = 'message_deleted';

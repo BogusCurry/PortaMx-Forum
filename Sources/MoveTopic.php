@@ -10,7 +10,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -689,7 +689,7 @@ function moveTopics($topics, $toBoard)
 	// Update the cache?
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
 		foreach ($topics as $topic_id)
-			$pmxCacheFunc['put']('topic_board-' . $topic_id, null, 120);
+			$pmxCacheFunc['drop']('topic_board-' . $topic_id);
 
 	require_once($sourcedir . '/Subs-Post.php');
 

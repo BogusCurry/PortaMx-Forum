@@ -10,7 +10,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -1081,7 +1081,7 @@ function reorderBoards()
 	}
 
 	// Empty the board order cache
-	$pmxCacheFunc['put']('board_order', null, -3600);
+	$pmxCacheFunc['drop']('board_order');
 }
 
 /**

@@ -810,6 +810,14 @@ UPDATE {$db_prefix}members
 SET id_theme = 0;
 ---#
 
+---# Modify smiley table.
+UPDATE {$db_prefix}smileys
+SET code = ':>(' WHERE code = '>:(';
+
+UPDATE {$db_prefix}smileys
+SET code = ':>D' WHERE code = '>:D';
+---#
+
 /******************************************************************************/
 --- Membergroup icons changes
 /******************************************************************************/
@@ -1183,7 +1191,8 @@ VALUES
 	('sef_ignoreactions', ''),
 	('sef_lowercase', '1'),
 	('sef_spacechar', '-'),
-	('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',",/,?,\,|');
+	('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',",/,?,\,|'),
+	('news', 'PortaMx Forum - Just Installed!');
 
 INSERT INTO {$db_prefix}themes
 	(id_theme, variable, value)

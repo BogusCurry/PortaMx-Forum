@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1 Beta 4; EclPrivacynotice
+// Version: 2.1 Beta 5; EclPrivacynotice
 
 /**
 	Additional informations for this file format:

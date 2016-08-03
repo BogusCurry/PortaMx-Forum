@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -18,7 +18,7 @@ if (!defined('PMX'))
 // This defines two version types for checking the API's are compatible with this version of SMF.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'PortaMx-Forum 2.1 Beta 4',
+	'forum_version' => 'PortaMx-Forum 2.1 Beta 5',
 	// This is the minimum version of SMF that an API could have been written for to work. (strtr to stop accidentally updating version on release)
 	'search_version' => strtr('PortaMx-Forum 2+1=Beta=4', array('+' => '.', '=' => ' ')),
 );
@@ -1828,7 +1828,7 @@ function PlushSearch2()
 
 	// Consider the search complete!
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-		$pmxCacheFunc['put']('search_start-' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']), null, 90);
+		$pmxCacheFunc['drop']('search_start-' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']));
 
 	$context['key_words'] = &$searchArray;
 

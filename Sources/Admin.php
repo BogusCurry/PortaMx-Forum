@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -552,11 +552,11 @@ function AdminHome()
 			'title' => $txt['admin_center'],
 			'help' => '',
 			'description' => '<strong>' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</strong>
-						' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']),
+			' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']),
 		);
 
-	if ($context['admin_area'] == 'admin')
-		loadJavascriptFile('admin.js', array('defer' => false), 'pmx_admin');
+//	if ($context['admin_area'] == 'admin')
+	loadJavascriptFile('admin.js', array('defer' => false), 'pmx_admin');
 }
 
 /**

@@ -1,5 +1,5 @@
 <?php
-// Version: 2.1 Beta 4; Editor
+// Version: 2.1 Beta 5; Editor
 
 global $editortxt;
 

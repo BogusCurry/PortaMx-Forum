@@ -10,7 +10,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -741,6 +741,9 @@ function MessageIndex()
 			),
 		),
 	);
+
+	// Javascript for inline editing.
+	loadJavascriptFile('topic.js', array('defer' => false), 'pmx_topic');
 
 	// Allow adding new buttons easily.
 	// Note: $context['normal_buttons'] is added for backward compatibility with 2.0, but is deprecated and should not be used

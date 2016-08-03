@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -169,8 +169,8 @@ function EditSmileySettings($return_config = false)
 		saveDBSettings($config_vars);
 		$_SESSION['adm-save'] = true;
 
-		$pmxCacheFunc['put']('parsing_smileys', null, 480);
-		$pmxCacheFunc['put']('posting_smileys', null, 480);
+		$pmxCacheFunc['drop']('parsing_smileys');
+		$pmxCacheFunc['drop']('posting_smileys');
 
 		redirectexit('action=admin;area=smileys;sa=settings');
 	}
@@ -265,8 +265,8 @@ function EditSmileySets()
 			if (!empty($_POST['smiley_sets_import']))
 				ImportSmileys($_POST['smiley_sets_path']);
 		}
-		$pmxCacheFunc['put']('parsing_smileys', null, 480);
-		$pmxCacheFunc['put']('posting_smileys', null, 480);
+		$pmxCacheFunc['drop']('parsing_smileys');
+		$pmxCacheFunc['drop']('posting_smileys');
 	}
 
 	// Load all available smileysets...
@@ -745,8 +745,8 @@ function AddSmiley()
 			array('id_smiley')
 		);
 
-		$pmxCacheFunc['put']('parsing_smileys', null, 480);
-		$pmxCacheFunc['put']('posting_smileys', null, 480);
+		$pmxCacheFunc['drop']('parsing_smileys');
+		$pmxCacheFunc['drop']('posting_smileys');
 
 		// No errors? Out of here!
 		redirectexit('action=admin;area=smileys;sa=editsmileys');
@@ -905,8 +905,8 @@ function EditSmileys()
 			}
 		}
 
-		$pmxCacheFunc['put']('parsing_smileys', null, 480);
-		$pmxCacheFunc['put']('posting_smileys', null, 480);
+		$pmxCacheFunc['drop']('parsing_smileys');
+		$pmxCacheFunc['drop']('posting_smileys');
 	}
 
 	// Load all known smiley sets.
@@ -1320,8 +1320,8 @@ function EditSmileyOrder()
 			)
 		);
 
-		$pmxCacheFunc['put']('parsing_smileys', null, 480);
-		$pmxCacheFunc['put']('posting_smileys', null, 480);
+		$pmxCacheFunc['drop']('parsing_smileys');
+		$pmxCacheFunc['drop']('posting_smileys');
 	}
 
 	$request = $pmxcFunc['db_query']('', '
@@ -1405,8 +1405,8 @@ function EditSmileyOrder()
 		}
 	}
 
-	$pmxCacheFunc['put']('parsing_smileys', null, 480);
-	$pmxCacheFunc['put']('posting_smileys', null, 480);
+	$pmxCacheFunc['drop']('parsing_smileys');
+	$pmxCacheFunc['drop']('posting_smileys');
 }
 
 /**
@@ -1627,8 +1627,8 @@ function InstallSmileySet()
 
 		logAction('install_package', array('package' => $pmxcFunc['htmlspecialchars']($smileyInfo['name']), 'version' => $pmxcFunc['htmlspecialchars']($smileyInfo['version'])), 'admin');
 
-		$pmxCacheFunc['put']('parsing_smileys', null, 480);
-		$pmxCacheFunc['put']('posting_smileys', null, 480);
+		$pmxCacheFunc['drop']('parsing_smileys');
+		$pmxCacheFunc['drop']('posting_smileys');
 	}
 
 	if (file_exists($packagesdir . '/temp'))
@@ -1702,8 +1702,8 @@ function ImportSmileys($smileyPath)
 			array('id_smiley')
 		);
 
-		$pmxCacheFunc['put']('parsing_smileys', null, 480);
-		$pmxCacheFunc['put']('posting_smileys', null, 480);
+		$pmxCacheFunc['drop']('parsing_smileys');
+		$pmxCacheFunc['drop']('posting_smileys');
 	}
 }
 

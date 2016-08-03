@@ -26,7 +26,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -99,7 +99,7 @@ function ThemesMain()
 	call_integration_hook('integrate_manage_themes', array(&$subActions));
 
 	// Whatever you decide to do, clean the minify cache.
-	$pmxCacheFunc['put']('minimized_css', null, 90);
+	$pmxCacheFunc['drop']('minimized_css');
 
 	// Follow the sa or just go to administration.
 	if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
@@ -183,7 +183,7 @@ function ThemeAdmin()
  */
 function ThemeList()
 {
-	global $context, $boarddir, $boardurl, $pmxcFunc;
+	global $context, $boarddir, $boardurl, $pmxcFunc, $pmxCacheFunc;
 
 	loadLanguage('Admin');
 	isAllowedTo('admin_forum');
@@ -216,7 +216,7 @@ function ThemeList()
 				$setValues[] = array($id, 0, 'base_images_url', $_POST['reset_url'] . '/' . basename($theme['base_theme_dir']) . '/' . basename($theme['base_images_url']));
 			}
 
-			$pmxCacheFunc['put']('theme_settings-' . $id, null, 90);
+			$pmxCacheFunc['drop']('theme_settings-' . $id);
 		}
 
 		if (!empty($setValues))
@@ -386,8 +386,8 @@ function SetThemeOptions()
 			);
 		}
 
-		$pmxCacheFunc['put']('theme_settings-' . $_GET['th'], null, 90);
-		$pmxCacheFunc['put']('theme_settings-1', null, 90);
+		$pmxCacheFunc['drop']('theme_settings-' . $_GET['th']);
+		$pmxCacheFunc['drop']('theme_settings-1');
 
 		redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 	}
@@ -735,8 +735,8 @@ function SetThemeSettings()
 			);
 		}
 
-		$pmxCacheFunc['put']('theme_settings-' . $_GET['th'], null, 90);
-		$pmxCacheFunc['put']('theme_settings-1', null, 90);
+		$pmxCacheFunc['drop']('theme_settings-' . $_GET['th']);
+		$pmxCacheFunc['drop']('theme_settings-1');
 
 		// Invalidate the cache.
 		updateSettings(array('settings_updated' => time()));
@@ -933,7 +933,7 @@ function PickTheme()
 					array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
 					array('id_theme', 'id_member', 'variable')
 				);
-				$pmxCacheFunc['put']('theme_settings-' . $_GET['th'] . '-' . $user_info['id'], null, 90);
+				$pmxCacheFunc['drop']('theme_settings-' . $_GET['th'] . '-' . $user_info['id']);
 
 				$_SESSION['id_variant'] = 0;
 			}
@@ -952,7 +952,7 @@ function PickTheme()
 			);
 
 			// Make it obvious that it's changed
-			$pmxCacheFunc['put']('theme_settings-' . $_GET['th'], null, 90);
+			$pmxCacheFunc['drop']('theme_settings-' . $_GET['th']);
 		}
 
 		// For everyone.
@@ -1000,7 +1000,7 @@ function PickTheme()
 					array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
 					array('id_theme', 'id_member', 'variable')
 				);
-				$pmxCacheFunc['put']('theme_settings-' . $_GET['th'] . '-' . (int) $_REQUEST['u'], null, 90);
+				$pmxCacheFunc['drop']('theme_settings-' . $_GET['th'] . '-' . (int) $_REQUEST['u']);
 
 				if ($user_info['id'] == $_REQUEST['u'])
 					$_SESSION['id_variant'] = 0;
@@ -1614,7 +1614,7 @@ function SetJavaScript()
 	if (isset($_GET['th']) || isset($_GET['id']))
 	{
 		// Invalidate the current themes cache too.
-		$pmxCacheFunc['put']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id'], null, 60);
+		$pmxCacheFunc['drop']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id']);
 
 		$settings['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 	}
@@ -1639,7 +1639,7 @@ function SetJavaScript()
 		array('id_theme', 'id_member', 'variable')
 	);
 
-	$pmxCacheFunc['put']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id'], null, 60);
+	$pmxCacheFunc['drop']('theme_settings-' . $settings['theme_id'] . '-' . $user_info['id']);
 
 	// Don't output anything...
 	redirectexit($settings['images_url'] . '/blank.png');

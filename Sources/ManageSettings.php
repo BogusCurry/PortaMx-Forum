@@ -10,7 +10,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -145,7 +145,7 @@ function ModifyBasicSettings($return_config = false)
 	global $txt, $scripturl, $context, $modSettings, $pmxCacheFunc;
 
 	// clear the cache
-	$pmxCacheFunc['put']('modSettings', null, 60);
+	$pmxCacheFunc['drop']('modSettings');
 
 	// We need to know if personal text is enabled, and if it's in the registration fields option.
 	// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
@@ -816,7 +816,7 @@ function ModifyAntispamSettings($return_config = false)
 		saveDBSettings($save_vars);
 		$_SESSION['adm-save'] = true;
 
-		$pmxCacheFunc['put']('verificationQuestions', null, 300);
+		$pmxCacheFunc['drop']('verificationQuestions');
 
 		redirectexit('action=admin;area=antispam');
 	}

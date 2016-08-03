@@ -9,7 +9,7 @@
  * @copyright 2016 Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -546,8 +546,8 @@ function DownloadLanguage()
 	// Kill the cache, as it is now invalid..
 	if (!empty($modSettings['cache_enable']))
 	{
-		$pmxCacheFunc['put']('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-		$pmxCacheFunc['put']('known_languages_all', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
+		$pmxCacheFunc['drop']('known_languages');
+		$pmxCacheFunc['drop']('known_languages_all');
 	}
 
 	require_once($sourcedir . '/Subs-List.php');
@@ -993,8 +993,8 @@ function ModifyLanguage()
 		// Fifth, update getLanguages() cache.
 		if (!empty($modSettings['cache_enable']))
 		{
-			$pmxCacheFunc['put']('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
-			$pmxCacheFunc['put']('known_languages_all', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
+			$pmxCacheFunc['drop']('known_languages');
+			$pmxCacheFunc['drop']('known_languages_all');
 		}
 
 		// Sixth, if we deleted the default language, set us back to english?

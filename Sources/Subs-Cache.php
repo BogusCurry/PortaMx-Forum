@@ -7,7 +7,7 @@
  * @author PortaMx
  * @copyright 2016 PortaMx
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -325,7 +325,7 @@ switch ($cache_accelerator)
 		}
 
 		// Put key data to cache
-		function pmxCachePut($key, $value, $ttl = 0, $useMember = false, $cleaner = null)
+		function pmxCachePut($key, $value, $ttl = 0, $useMember = false)
 		{
 			global $pmxCache, $cache_enable, $cachedir;
 
@@ -388,13 +388,34 @@ switch ($cache_accelerator)
 		{
 			return null;
 		}
-		function pmxCachePut($key, $value, $ttl = 0, $cleaner = null)
+		function pmxCachePut($key, $value, $ttl = 0)
 		{
 			return;
 		}
 		function pmxCacheClean()
 		{
 			return;
+		}
+	}
+}
+
+/**
+* if usegroups given, clear all groups cache
+* else clear the give key cache 
+*/
+function pmxCacheDrop($key, $usegroups = false)
+{
+	global $pmxCacheFunc;
+
+	if(empty($usegroups))
+		$pmxCacheFunc['put']($key, null);
+	else
+	{
+		$cgrps = explode(',', $pmxCacheFunc['get']('usedgroups', false));
+		if(!empty($cgrps) && is_array($cgrps))
+		{
+			foreach($cgrps as $grp)
+				$pmxCacheFunc['put']($key .'_'. $grp, null);
 		}
 	}
 }
@@ -440,26 +461,6 @@ function pmxCacheUsedGroups($groups = true)
 }
 
 /**
-* Clear all group cached values
-*/
-function pmxCacheDrop($key, $usegroups = false)
-{
-	global $pmxCacheFunc;
-
-	if(!empty($usegroups))
-	{
-		$cgrps = explode(',', $pmxCacheFunc['get']('usedgroups', false));
-		if(!empty($cgrps) && is_array($cgrps))
-		{
-			foreach($cgrps as $grp)
-				$pmxCacheFunc['put']($key .'_'. $grp, null);
-		}
-	}
-	else
-		$pmxCacheFunc['put']($key, null);
-}
-
-/**
 * get usergroup id's
 */
 function pmxCache_getGroups()
@@ -480,7 +481,6 @@ function pmxCache_getGroups()
 		$result[] = $row['id_group'];
 
 	$pmxcFunc['db_free_result']($request);
-
 	return $result;
 }
 ?>

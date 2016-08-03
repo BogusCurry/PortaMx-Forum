@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -1635,8 +1635,8 @@ function MaintainMassMoveTopics()
 			// Just return if we don't have any topics left to move.
 			if (empty($topics))
 			{
-				$pmxCacheFunc['put']('board-' . $id_board_from, null, 120);
-				$pmxCacheFunc['put']('board-' . $id_board_to, null, 120);
+				$pmxCacheFunc['drop']('board-' . $id_board_from);
+				$pmxCacheFunc['drop']('board-' . $id_board_to);
 				redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
 			}
 
@@ -1661,8 +1661,8 @@ function MaintainMassMoveTopics()
 	}
 
 	// Don't confuse admins by having an out of date cache.
-	$pmxCacheFunc['put']('board-' . $id_board_from, null, 120);
-	$pmxCacheFunc['put']('board-' . $id_board_to, null, 120);
+	$pmxCacheFunc['drop']('board-' . $id_board_from);
+	$pmxCacheFunc['drop']('board-' . $id_board_to);
 
 	redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
 }

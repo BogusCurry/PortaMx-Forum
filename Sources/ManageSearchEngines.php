@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -200,7 +200,7 @@ function ViewSpiders()
 			)
 		);
 
-		$pmxCacheFunc['put']('spider_search', null, 300);
+		$pmxCacheFunc['drop']('spider_search');
 		recacheSpiderNames();
 	}
 
@@ -428,7 +428,7 @@ function EditSpider()
 			);
 
 
-		$pmxCacheFunc['put']('spider_search', null, 300);
+		$pmxCacheFunc['drop']('spider_search');
 		recacheSpiderNames();
 
 		redirectexit('action=admin;area=sengines;sa=spiders');

@@ -7,7 +7,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 // Don't do anything if Portamx/SMF is already loaded.
@@ -21,7 +21,7 @@ global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $boarddir, $sourcedir, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $db_connection, $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
-global $pmxcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd, $cachedir;
+global $pmxcFunc, $pmxCacheFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd, $cachedir;
 
 // Remember the current configuration so it can be set back.
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
@@ -58,6 +58,7 @@ if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
 	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
 
 // Load the important includes.
+require_once($sourcedir . '/Subs-Cache.php');
 require_once($sourcedir . '/QueryString.php');
 require_once($sourcedir . '/Session.php');
 require_once($sourcedir . '/Subs.php');

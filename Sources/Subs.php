@@ -9,7 +9,7 @@
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.1 Beta 4
+ * @version 2.1 Beta 5
  */
 
 if (!defined('PMX'))
@@ -598,11 +598,11 @@ function updateMemberData($members, $data)
 		{
 			if ($modSettings['cache_enable'] >= 3)
 			{
-				$pmxCacheFunc['put']('member_data-profile-' . $member, null, 120);
-				$pmxCacheFunc['put']('member_data-normal-' . $member, null, 120);
-				$pmxCacheFunc['put']('member_data-minimal-' . $member, null, 120);
+				$pmxCacheFunc['drop']('member_data-profile-' . $member);
+				$pmxCacheFunc['drop']('member_data-normal-' . $member);
+				$pmxCacheFunc['drop']('member_data-minimal-' . $member);
 			}
-			$pmxCacheFunc['put']('user_settings-' . $member, null, 60);
+			$pmxCacheFunc['drop']('user_settings-' . $member);
 		}
 	}
 }
@@ -667,7 +667,7 @@ function updateSettings($changeArray, $update = false)
 		}
 
 		// Clean out the cache and make sure the cobwebs are gone too.
-		$pmxCacheFunc['put']('modSettings', null, 60);
+		$pmxCacheFunc['drop']('modSettings');
 
 		return;
 	}
@@ -698,7 +698,7 @@ function updateSettings($changeArray, $update = false)
 	);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	$pmxCacheFunc['put']('modSettings', null, 10);
+	$pmxCacheFunc['drop']('modSettings');
 }
 
 /**
@@ -2760,8 +2760,8 @@ function parsesmileys(&$message)
 		// Use the default smileys if it is disabled. (better for "portability" of smileys.)
 		if (empty($modSettings['smiley_enable']))
 		{
-			$smileysfrom = array(':>D', ':D', '::)', ':>(', ':))', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', '0:)');
-			$smileysto = array('evil.gif', 'cheesy.gif', 'rolleyes.gif', 'angry.gif', 'laugh.gif', 'smiley.gif', 'wink.gif', 'grin.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'tongue.gif', 'huh.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'kiss.gif', 'cry.gif', 'undecided.gif', 'azn.gif', 'afro.gif', 'police.gif', 'angel.gif');
+			$smileysfrom = array(':)', ';)', ':D', ';D', ':>(', ':(', ':o', '8)', '???', '::)', ':P', ':-[', ':-X', ':-\\', ':-*', ':\'(', ':>D', '^-^', 'O0', ':))', 'C:-)', 'O:-)');
+			$smileysto = array('smiley.gif', 'wink.gif', 'cheesy.gif', 'grin.gif', 'angry.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'huh.gif', 'rolleyes.gif', 'tongue.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'undecided.gif', 'kiss.gif', 'cry.gif', 'evil.gif', 'azn.gif', 'afro.gif', 'laugh.gif', 'police.gif', 'angel.gif');
 			$smileysdescs = array('', $txt['icon_cheesy'], $txt['icon_rolleyes'], $txt['icon_angry'], '', $txt['icon_smiley'], $txt['icon_wink'], $txt['icon_grin'], $txt['icon_sad'], $txt['icon_shocked'], $txt['icon_cool'], $txt['icon_tongue'], $txt['icon_huh'], $txt['icon_embarrassed'], $txt['icon_lips'], $txt['icon_kiss'], $txt['icon_cry'], $txt['icon_undecided'], '', '', '', '');
 		}
 		else
@@ -3724,7 +3724,7 @@ function custMinify($data, $type, $do_deferred = false)
 	{
 		loadLanguage('Errors');
 		log_error(sprintf($txt['file_not_created'], $toCreate), 'general');
-		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null, 60);
+		$pmxCacheFunc['drop']('minimized_'. $settings['theme_id'] .'_'. $type);
 
 		// The process failed so roll back to print each individual file.
 		return $data;
@@ -3759,7 +3759,7 @@ function custMinify($data, $type, $do_deferred = false)
 	{
 		loadLanguage('Errors');
 		log_error(sprintf($txt['file_not_created'], $toCreate), 'general');
-		$pmxCacheFunc['put']('minimized_'. $settings['theme_id'] .'_'. $type, null, 60);
+		$pmxCacheFunc['drop']('minimized_'. $settings['theme_id'] .'_'. $type);
 
 		// The process failed so roll back to print each individual file.
 		return $data;

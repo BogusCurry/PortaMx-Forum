@@ -18,8 +18,6 @@
 	}
 */
 
-
-
 // Handle the JavaScript surrounding the admin and moderation center.
 function pmx_AdminIndex(oOptions)
 {
@@ -74,9 +72,9 @@ pmx_AdminIndex.prototype.showCurrentVersion = function ()
 
 	setInnerHTML(oSmfVersionContainer, window.smfVersion);
 
-	var sCurrentVersion = getInnerHTML(oYourVersionContainer);
 	if (sCurrentVersion != window.smfVersion)
 		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
+	
 }
 
 pmx_AdminIndex.prototype.checkUpdateAvailable = function ()
@@ -98,8 +96,6 @@ pmx_AdminIndex.prototype.checkUpdateAvailable = function ()
 	oContainer.className = ('smfUpdateCritical' in window) ? 'errorbox' : 'noticebox';
 }
 
-
-
 function pmx_ViewVersions (oOptions)
 {
 	this.opt = oOptions;
@@ -115,6 +111,8 @@ pmx_ViewVersions.prototype.init = function ()
 		window.viewVersionsInstanceRef.loadViewVersions();
 	}
 	addLoadEvent(fHandlePageLoaded);
+
+	setInnerHTML(document.getElementById('yourVersion'), window.smfVersions['PMX']);
 }
 
 pmx_ViewVersions.prototype.loadViewVersions = function ()
