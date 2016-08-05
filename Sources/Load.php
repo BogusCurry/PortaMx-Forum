@@ -1988,7 +1988,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'jsmodify',
 		'xmlhttp',
 		'post2',
-		'stats'
+		'stats',
+		'notifyboard',
+		'notifytopic',
 	);
 
 	call_integration_hook('integrate_simple_actions', array(&$simpleActions, &$simpleAreas, &$simpleSubActions, &$xmlActions));

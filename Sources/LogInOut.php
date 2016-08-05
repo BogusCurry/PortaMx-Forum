@@ -58,15 +58,36 @@ function Login()
 		'name' => $txt['login'],
 	);
 
-	// Set the login URL - will be used when the login process is done (but careful not to send us to an attachment).
-	if (isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'dlattach') === false && preg_match('~(board|topic)[=,]~', $_SESSION['old_url']) != 0)
-		$_SESSION['login_url'] = $_SESSION['old_url'];
-	elseif (isset($_SESSION['login_url']) && strpos($_SESSION['login_url'], 'dlattach') !== false)
-		unset($_SESSION['login_url']);
+	// Set the login URL - will be used when the login process is done .
+	getLoginURL();
 
 	// Create a one time token.
 	createToken('login');
 }
+
+/**
+ * Get the login url with check if SEF enabled
+ * but careful not to send us to an attachment
+ */
+function getLoginURL()
+{
+	global $modSettings, $scripturl, $boardurl;
+
+	if (isset($_SESSION['old_url']) && empty($_SESSION['login_url']))
+	{
+		if (!empty($modSettings['sef_enabled']))
+		{
+			$query = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SESSION['old_url']), '/')));
+			if ((isset($query['board']) || isset($query['topic'])) && !isset($query['dlattach']))
+				$_SESSION['login_url'] = $scripturl .'?'. pmxsef_build_query($query);
+		}
+		else
+		{   
+			if (isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'dlattach') === false && preg_match('~(board|topic)[=,]~', $_SESSION['old_url']) != 0)
+				$_SESSION['login_url'] = $_SESSION['old_url'];
+		}
+	}
+} 
 
 /**
  * Actually logs you in.
@@ -185,8 +206,7 @@ function Login2()
 	spamProtection('login');
 
 	// Set the login_url if it's not already set (but careful not to send us to an attachment).
-	if ((empty($_SESSION['login_url']) && isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'dlattach') === false && preg_match('~(board|topic)[=,]~', $_SESSION['old_url']) != 0) || (isset($_GET['quicklogin']) && isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'login') === false))
-		$_SESSION['login_url'] = $_SESSION['old_url'];
+	getLoginURL();
 
 	// Been guessing a lot, haven't we?
 	if (isset($_SESSION['failed_login']) && $_SESSION['failed_login'] >= $modSettings['failed_login_threshold'] * 3)

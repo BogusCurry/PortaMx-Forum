@@ -65,7 +65,6 @@ function BoardNotify()
 					'current_member' => $user_info['id'],
 				)
 			);
-
 	}
 
 	// Back to the board!

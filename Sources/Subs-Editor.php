@@ -1654,7 +1654,7 @@ function create_control_richedit($editorOptions)
 	// prepare the cancel link
 	if($editorOptions['id'] == 'quickReply' || (isset($_GET['action']) && $_GET['action'] != 'pm'))
 	{
-		if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'post2')
+		if((isset($_REQUEST['action']) && $_REQUEST['action'] == 'post2') || isset($_REQUEST['id_draft']))
 			$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'];
 		else
 		{

@@ -2905,13 +2905,14 @@ function redirectexit($setLocation = '', $refresh = false, $permanent = false)
 	// Maybe integrations want to change where we are heading?
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh, &$permanent));
 
-	// Set the header.
-	header('Location: ' . str_replace(' ', '%20', $setLocation), true, $permanent ? 301 : 302);
-
 	// Debugging.
 	if (isset($db_show_debug) && $db_show_debug === true)
 		$_SESSION['debug_redirect'] = $db_cache;
 
+	// Set the header.
+	$header = str_replace(' ', '%20', $setLocation);
+	header("Location: $header", true, $permanent ? 301 : 302);
+ 
 	obExit(false);
 }
 
@@ -3004,7 +3005,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewpmxfile') === false)
+	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewpmxfile') === false && strpos($_SERVER['REQUEST_URL'], 'jscook') === false)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...

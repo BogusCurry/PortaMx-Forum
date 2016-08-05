@@ -1089,6 +1089,9 @@ function Display()
 	foreach ($common_permissions as $contextual => $perm)
 		$context[$contextual] = allowedTo($perm);
 
+	// hide likes if ECL not accepted
+	$context['can_see_likes'] = checkECL_Cookie(true);
+
 	// Permissions with _any/_own versions.  $context[YYY] => ZZZ_any/_own.
 	$anyown_permissions = array(
 		'can_move' => 'move',

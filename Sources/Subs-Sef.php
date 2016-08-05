@@ -56,23 +56,21 @@ function pmxsef_convertSEF()
 	if(strpos($_SERVER['REQUEST_URL'], $scripturl) !== false)
 		return;
 
-	// convert the query
-	if(!empty($_GET['q']))
+	// special handling for likes
+	if(!empty($_GET['q']) && strpos($_GET['q'], 'likes') !== false && isset($_GET['_']))
+		$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('js/', '/_/'), $_SERVER['REQUEST_URL']);
+
+	// convert the SEF query
+ 	$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
+	$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET);
+
+	// check if a topic subject changed
+	if(isset($_GET['action']) && $_GET['action'] == 'post2' && !empty($_POST) && !isset($_POST['preview']) && isset($pmxSEF['TopicNameList'][$_POST['topic']]))
 	{
-		// special handling for likes
-		if(strpos($_GET['q'], 'likes') !== false && isset($_GET['_']))
-			$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('js/', '/_/'), $_SERVER['REQUEST_URL']);
-
-		// convert the SEF query
- 		$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
-		$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET);
-
-		// check if a topic subject changed
-		if(isset($_GET['action']) && $_GET['action'] == 'post2' && !empty($_POST) && !isset($_POST['preview']) && isset($pmxSEF['TopicNameList'][$_POST['topic']]))
-		{
-			unset($pmxSEF['TopicNameList'][$_POST['topic']]);
-			$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
-		}
+		$temp = explode('/', $pmxSEF['TopicNameList'][$_POST['topic']]);
+		unset($pmxSEF['TopicNameList'][$_POST['topic']]);
+		$pmxSEF['TopicNameList'][$_POST['topic']] = CheckDupe($temp[0] .'/', $_POST['subject'], array('Topic'));
+		$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
 	}
 }
 
@@ -204,15 +202,13 @@ function pmxsef_query($query)
 ********************************************/
 function pmxsef_Redirect(&$setLocation)
 {
-	global $scripturl, $pmxSEF, $pmxCacheFunc, $modSettings;
+	global $boardurl, $pmxSEF, $pmxCacheFunc, $modSettings;
 
 	if(empty($modSettings['sef_enabled']))
 		return;
 
-	$pmxSEF['redirect'] = true;
-
 	// Only do this if it's an URL for this board
-	if(strpos($setLocation, $scripturl) !== false)
+	if(strpos($setLocation, $boardurl) !== false)
 	{
 		$setLocation = create_sefurl($setLocation);
 
@@ -223,6 +219,7 @@ function pmxsef_Redirect(&$setLocation)
 			updateSettings($changeArray);
 			$pmxCacheFunc['drop']('sef_settings');
 		}
+		$pmxSEF['redirect'] = true;
 	}
 }
 
@@ -237,7 +234,7 @@ function pmxsef_XMLOutput($do_footer)
 	if(empty($modSettings['sef_enabled']))
 		return;
 
-	if(!$do_footer && empty($pmxSEF['redirect']))
+	if(empty($do_footer) && empty($pmxSEF['redirect']))
 	{
 		$temp = ob_get_contents();
 
