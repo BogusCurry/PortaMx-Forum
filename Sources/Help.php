@@ -24,7 +24,6 @@ if (!defined('PMX'))
 function ShowHelp()
 {
 	loadTemplate('Help');
-	loadLanguage('Manual');
 
 	$subActions = array(
 		'index' => 'HelpIndex',

@@ -205,7 +205,7 @@ $txt['error_valid_server_email_needed'] = 'You have not entered a valid webmaste
 $txt['error_already_installed'] = 'The installer has detected that you already have PortaMx Forum installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br><br>If you wish to upgrade please visit the <a href="http://portamx.com">PortaMx Website</a> and download the latest <em>upgrade</em> package.<br><br>If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
 $txt['error_warning_notice'] = 'Warning!';
 $txt['error_script_outdated'] = 'This install script is out of date! The current version of PortaMx Forum is %1$s but this install script is for %2$s.<br><br>
-	It is recommended that you visit the <a href="http://www.simplemachines.org">Simple Machines</a> website to ensure you are installing the latest version.';
+	It is recommended that you visit the <a href="http://portamx.com">PortaMx</a> website to ensure you are installing the latest version.';
 $txt['error_db_prefix_numeric'] = 'The selected database type does not support the use of numeric prefixes.';
 $txt['error_invalid_characters_username'] = 'Invalid character used in Username.';
 $txt['error_username_too_long'] = 'Username must be less than 25 characters long.';
@@ -234,10 +234,10 @@ $txt['upgrade_paused_overload'] = 'This upgrade has been paused to avoid overloa
 
 $txt['upgrade_ready_proceed'] = 'Thank you for choosing to upgrade to PortaMx Forum %1$s. All files appear to be in place, and we\'re ready to proceed.';
 
-$txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or it is out of date. Make sure your theme paths are correct. You can download a setting checker tool from the <a href="http://www.simplemachines.org">Simple Machines Website</a>';
+$txt['upgrade_error_script_js'] = 'The upgrade script cannot find script.js or it is out of date. Make sure your theme paths are correct. You can download a setting checker tool from the <a href="http://portamx.com">PortaMx Website</a>';
 
 $txt['upgrade_warning_lots_data'] = 'This upgrade script has detected that your forum contains a lot of data which needs upgrading. This process may take quite some time depending on your server and forum size, and for very large forums (~300,000 messages) may take several hours to complete.';
-$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of PortaMx Forum is <em id="pmxVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br><br>It is recommended that you visit the <a href="http://www.simplemachines.org">Simple Machines</a> website to ensure you are upgrading to the latest version.';
+$txt['upgrade_warning_out_of_date'] = 'This upgrade script is out of date! The current version of PortaMx Forum is <em id="pmxVersion" style="white-space: nowrap;">??</em> but this upgrade script is for <em id="yourVersion" style="white-space: nowrap;">%1$s</em>.<br><br>It is recommended that you visit the <a href="http://pwortamx.com">PortaMx</a> website to ensure you are upgrading to the latest version.';
 
 $txt['error_ftp_no_connect'] = 'Unable to connect to FTP server with this combination of details.';
 $txt['ftp_login'] = 'Your FTP connection information';

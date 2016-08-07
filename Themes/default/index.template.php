@@ -378,7 +378,7 @@ function template_body_below()
 		echo '
 			<p>';
 
-			if(!empty($pmxCache['vals']['enabled']))
+		if(!empty($pmxCache['vals']['enabled']))
 		{
 			$values = $pmxCache['vals'];
 			$values['time'] = sprintf("%0.3F", $values['time'] * 1000) . $txt['cache_msec'];
