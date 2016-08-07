@@ -36,7 +36,7 @@ function template_admin()
 									</h3>
 								</div>
 								<div class="windowbg nopadding">
-									<div id="smfAnnouncements">', $txt['lfyi'], '</div>
+									<div id="pmxAnnouncements">', $txt['lfyi'], '</div>
 								</div>
 							</div>';
 
@@ -54,7 +54,7 @@ function template_admin()
 										', $txt['support_versions_forum'], ':
 										<em id="yourVersion">', $context['forum_version'], '</em><br>
 										', $txt['support_versions_current'], ':
-										<em id="smfVersion">??</em><br>
+										<em id="pmxVersion">??</em><br>
 										', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br>';
 
 	// Display all the members who can administrate the forum.
@@ -125,10 +125,10 @@ function template_admin()
 									%message%
 								</dd>
 							'), ',
-							sAnnouncementContainerId: \'smfAnnouncements\',
+							sAnnouncementContainerId: \'pmxAnnouncements\',
 
 							bLoadVersions: true,
-							sSmfVersionContainerId: \'smfVersion\',
+							sSmfVersionContainerId: \'pmxVersion\',
 							sYourVersionContainerId: \'yourVersion\',
 							sVersionOutdatedTemplate: ', JavaScriptEscape('
 								<span class="alert">%currentVersion%</span>
@@ -174,7 +174,7 @@ function template_credits()
 									', $txt['support_versions_forum'], ':
 								<em id="yourVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br>
 									', $txt['support_versions_current'], ':
-								<em id="smfVersion">??</em><br>';
+								<em id="pmxVersion">??</em><br>';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
@@ -263,19 +263,19 @@ function template_credits()
 							{
 								var smfVer, yourVer;
 
-								if (!window.smfVersion)
+								if (!window.pmxVersion)
 									return;
 
-								smfVer = document.getElementById("smfVersion");
+								smfVer = document.getElementById("pmxVersion");
 								yourVer = document.getElementById("yourVersion");
 
-								setInnerHTML(smfVer, window.smfVersion);
+								setInnerHTML(smfVer, window.pmxVersion);
 
 								var currentVersion = getInnerHTML(yourVer);
-								if (currentVersion != window.smfVersion)
+								if (currentVersion != window.pmxVersion)
 									setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
 								else
-									setInnerHTML(smfVer, window.smfVersion);
+									setInnerHTML(smfVer, window.pmxVersion);
 							}
 
 							addLoadEvent(smfCurrentVersion)

@@ -1497,10 +1497,10 @@ function PackageBrowse()
 	$context['available_all'] = array();
 
 	$get_versions = $pmxcFunc['db_query']('', '
-		SELECT data FROM {db_prefix}admin_info_files WHERE filename={string:versionsfile} AND path={string:smf}',
+		SELECT data FROM {db_prefix}admin_info_files WHERE filename={string:versionsfile} AND path={string:type}',
 		array(
 			'versionsfile' => 'latest-versions.txt',
-			'smf' => 'infofiles/',
+			'type' => 'infofiles/',
 		)
 	);
 

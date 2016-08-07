@@ -159,8 +159,8 @@ body#help_popup {
 	clear: both;
 }
 #likes .avatar {
-	max-height: 90px;
-	max-width: 90px;
+	max-height: 50px;
+	max-width: 50px;
 	padding: 0 10px 0 0;
 }
 #likes span {
@@ -1089,7 +1089,7 @@ h1.forumtitle {
 	font-size: 1.8em;
 	font-family: "Tahoma", sans-serif;
 	margin: 0;
-	padding: 14px 12px 0px 10px;
+	padding: 15px 12px 0px 6px;
 	float: left;
 	font-weight: normal;
 }
@@ -1100,14 +1100,14 @@ h1.forumtitle a {
 /* Float these items to the right */
 #siteslogan, img#smflogo {
 	margin: 0;
-	padding-right: 2px;
+	padding-right: 6px;
 	float: right;
 	line-height: 50px;
 	font-size: 1.8em;
 }
 /* Tweak the SMF logo */
 img#smflogo {
-	margin: 10px 0 4px 0;
+	margin: 10px -4px 4px 0;
 }
 /* Even guests need to be aligned */
 .welcome
@@ -1232,17 +1232,20 @@ ul li.greeting {
 	display: block;
 	clear: both;
 }
-/* Footer is now full-width by default. */
 /* The footer with copyright links etc. */
+#footerfix {
+	padding-bottom: 2em;
+}
 #footer {
-	margin: 4em 0px 0 0;
-	padding: 10px 2.5%;
-	background: #3e5a78;
-	border-top: 3px solid #b2b6bd;
-	position:absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
+	background: #3e5a80;
+	margin: 1em -1px 0 -1px;
+	padding: 10px 7px;
+	border-top: 1px solid #777;
+	border-bottom: 1px solid #777;
+	border-radius: 0 0 8px 8px;
+	box-sizing: border-box;
+	box-shadow: 0 16px 20px rgba(255,255,255,0.15) inset;
+	text-shadow: -1px -1px 1px rgba(0,0,0,0.2);
 }
 #footer li, #footer p, #footer a {
 	font-size: 0.9em;
@@ -1254,15 +1257,11 @@ ul li.greeting {
 #footer ul, #footer p {
 	padding: 0 5px !important;
 }
-
 #footer li.copyright {
 	display: block;
 	font-family: Verdana, sans-serif; /* Copyright must be Verdana! */
 }
 
-#footerfix{
-	padding-bottom: 90px;
-}
 /* the posting icons */
 #postbuttons_upper ul li a span {
 	line-height: 19px;

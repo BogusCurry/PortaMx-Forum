@@ -38,7 +38,7 @@ function pmxsef_convertSEF()
 	pmxsef_LoadSettings();
 
 	// Make sure we know the URL of the current request.
-	parse_str(preg_replace('~&(\w+)(?=&|$)~', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', '/;' => '/', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
+	parse_str(preg_replace('~&(\w+)(?=&|$)~', '&$1=', strtr(str_replace('q=', '', $_SERVER['QUERY_STRING']), array(';?' => '&', '/;' => '/', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
 	$scripturl = $boardurl . '/index.php';
 	if(empty($_SERVER['REQUEST_URI']))
@@ -52,14 +52,22 @@ function pmxsef_convertSEF()
 	if(strpos($_SERVER['REQUEST_URL'], 'index.php') === false && strpos($_SERVER['REQUEST_URL'], $boardurl .'/?') !== false)
 		$_SERVER['REQUEST_URL'] = str_replace($boardurl .'/?', $scripturl .'?', $_SERVER['REQUEST_URL']);
 
-	// exit here if a other they not need to convert sef url
+	// redirect on bord/topic (like called from external), return if is a ignore action, convert other
 	if(strpos($_SERVER['REQUEST_URL'], $scripturl) !== false)
-		return;
+	{
+		if(isset($_GET['action']) && in_array($_GET['action'], $pmxSEF['ignoreactions']))
+			return;
+
+		// topic or board requested .. redirect
+		if(!isset($_GET['action']) && isset($_GET['board']) || isset($_GET['topic']))
+			redirectexit($_SERVER['REQUEST_URL']);
+
+		// else convert the query
+		$_SERVER['REQUEST_URL'] = create_sefurl($_SERVER['REQUEST_URL']);
+	}
 
 	// special handling for likes
-	if(!empty($_GET['q']) && strpos($_GET['q'], 'likes') !== false && isset($_GET['_']))
-		$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('js/', '/_/'), $_SERVER['REQUEST_URL']);
-
+	$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('js/', '/_/'), $_SERVER['REQUEST_URL']);
 	// convert the SEF query
  	$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
 	$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET);
@@ -85,7 +93,7 @@ function pmxsef_LoadSettings()
 	{
 		$pmxSEF = array(
 			'actions' => array_unique(explode(',', $modSettings['sef_actions'])),
-			'ignoreactions' => array_unique(array_merge(array('admin', 'viewpmxfile'), explode(',', $modSettings['sef_ignoreactions']))),
+			'ignoreactions' => array_unique(array_merge(array('admin', 'viewpmxfile', 'uploadAttach'), explode(',', $modSettings['sef_ignoreactions']))),
 			'ignorerequests' => array('type' => 'preview'),
 			'stripchars' => array_diff(explode(',', $modSettings['sef_stripchars']), array(trim($modSettings['sef_spacechar']))),
 			'spacechar' => trim($modSettings['sef_spacechar']),
@@ -290,6 +298,16 @@ function ob_pmxsef($buffer)
 	if(isset($_REQUEST['jscook']) || empty($modSettings['sef_enabled']))
 		return $buffer;
 
+	// Gotta fix up some javascript laying around in the templates
+	$extra_replacements = array(
+		'%1/$d' => '%1$d/',
+		'/$d\',' => '_%1$d/\',',
+		'/rand,' => '/rand=',
+		'%1_%1$d/\',' => '%1$d/\',',
+//		'var pmx_scripturl = "' . $scripturl => 'var pmx_scripturl = "' . $boardurl .'/?',
+	);
+	$buffer = str_replace(array_keys($extra_replacements), array_values($extra_replacements), $buffer);
+
 	// fix expandable pagelinks
 	$buffer = str_replace('/index.php\'+\'?', '/index.php?', $buffer);
 
@@ -325,16 +343,6 @@ function ob_pmxsef($buffer)
 		}
 		$buffer = str_replace(array_keys($replacements), array_values($replacements), $buffer);
 	}
-
-	// Gotta fix up some javascript laying around in the templates
-	$extra_replacements = array(
-		'%1/$d' => '%1$d/',
-		'/$d\',' => '_%1$d/\',',
-		'/rand,' => '/rand=',
-		'%1_%1$d/\',' => '%1$d/\',',
-		'var pmx_scripturl = "' . $scripturl => 'var pmx_scripturl = "' . $boardurl .'/',
-	);
-	$buffer = str_replace(array_keys($extra_replacements), array_values($extra_replacements), $buffer);
 
 	//	fix expandable page links
 	preg_match_all('~\b(pmx_scripturl)(.*?)(topic=)([0-9\.]+)([\%\$d0-9]+)~', $buffer, $matches, PREG_SET_ORDER);

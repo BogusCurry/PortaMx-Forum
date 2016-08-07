@@ -540,7 +540,7 @@ function template_browse()
 	// Make a list of already installed mods so nothing is listed twice ;).
 	echo '
 				window.smfInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
-				window.smfVersion = "', $context['forum_version'], '";
+				window.pmxVersion = "', $context['forum_version'], '";
 			</script>
 			<div id="yourVersion" style="display:none">', $context['forum_version'], '</div>';
 

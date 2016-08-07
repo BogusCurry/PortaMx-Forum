@@ -422,8 +422,8 @@ function iCalDownload()
 	$filecontents = '';
 	$filecontents .= 'BEGIN:VCALENDAR' . "\n";
 	$filecontents .= 'METHOD:PUBLISH' . "\n";
-	$filecontents .= 'PRODID:-//SimpleMachines//SMF ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('SMF ' => ''))) . '//EN' . "\n";
-	$filecontents .= 'VERSION:2.0' . "\n";
+	$filecontents .= 'PRODID:-//PortaMxForum//PMX ' . (empty($forum_version) ? 2.1 : strtr($forum_version, array('PMX ' => ''))) . '//EN' . "\n";
+	$filecontents .= 'VERSION:2.1' . "\n";
 	$filecontents .= 'BEGIN:VEVENT' . "\n";
 	// @TODO - Should be the members email who created the event rather than $webmaster_email.
 	$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";

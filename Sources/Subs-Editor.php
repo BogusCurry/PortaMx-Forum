@@ -1583,7 +1583,7 @@ function theme_postbox($msg)
 function create_control_richedit($editorOptions)
 {
 	global $txt, $modSettings, $options, $pmxcFunc, $pmxCacheFunc, $editortxt;
-	global $context, $settings, $user_info, $scripturl;
+	global $context, $settings, $user_info, $scripturl, $boardurl;
 
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
@@ -1652,17 +1652,29 @@ function create_control_richedit($editorOptions)
  	);
 
 	// prepare the cancel link
-	if($editorOptions['id'] == 'quickReply' || (isset($_GET['action']) && $_GET['action'] != 'pm'))
+	$isQuickReply = $editorOptions['id'] == 'quickReply';
+	$isAction = isset($_GET['action']) && in_array($_GET['action'], array('post', 'post2')) ? $_GET['action'] : false;
+	if($isQuickReply || $isAction)
 	{
-		if((isset($_REQUEST['action']) && $_REQUEST['action'] == 'post2') || isset($_REQUEST['id_draft']))
-			$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'];
-		else
+		if($isQuickReply || in_array($isAction, array('post', 'post2')))
 		{
-			$fromWhere = $editorOptions['id'] == 'quickReply' ? $_SERVER['REQUEST_URL'] : $_SERVER['HTTP_REFERER'];
-			if(strpos($fromWhere, 'showposts') == false)
-				preg_match('/(msg[0-9]+)/', $fromWhere, $fragment);
-			$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'] = $fromWhere . (isset($fragment[0]) ? '#'. $fragment[0] : '#top');
+			if(!empty($modSettings['sef_enabled']))
+				$cururl = pmxsef_query(str_replace($boardurl, '', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $_SERVER['REQUEST_URL']));
+			else
+				$cururl = parse_url(rawurldecode(str_replace($scripturl .'?', '', $_SERVER['HTTP_REFERER'])));
+
+			if(!isset($cururl['action']) || (isset($cururl['action']) && !in_array($cururl['action'], array('post', 'post2')) && !isset($cururl['id_draft'])))
+			{
+				$fromWhere = $isQuickReply ? $_SERVER['REQUEST_URL'] : $_SERVER['HTTP_REFERER'];
+				if(strpos($fromWhere, 'showposts') == false)
+					preg_match('/(msg[0-9]+)/', $fromWhere, $fragment);
+				$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'] = $fromWhere . (isset($fragment[0]) ? '#'. $fragment[0] : '#top');
+			}
+			else
+				$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'];
 		}
+		elseif($isAction == 'post2' || isset($_GET['id_draft']))
+			$context['controls']['richedit'][$editorOptions['id']]['cancel_link'] = $_SESSION['cancel_link'];
 	}
 
 	if (empty($context['bbc_tags']))

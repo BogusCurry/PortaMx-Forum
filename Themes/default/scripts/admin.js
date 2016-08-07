@@ -52,29 +52,29 @@ pmx_AdminIndex.prototype.loadAdminIndex = function ()
 
 pmx_AdminIndex.prototype.setAnnouncements = function ()
 {
-	if (!('smfAnnouncements' in window) || !('length' in window.smfAnnouncements))
+	if (!('pmxAnnouncements' in window) || !('length' in window.pmxAnnouncements))
 		return;
 
 	var sMessages = '';
-	for (var i = 0; i < window.smfAnnouncements.length; i++)
-		sMessages += this.opt.sAnnouncementMessageTemplate.replace('%href%', window.smfAnnouncements[i].href).replace('%subject%', window.smfAnnouncements[i].subject).replace('%time%', window.smfAnnouncements[i].time).replace('%message%', window.smfAnnouncements[i].message);
+	for (var i = 0; i < window.pmxAnnouncements.length; i++)
+		sMessages += this.opt.sAnnouncementMessageTemplate.replace('%href%', window.pmxAnnouncements[i].href).replace('%subject%', window.pmxAnnouncements[i].subject).replace('%time%', window.pmxAnnouncements[i].time).replace('%message%', window.pmxAnnouncements[i].message);
 
 	setInnerHTML(document.getElementById(this.opt.sAnnouncementContainerId), this.opt.sAnnouncementTemplate.replace('%content%', sMessages));
 }
 
 pmx_AdminIndex.prototype.showCurrentVersion = function ()
 {
-	if (!('smfVersion' in window))
+	if (!('pmxVersion' in window))
 		return;
 
 	var oSmfVersionContainer = document.getElementById(this.opt.sSmfVersionContainerId);
 	var oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId);
 
-	setInnerHTML(oSmfVersionContainer, window.smfVersion);
+	setInnerHTML(oSmfVersionContainer, window.pmxVersion);
 
-	if (sCurrentVersion != window.smfVersion)
+	var sCurrentVersion = getInnerHTML(oYourVersionContainer);
+	if (sCurrentVersion != window.pmxVersion)
 		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
-	
 }
 
 pmx_AdminIndex.prototype.checkUpdateAvailable = function ()
@@ -112,7 +112,7 @@ pmx_ViewVersions.prototype.init = function ()
 	}
 	addLoadEvent(fHandlePageLoaded);
 
-	setInnerHTML(document.getElementById('yourVersion'), window.smfVersions['PMX']);
+	setInnerHTML(document.getElementById('yourVersion'), window.pmxVersions['PMX']);
 }
 
 pmx_ViewVersions.prototype.loadViewVersions = function ()
@@ -235,10 +235,10 @@ pmx_ViewVersions.prototype.determineVersions = function ()
 		}
 	}
 
-	if (!('smfVersions' in window))
-		window.smfVersions = {};
+	if (!('pmxVersions' in window))
+		window.pmxVersions = {};
 
-	for (var sFilename in window.smfVersions)
+	for (var sFilename in window.pmxVersions)
 	{
 		if (!document.getElementById('current' + sFilename))
 			continue;
@@ -257,19 +257,19 @@ pmx_ViewVersions.prototype.determineVersions = function ()
 		{
 			if ((this.compareVersions(oHighYour[sCurVersionType], sYourVersion) || oHighYour[sCurVersionType] == '??') && !oLowVersion[sCurVersionType])
 				oHighYour[sCurVersionType] = sYourVersion;
-			if (this.compareVersions(oHighCurrent[sCurVersionType], smfVersions[sFilename]) || oHighCurrent[sCurVersionType] == '??')
-				oHighCurrent[sCurVersionType] = smfVersions[sFilename];
+			if (this.compareVersions(oHighCurrent[sCurVersionType], pmxVersions[sFilename]) || oHighCurrent[sCurVersionType] == '??')
+				oHighCurrent[sCurVersionType] = pmxVersions[sFilename];
 
-			if (this.compareVersions(sYourVersion, smfVersions[sFilename]))
+			if (this.compareVersions(sYourVersion, pmxVersions[sFilename]))
 			{
 				oLowVersion[sCurVersionType] = sYourVersion;
 				document.getElementById('your' + sFilename).className = 'alert';
 			}
 		}
-		else if (this.compareVersions(sYourVersion, smfVersions[sFilename]))
+		else if (this.compareVersions(sYourVersion, pmxVersions[sFilename]))
 			oLowVersion[sCurVersionType] = sYourVersion;
 
-		setInnerHTML(document.getElementById('current' + sFilename), smfVersions[sFilename]);
+		setInnerHTML(document.getElementById('current' + sFilename), pmxVersions[sFilename]);
 		setInnerHTML(document.getElementById('your' + sFilename), sYourVersion);
 	}
 

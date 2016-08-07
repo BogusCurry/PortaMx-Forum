@@ -362,30 +362,23 @@ function template_body_below()
 	echo '
 			</div>
 		</div>
-	</div>
-</div>';
 
-	// Show the XHTML, RSS and WAP2 links, as well as the copyright.
-	// Footer is now full-width by default.
-	echo '
-	<div id="footer">';
+		<div id="footer">';
 
 	// There is now a global "Go to top" link at the right.
-		echo '
-		<ul>
-			<li class="floatright">', (!empty($modSettings['requireAgreement'])) ? '<a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a>' : '', ' | <a href="#head">', $txt['go_up'], ' &#9650;</a></li>
-			<li class="copyright">', theme_copyright(), '</li>
-		</ul>';
+	echo '
+			<ul>
+				<li class="floatright">', (!empty($modSettings['requireAgreement'])) ? '<a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a>' : '', ' | <a href="#head">', $txt['go_up'], ' &#9650;</a></li>
+				<li class="copyright">', theme_copyright(), '</li>
+			</ul>';
 
-		echo '
-		<p>';
-	
 	// Show the load time?
 	if ($context['show_load_time'])
 	{
 		echo '
-		<p>';
-		if(!empty($pmxCache['vals']['enabled']))
+			<p>';
+
+			if(!empty($pmxCache['vals']['enabled']))
 		{
 			$values = $pmxCache['vals'];
 			$values['time'] = sprintf("%0.3F", $values['time'] * 1000) . $txt['cache_msec'];
@@ -399,8 +392,8 @@ function template_body_below()
 	}
 
 	echo '
-	</div>';
-
+		</div>
+		<script>fSetWrapper();</script>';
 }
 
 /**

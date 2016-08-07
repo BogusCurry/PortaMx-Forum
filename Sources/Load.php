@@ -2118,7 +2118,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'pmx_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'pmx_images_url' => '"' . $settings['images_url'] . '"',
 		'pmx_smileys_url' => '"' . $modSettings['smileys_url'] . '"',
-		'pmx_scripturl' => '"' . $scripturl . '"',
+		'pmx_scripturl' => '"' . $scripturl .'"',
 		'pmx_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
 		'pmx_charset' => '"' . $context['character_set'] . '"',
 		'pmx_session_id' => '"' . $context['session_id'] . '"',
@@ -2175,6 +2175,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		addInlineJavascript('
 	function fSetFavicon(jQuery){$(\':not(.signature)>.bbc_link,.ecl_link\').each(function(){var url=$(this).attr(\'href\'),domain=url.match(/:\/\/(.[^/]+)/)[1],schema=url.match(/^(http[s]*):\/\//)[1];$(this).css({\'background-image\':\'url(//www.google.com/s2/favicons?domain=\'+schema+\'://\'+domain+\')\',\'background-repeat\':\'no-repeat\',\'padding-left\':\'20px\',\'background-position\':\'1px\'});});}
 	$(document).ready(fSetFavicon);');
+	addInlineJavascript('
+	function fSetWrapper(){document.getElementById(\'content_section\').style.minHeight=window.innerHeight-(document.getElementById(\'footer\').clientHeight+document.getElementById(\'content_section\').offsetTop+document.getElementById(\'top_section\').clientHeight+10)+\'px\'};');
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())

@@ -463,6 +463,9 @@
 		padding-left: 0;
 		padding-right: 0;
 	}
+	#footer {
+		border-radius: 0 !important;
+	}
 	#header {
 		margin-left: 0;
 		margin-right: 0;
