@@ -4,6 +4,7 @@
 global $helptxt;
 
 $txt['close_window'] = 'Close window';
+$txt['agreement_disabled'] = 'Registration agreement disabled';
 
 $helptxt['manage_boards'] = '
 	<strong>Edit Boards</strong><br>
