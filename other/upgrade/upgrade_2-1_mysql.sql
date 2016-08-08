@@ -1200,11 +1200,16 @@ VALUES
 	('1', 'drafts_show_saved_enabled', '1');
 ---#
 
+---# remove SMF package server...
+DELETE FROM {$db_prefix}package_servers
+	WHERE url = 'http://mods.simplemachines.org' OR url = 'http://custom.simplemachines.org/packages/mods';
+---#
+
 ---# Inserting "package_servers"...
 INSERT IGNORE INTO {$db_prefix}package_servers
 	(id_server, name, url)
 VALUES
-	(2, 'PortaMx File Server', 'http://docserver.portamx.com');
+	(1, 'PortaMx File Server', 'http://docserver.portamx.com');
 ---#
 
 /******************************************************************************/

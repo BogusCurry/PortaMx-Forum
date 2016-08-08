@@ -1510,13 +1510,13 @@ function PackageBrowse()
 	// Decode the data.
 	$items = pmx_json_decode($data['data'], true);
 
-	$context['emulation_versions'] = preg_replace('~^PortaMx-Forum ~', '', $items);
+	$context['emulation_versions'] = preg_replace('~^PortaMx-Forum ~', 'PMX ', $items);
 
 	// Current SMF version, which is selected by default
-	$context['default_version'] = preg_replace('~^PortaMx-Forum ~', '', $forum_version);
+	$context['default_version'] = preg_replace('~^PortaMx-Forum ~', 'PMX ', $forum_version);
 
 	// Version we're currently emulating, if any
-	$context['selected_version'] = preg_replace('~^PortaMx-Forum ~', '', $context['forum_version']);
+	$context['selected_version'] = preg_replace('~^PortaMx-Forum ~', 'PMX ', $context['forum_version']);
 }
 
 /**

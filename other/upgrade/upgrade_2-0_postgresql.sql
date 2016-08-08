@@ -532,17 +532,16 @@ else
 --- Making changes to the package manager.
 /******************************************************************************/
 
----# Changing URL to SMF package server...
-UPDATE {$db_prefix}package_servers
-SET url = 'http://custom.simplemachines.org/packages/mods'
-WHERE url = 'http://mods.simplemachines.org';
+---# remove SMF package server...
+DELETE FROM {$db_prefix}package_servers
+	WHERE url = 'http://mods.simplemachines.org' OR url = 'http://custom.simplemachines.org/packages/mods';
 ---#
 
 ---# Inserting "package_servers"...
 INSERT IGNORE INTO {$db_prefix}package_servers
 	(id_server, name, url)
 VALUES
-	(2, 'PortaMx File Server', 'http://docserver.portamx.com');
+	(1, 'PortaMx File Server', 'http://docserver.portamx.com');
 ---#
 
 /******************************************************************************/

@@ -557,17 +557,19 @@ a.moderation_link, a.moderation_link:visited {
 /* AJAX notification bar
 ------------------------------------------------------- */
 #ajax_in_progress {
-	background: #fff;
-	border-bottom: 4px solid #f96f00;
+	background: #f0f0f0;
+	border: 1px solid #777;
+	border-radius: 5px;
 	color: #f96f00;
 	text-align: center;
-	font-size: 1.6em;
-	padding: 8px;
-	width: 100%;
-	line-height: 25px;
+	font-size: 1.1em;
+	line-height: 20px;
+	font-weight: bold;
+	padding: 5px;
+	width: 50%;
 	position: fixed;
-	top: 0;
-	left: 0;
+	top: 2px;
+	left: 25%;
 }
 
 #ajax_in_progress a {

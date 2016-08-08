@@ -1605,8 +1605,8 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 function matchPackageVersion($version, $versions)
 {
 	// Make sure everything is lowercase and clean of spaces and unpleasant history.
-	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
-	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
+//	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
+	$versions = explode(',', strtolower($versions));
 
 	// Perhaps we do accept anything?
 	if (in_array('all', $versions))
@@ -1654,8 +1654,8 @@ function compareVersions($version1, $version2)
 	foreach (array(1 => $version1, $version2) as $id => $version)
 	{
 		// Clean the version and extract the version parts.
-		$clean = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
-		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)~', $clean, $parts);
+		$clean = strtolower($version);
+		preg_match('~pmx\s+(\d+)(?:\.(\d+|))\s+(?:(alpha|beta|rc|)\s+(\d+|)(?:\.|)?(\d+|))~', $clean, $parts);
 
 		// Build an array of parts.
 		$versions[$id] = array(

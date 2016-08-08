@@ -1728,9 +1728,6 @@ VALUES (1, 1, 1, 1, UNIX_TIMESTAMP(), '{$default_topic_subject}', 'PortaMx', 'su
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
 VALUES ('PortaMx File Server', 'http://docserver.portamx.com');
-INSERT INTO {$db_prefix}package_servers
-	(name, url)
-VALUES ('Simple Machines Third-party Mod Site', 'http://custom.simplemachines.org/packages/mods');
 # --------------------------------------------------------
 
 #
