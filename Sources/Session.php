@@ -95,6 +95,7 @@ function loadSession()
 		$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', sha1(mt_rand() . session_id() . mt_rand())), 0, rand(7, 12));
 	}
 	$sc = $_SESSION['session_value'];
+	$_SESSION['mictrotime'] = microtime();
 }
 
 /**

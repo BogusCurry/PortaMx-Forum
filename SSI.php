@@ -124,6 +124,7 @@ else
 		$_SESSION['session_value'] = md5(session_id() . mt_rand());
 	}
 	$sc = $_SESSION['session_value'];
+	$_SESSION['mictrotime'] = microtime();
 }
 
 // Get rid of $board and $topic... do stuff loadBoard would do.

@@ -94,7 +94,6 @@ function pmxsef_LoadSettings()
 		$pmxSEF = array(
 			'actions' => array_unique(explode(',', $modSettings['sef_actions'])),
 			'ignoreactions' => array_unique(array_merge(array('admin', 'viewpmxfile', 'uploadAttach'), explode(',', $modSettings['sef_ignoreactions']))),
-			'ignorerequests' => array('type' => 'preview'),
 			'stripchars' => array_diff(explode(',', $modSettings['sef_stripchars']), array(trim($modSettings['sef_spacechar']))),
 			'spacechar' => trim($modSettings['sef_spacechar']),
 			'lowercase' => $modSettings['sef_lowercase'],
@@ -155,30 +154,44 @@ function pmxsef_query($query)
 			// not a category .. check board or topic
 			else
 			{
-				// topic ?
+				// board or board/topic ?
 				$value = false;
-				if(count($url_array) >= 2)
-				{
-					if(empty($pmxSEF['TopicNameList']))
-						getTopicNameList();
-					if(($value = array_search($url_array[0] .'/'. $url_array[1], $pmxSEF['TopicNameList'], true)) !== false)
-					{
-						$page = isset($url_array[2]) && preg_match('/msg([0-9]+)|[0-9]+/', $url_array[2], $msgPage) > 0 && $msgPage[0] == $url_array[2] ? strval($msgPage[0]) : '0';
-						$querystring['topic'] = $value .'.'. $page;
-						array_splice($url_array, 0, 2 + intval(!empty($page)));
-					}
-				}
-
-				// board ?
-				if(empty($value) && count($url_array) >= 1)
+				if(count($url_array) >= 1)
 				{
 					if(empty($pmxSEF['BoardNameList']))
 						getBoardNameList();
-					if(($value = array_search(current($url_array), $pmxSEF['BoardNameList'], true)) !== false)
+
+					if(($boardID = array_search(current($url_array), $pmxSEF['BoardNameList'], true)) !== false)
 					{
+						$boardName = current($url_array);
 						$page = isset($url_array[1]) && is_numeric($url_array[1]) ? $url_array[1] : '0';
-						$querystring['board'] = $value .'.'. $page;
+						$querystring['board'] = $boardID .'.'. $page;
 						array_splice($url_array, 0, 1 + intval(!empty($page)));
+
+						// if a topic given ?
+						if(count($url_array) >= 1)
+						{
+							if(empty($pmxSEF['TopicNameList']))
+								getTopicNameList();
+
+							if(($topicID = array_search($boardName .'/'. current($url_array), $pmxSEF['TopicNameList'], true)) === false)
+							{
+								// if directly called, get topics in the board
+								getTopicNameList(array(), $boardID);
+								$topicID = array_search($boardName .'/'. current($url_array), $pmxSEF['TopicNameList'], true);
+							}
+
+							// have a topic?
+							if($topicID !== false)
+							{
+								$page = isset($url_array[1]) && preg_match('/msg([0-9]+)|[0-9]+/', $url_array[1], $msgPage) > 0 && $msgPage[0] == $url_array[1] ? strval($msgPage[0]) : '0';
+								$querystring['topic'] = $topicID .'.'. $page;
+								array_splice($url_array, 0, 1 + intval(!empty($page)));
+
+								//finally remove the board id
+ 								unset($querystring['board']);
+							}
+						}
 					}
 				}
 			}
@@ -298,16 +311,16 @@ function ob_pmxsef($buffer)
 	if(isset($_REQUEST['jscook']) || empty($modSettings['sef_enabled']))
 		return $buffer;
 
+/*
 	// Gotta fix up some javascript laying around in the templates
 	$extra_replacements = array(
 		'%1/$d' => '%1$d/',
 		'/$d\',' => '_%1$d/\',',
 		'/rand,' => '/rand=',
 		'%1_%1$d/\',' => '%1$d/\',',
-//		'var pmx_scripturl = "' . $scripturl => 'var pmx_scripturl = "' . $boardurl .'/?',
 	);
 	$buffer = str_replace(array_keys($extra_replacements), array_values($extra_replacements), $buffer);
-
+*/
 	// fix expandable pagelinks
 	$buffer = str_replace('/index.php\'+\'?', '/index.php?', $buffer);
 
@@ -558,34 +571,61 @@ function getBoardName($id)
 * convert topic subjects to SEF
 * called from: getTopicName, create_sefurl
 **/
-function getTopicNameList($seftopics = array())
+function getTopicNameList($seftopics = array(), $boardID = null)
 {
 	global $pmxSEF, $pmxcFunc, $pmxCacheFunc, $boarddir;
 
 	// make integers
 	array_walk($seftopics, create_function('&$v, $k', '$v = intval(trim($v));'));
+
 	$pmxSEF['TopicNameList'] = $pmxCacheFunc['get']('sef_topiclist');
 	if(empty($pmxSEF['TopicNameList']))
 		$pmxSEF['TopicNameList'] = array();
 
-	$notcached = array_diff($seftopics, array_keys($pmxSEF['TopicNameList']));
-	if(!empty($notcached))
+	if(!empty($boardID))
 	{
+		$board = getBoardName($boardID);
 		$request = $pmxcFunc['db_query']('', '
 			SELECT t.id_topic, m.subject, t.id_board
 			FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			WHERE t.id_topic IN ({array_int:topics})',
-			array('topics' => $notcached)
+			WHERE t.id_board = {int:board}',
+			array('board' => $boardID)
 		);
-
 		while($row = $pmxcFunc['db_fetch_assoc']($request))
 		{
-			$board = getBoardName($row['id_board']);
-			$pmxSEF['TopicNameList'][$row['id_topic']] = CheckDupe($board, $row['subject'], array('Topic'));
+			if(empty($pmxSEF['TopicNameList'][$row['id_topic']]))
+				$pmxSEF['TopicNameList'][$row['id_topic']] = CheckDupe($board, $row['subject'], array('Topic'));
 		}
 		$pmxcFunc['db_free_result']($request);
 		$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
+	}
+	else
+	{
+		$notcached = array_diff($seftopics, array_keys($pmxSEF['TopicNameList']));
+		if(!empty($notcached))
+		{
+			$boardID = '';
+			$request = $pmxcFunc['db_query']('', '
+				SELECT t.id_topic, m.subject, t.id_board
+				FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+				WHERE t.id_topic IN ({array_int:topics})
+				ORDER by t.id_board',
+				array('topics' => $notcached)
+			);
+			while($row = $pmxcFunc['db_fetch_assoc']($request))
+			{
+				if($boardID != $row['id_board'])
+				{
+					$boardID = $row['id_board'];
+					$board = getBoardName($row['id_board']);
+				}
+				$pmxSEF['TopicNameList'][$row['id_topic']] = CheckDupe($board, $row['subject'], array('Topic'));
+			}
+			$pmxcFunc['db_free_result']($request);
+			$pmxCacheFunc['put']('sef_topiclist', $pmxSEF['TopicNameList'], 3600);
+		}
 	}
 }
 

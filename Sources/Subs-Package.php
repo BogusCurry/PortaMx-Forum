@@ -1571,7 +1571,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 		$near_version = 0;
 
 	// Normalize the $versions while we remove our previous Doh!
-	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
+	$versions = explode(',', strtolower($versions));
 
 	// Loop through each version, save the highest we can find
 	foreach ($versions as $for)
