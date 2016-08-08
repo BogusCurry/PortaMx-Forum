@@ -311,16 +311,6 @@ function ob_pmxsef($buffer)
 	if(isset($_REQUEST['jscook']) || empty($modSettings['sef_enabled']))
 		return $buffer;
 
-/*
-	// Gotta fix up some javascript laying around in the templates
-	$extra_replacements = array(
-		'%1/$d' => '%1$d/',
-		'/$d\',' => '_%1$d/\',',
-		'/rand,' => '/rand=',
-		'%1_%1$d/\',' => '%1$d/\',',
-	);
-	$buffer = str_replace(array_keys($extra_replacements), array_values($extra_replacements), $buffer);
-*/
 	// fix expandable pagelinks
 	$buffer = str_replace('/index.php\'+\'?', '/index.php?', $buffer);
 
