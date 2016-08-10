@@ -45,7 +45,7 @@ function HelpIndex()
 	global $scripturl, $context, $txt;
 
 	// Lastly, some minor template stuff.
-	$context['page_title'] = $txt['manual_pmx_user_help'];
+	$context['page_title'] = $txt['manual_user_help'];
 	$context['sub_template'] = 'manual';
 }
 

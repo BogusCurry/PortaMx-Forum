@@ -88,7 +88,6 @@ function template_html_above()
 	<html', $context['right_to_left'] ? ' dir="rtl"' : '', !empty($txt['lang_locale']) ? ' lang="' . str_replace("_", "-", substr($txt['lang_locale'], 0, strcspn($txt['lang_locale'], "."))) . '"' : '' , '>
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=', $context['character_set'], '" />';
-//	<meta charset="', $context['character_set'], '">';
 
 	// You don't need to manually load index.css, this will be set up for you. You can, of course, add
 	// any other files you want, after template_css() has been run. Note that RTL will also be loaded for you.
@@ -167,8 +166,7 @@ function template_html_above()
 	echo '
 </head>
 <body id="', $context['browser_body_id'], '" class="action_', !empty($context['current_action']) ? $context['current_action'] : (!empty($context['current_board']) ?
-		'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')), !empty($context['current_board']) ? ' board_' . $context['current_board'] : '', '">
-<div id="footerfix">';
+		'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')), !empty($context['current_board']) ? ' board_' . $context['current_board'] : '', '">';
 }
 
 /**
@@ -393,7 +391,7 @@ function template_body_below()
 
 	echo '
 		</div>
-		<script>fSetWrapper();</script>';
+	</div>';
 }
 
 /**
@@ -405,6 +403,7 @@ function template_html_below()
 	template_javascript(true);
 
 	echo '
+	<script>window.addEventListener("resize", fSetWrapper);fSetWrapper();</script>
 </body>
 </html>';
 }

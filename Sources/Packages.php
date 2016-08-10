@@ -1657,7 +1657,7 @@ function list_getPackages($start, $items_per_page, $sort, $params)
 				// This package is currently NOT installed.  Check if it can be.
 				if (!$packageInfo['is_installed'] && $packageInfo['xml']->exists('install'))
 				{
-					// Check if there's an install for *THIS* version of SMF.
+					// Check if there's an install for *THIS* version of PMX.
 					$installs = $packageInfo['xml']->set('install');
 					foreach ($installs as $install)
 					{
@@ -1687,10 +1687,10 @@ function list_getPackages($start, $items_per_page, $sort, $params)
 				{
 					$upgrades = $packageInfo['xml']->set('upgrade');
 
-					// First go through, and check against the current version of SMF.
+					// First go through, and check against the current version of PMX.
 					foreach ($upgrades as $upgrade)
 					{
-						// Even if it is for this SMF, is it for the installed version of the mod?
+						// Even if it is for this PMX, is it for the installed version of the mod?
 						if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
 							if (!$upgrade->exists('@from') || matchPackageVersion($installed_mods[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
 							{
@@ -1704,7 +1704,7 @@ function list_getPackages($start, $items_per_page, $sort, $params)
 				{
 					$uninstalls = $packageInfo['xml']->set('uninstall');
 
-					// Can we find any uninstallation methods that work for this SMF version?
+					// Can we find any uninstallation methods that work for this PMX version?
 					foreach ($uninstalls as $uninstall)
 					{
 						if (!$uninstall->exists('@for') || matchPackageVersion($the_version, $uninstall->fetch('@for')))

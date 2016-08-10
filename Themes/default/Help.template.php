@@ -154,12 +154,12 @@ function template_manual()
 
 	echo '
 			<div class="cat_bar">
-				<h3 class="catbg">', $txt['manual_pmx_user_help'], '</h3>
+				<h3 class="catbg">', $txt['manual_user_help'], '</h3>
 			</div>
 			<div id="help_container">
 				<div id="helpmain" class="windowbg2">
-					<p>', sprintf($txt['manual_welcome'], $context['forum_name_html_safe']), '</p>
-					<p style="text-align:center;">This page is currently not available.</p>
+					<p style="text-align:center;font-weight:bold;">', sprintf($txt['manual_welcome'], $context['forum_name_html_safe']), '</p>
+					<p style="text-align:center;">', $txt['manual_not_available'] ,'</p>
 				</div>
 			</div>';
 }

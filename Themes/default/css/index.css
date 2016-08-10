@@ -1,7 +1,7 @@
 /* You can find detailed information at http://wiki.simplemachines.org/smf/Curve2_CSS
 /* Index */
 html {
-	background: #3e5a78;
+	background: #e9eef2;
 	height: 100%;
 }
 body {
@@ -9,9 +9,7 @@ body {
 	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Nimbus Sans L", Arial, "Liberation Sans", sans-serif;
 	color: #4d4d4d;
 	margin: 0;
-	padding: 0;
-	min-height: 100%;
-	position: relative;
+	padding: 0 0 10px 0;
 }
 /* <p> is a possible exception for margins. Must test that one a bit. */
 p, ul, ol, li, dl, dd ,dt, fieldset, form {
@@ -157,6 +155,7 @@ body#help_popup {
 
 #likes li {
 	clear: both;
+	height: 50px;
 }
 #likes .avatar {
 	max-height: 50px;
@@ -997,10 +996,9 @@ img.sort, .sort {
 #footer {
 	box-sizing: border-box;
 }
-
 /* Box-shadow only on this one. */
 #wrapper {
-	margin: 0 auto;
+	margin: 0 auto 1em auto;
 	width: 94%;
 	clear: both;
 	background: #fff;
@@ -1236,13 +1234,9 @@ ul li.greeting {
 	display: block;
 	clear: both;
 }
-/* The footer with copyright links etc. */
-#footerfix {
-	padding-bottom: 2em;
-}
 #footer {
 	background: #3e5a80;
-	margin: 1em -1px 0 -1px;
+	margin: 0 -1px 0 -1px;
 	padding: 10px 7px;
 	border-top: 1px solid #777;
 	border-bottom: 1px solid #777;
@@ -2968,7 +2962,10 @@ span.postby {
 	box-shadow: none;
 }
 #description_board h3, #description_board p {
-	display: inline-block;
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 #description_board h3:after {
 	content: ' - ';
@@ -3781,6 +3778,9 @@ h3.profile_hd {
 	font-size: 26px;
 	margin-bottom: 0.25em;
 	line-height: 24px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #reported_posts .generic_icons,

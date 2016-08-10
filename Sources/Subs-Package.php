@@ -1576,10 +1576,6 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	// Loop through each version, save the highest we can find
 	foreach ($versions as $for)
 	{
-		// Adjust for those wild cards
-		if (strpos($for, '*') !== false)
-			$for = str_replace('*', '0dev0', $for) . '-' . str_replace('*', '999', $for);
-
 		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 2.0 vs 2.0.99
 		if (strpos($for, '-') !== false)
 			list ($for, $higher) = explode('-', $for);
@@ -1605,7 +1601,6 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 function matchPackageVersion($version, $versions)
 {
 	// Make sure everything is lowercase and clean of spaces and unpleasant history.
-//	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
 	$versions = explode(',', strtolower($versions));
 
 	// Perhaps we do accept anything?
@@ -1615,10 +1610,6 @@ function matchPackageVersion($version, $versions)
 	// Loop through each version.
 	foreach ($versions as $for)
 	{
-		// Wild card spotted?
-		if (strpos($for, '*') !== false)
-			$for = str_replace('*', '0dev0', $for) . '-' . str_replace('*', '999', $for);
-
 		// Do we have a range?
 		if (strpos($for, '-') !== false)
 		{
@@ -1654,19 +1645,25 @@ function compareVersions($version1, $version2)
 	foreach (array(1 => $version1, $version2) as $id => $version)
 	{
 		// Clean the version and extract the version parts.
-		$clean = strtolower($version);
-		preg_match('~pmx\s+(\d+)(?:\.(\d+|))\s+(?:(alpha|beta|rc|)\s+(\d+|)(?:\.|)?(\d+|))~', $clean, $parts);
+		$clean = str_replace(' ', '', strtolower($version));
+		preg_match('~(([a-z]+|)(\d+|\*|)(?:\.(\d+|)))(?:(alpha|beta|rc|\*)?(\d+|\*|)(?:\.|)?(\d+|)|)?(?:(dev))?(\d+|)~', $clean, $parts);
 
-		// Build an array of parts.
-		$versions[$id] = array(
-			'major' => !empty($parts[1]) ? (int) $parts[1] : 0,
-			'minor' => !empty($parts[2]) ? (int) $parts[2] : 0,
-			'patch' => !empty($parts[3]) ? (int) $parts[3] : 0,
-			'type' => empty($parts[4]) ? 'stable' : $parts[4],
-			'type_major' => !empty($parts[6]) ? (int) $parts[5] : 0,
-			'type_minor' => !empty($parts[6]) ? (int) $parts[6] : 0,
-			'dev' => !empty($parts[7]),
-		);
+		if(!empty($parts))
+		{
+			// Build an array of parts.
+			$parts[2] = trim($parts[2]);
+			$versions[$id] = array(
+				'devel' => empty($parts[2]) ? 'pmx' : $parts[2],
+				'major' => !empty($parts[3]) ? (int) $parts[3] : 0,
+				'minor' => !empty($parts[4]) ? (int) $parts[4] : ($parts[5] == '*' ? $versions[1]['minor'] : 0),
+				'type' => $parts[5] == '*' ? $versions[1]['type'] : $parts[5],
+				'type_major' => empty($parts[6]) ? ($parts[5] == '*' ? $versions[1]['type_major'] : (int) $parts[6]) : 0,
+				'type_minor' => empty($parts[7]) ? ($parts[5] == '*' ? $versions[1]['type_minor'] : (int) $parts[7]) : 0,
+				'dev' => !empty($parts[8]) ? (int) $parts[9] : 0,
+			);
+		}
+		else
+			return -1;
 	}
 
 	// Are they the same, perhaps?
@@ -1686,7 +1683,12 @@ function compareVersions($version1, $version2)
 			// Dev builds are a problematic exception.
 			// (stable) dev < (stable) but (unstable) dev = (unstable)
 			if ($category == 'type')
-				return $versions[1][$category] > $versions[2][$category] ? ($versions[1]['dev'] ? -1 : 1) : ($versions[2]['dev'] ? 1 : -1);
+			{
+				if($versions[2][$category] == '*')
+					return 0;
+				else
+					return $versions[1][$category] > $versions[2][$category] ? ($versions[1]['dev'] ? -1 : 1) : ($versions[2]['dev'] ? 1 : -1);
+			}
 			elseif ($category == 'dev')
 				return $versions[1]['dev'] ? ($versions[2]['type'] == 'stable' ? -1 : 0) : ($versions[1]['type'] == 'stable' ? 1 : 0);
 			// Otherwise a simple comparison.

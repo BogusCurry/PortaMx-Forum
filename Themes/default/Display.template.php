@@ -179,7 +179,7 @@ function template_main()
 	$haveButtons = template_button_strip($context['normal_buttons'], 'right', array(), true);
 	if(!empty($haveButtons))
 		echo '
-			<div class="pagesection top" id="top">
+			<div class="pagesection top">
 				', $haveButtons, '
 				', $context['menu_separator'], '<a href="#bot" class="topbottom floatleft">', $txt['go_down'], '</a>
 				<div class="pagelinks floatleft">
@@ -188,7 +188,7 @@ function template_main()
 			</div>';
 	else
 		echo '
-			<div class="pagesection top" id="top">
+			<div class="pagesection top">
 				<a href="#bot" class="topbottom floatleft">', $txt['go_down'], '</a>
 				<div class="pagelinks floatleft">
 					', $context['page_index'], '
@@ -648,15 +648,7 @@ function template_single_post($message)
 
 	echo '
 									</span>
-									<script>
-										window.addEventListener("resize", TitleResize);
-										function TitleResize(){
-											if(!document.getElementById("edreason'. $message['id'] .'"))
-												document.getElementById("modified_'. $message['id'] .'").style.marginTop = "-2px";
-											else
-												document.getElementById("subject_'. $message['id'] .'").style.paddingRight = document.getElementById("modified_'. $message['id'] .'").offsetWidth +"px";}
-										TitleResize();
-									</script>
+									<script>window.addEventListener("resize",Title'. $message['id'] .'Resize);function Title'. $message['id'] .'Resize(){if(!document.getElementById("edreason'. $message['id'] .'"))document.getElementById("modified_'. $message['id'] .'").style.marginTop = "-2px"; else document.getElementById("subject_'. $message['id'] .'").style.paddingRight=document.getElementById("modified_'. $message['id'] .'").offsetWidth+"px";}Title'. $message['id'] .'Resize();</script>
 								</h5>
 								<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
 							</div>';

@@ -116,7 +116,7 @@ function template_main()
 		$normButtons = template_button_strip($context['normal_buttons'], 'right', '', true);
 
 		echo '
-	<div class="pagesection" id="top">';
+	<div class="pagesection">';
 
 		if(!empty($normButtons))
 			echo '

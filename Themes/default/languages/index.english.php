@@ -3,6 +3,11 @@
 
 global $forum_copyright, $webmaster_email, $scripturl, $context, $boardurl;
 
+// Help text for user manual (curently not available)
+$txt['manual_welcome'] = 'Welcome to %s, powered by PortaMx&reg; Forum Software!';
+$txt['manual_user_help'] = 'PortaMx User Help';
+$txt['manual_not_available'] = 'This page is currently not available.';
+
 // Locale (strftime, pspell_new) and spelling. (pspell_new, can be left as '' normally.)
 // For more information see:
 //   - http://www.php.net/function.pspell-new
