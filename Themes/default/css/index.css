@@ -153,11 +153,14 @@ body#help_popup {
 	box-sizing: border-box;
 }
 
+ul#likes {
+	margin-bottom: -10px;
+}
 #likes li {
 	clear: both;
-	height: 50px;
+	height: 60px;
 }
-#likes .avatar {
+#likes li .avatar {
 	max-height: 50px;
 	max-width: 50px;
 	border-radius: 5px;
@@ -996,6 +999,7 @@ img.sort, .sort {
 #footer {
 	box-sizing: border-box;
 }
+
 /* Box-shadow only on this one. */
 #wrapper {
 	margin: 0 auto 1em auto;
@@ -2113,6 +2117,16 @@ dl {
 img.avatar {
 	border-radius: 5px;
 }
+#avatar_upload > img,
+#avatar_server_stored > div > img {
+	border-radius: 5px;
+	max-width: 65px;
+	max-height:65px;
+}
+#avatar_server_stored >div > img {
+	margin-left: 10px;
+}
+
 #basicinfo ul {
 	list-style-type: none;
 	margin: 10px 0 0 0;
@@ -2244,7 +2258,6 @@ img.avatar {
 	padding-top: 12px;
 	margin: 0;
 	overflow: auto;
-	word-break: hyphenate;
 	word-wrap: break-word;
 }
 .topic h4 {
@@ -3197,7 +3210,6 @@ div#pollmoderation {
 	/* Don't set this in em.It will eat too much space if people need to set large text sizes. */
 	/* Better to just break the few words here, and leave more space for actual topic content. */
 	width: 160px;
-	word-break: hyphenate;
 	word-wrap: break-word;
 }
 .poster h4 {
@@ -3299,7 +3311,6 @@ div#pollmoderation {
 	border-top: 1px solid #bfbfbf;
 	box-shadow: 0 1px 0 #fff inset;
 	min-height: 85px;
-	word-break: hyphenate;
 	word-wrap: break-word;
 }
 img.smiley {

@@ -1863,6 +1863,19 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
 			),
+			array(
+				'tag' => 'sigurl',
+				'type' => 'unparsed_equals',
+				'before' => '<a href="$1" target="_blank">',
+				'after' => '</a>',
+				'validate' => function (&$tag, &$data, $disabled)
+				{
+					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+						$data = 'http://' . $data;
+				},
+				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
+				'disabled_after' => ' ($1)',
+			),
 		);
 
 		// Inside these tags autolink is not recommendable.
@@ -1899,21 +1912,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		{
 			foreach ($itemcodes as $c => $dummy)
 				$bbc_codes[$c] = array();
-		}
-
-		// Shhhh!
-		if (!isset($disabled['color']))
-		{
-			$codes[] = array(
-				'tag' => 'chrissy',
-				'before' => '<span style="color: #cc0099;">',
-				'after' => ' :-*</span>',
-			);
-			$codes[] = array(
-				'tag' => 'kissy',
-				'before' => '<span style="color: #cc0099;">',
-				'after' => ' :-*</span>',
-			);
 		}
 
 		foreach ($codes as $code)
