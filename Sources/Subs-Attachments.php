@@ -897,7 +897,7 @@ function parseAttachBBC($attachID = 0)
 		return 'attachments_not_enable';
 
 	// Previewing much? no msg ID has been set yet.
-	if (!empty($context['preview_message']) || isset($_POST['preview']))
+	if (!empty($context['preview_message'])) // || (isset($_POST['topic']) && $_POST['topic'] == 0))
 	{
 		$allAttachments = getAttachsByMsg(0);
 
@@ -915,7 +915,7 @@ function parseAttachBBC($attachID = 0)
 		$attachContext['link'] = '<a href="' . $scripturl . '?action=dlattach;attach=' . $attachID .''. (empty($attachContext['is_image']) ? ';file' : ';image') .'">' . $pmxcFunc['htmlspecialchars']($attachContext['name']) . '</a>';
 
 		// Fix the thumbnail too, if the image has one.
-		if (!empty($attachContext['thumbnail']) && !empty($attachContext['thumbnail']['has_thumb']))
+		if (!empty($attachContext['thumbnail']) && !empty($attachContext['thumbnail']['has_thumb']) && strpos($attachContext['thumbnail']['href'], ';image') === false)
 			$attachContext['thumbnail']['href'] = $scripturl . '?action=dlattach;attach=' . $attachContext['thumbnail']['id'] . ';image';
 
 		return $attachContext;

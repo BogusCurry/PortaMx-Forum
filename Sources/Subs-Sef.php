@@ -68,9 +68,13 @@ function pmxsef_convertSEF()
 
 	// special handling for likes
 	$_SERVER['REQUEST_URL'] = preg_replace(array('~;js=~', '~\?_=~'), array('js/', '/_/'), $_SERVER['REQUEST_URL']);
+
 	// convert the SEF query
  	$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
 	$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET);
+	if(isset($_REQUEST['q']))
+		unset($_REQUEST['q']);
+	$_REQUEST = array_merge($_REQUEST, $_GET);
 
 	// check if a topic subject changed
 	if(isset($_GET['action']) && $_GET['action'] == 'post2' && !empty($_POST) && !isset($_POST['preview']) && isset($pmxSEF['TopicNameList'][$_POST['topic']]))
@@ -211,7 +215,7 @@ function pmxsef_query($query)
 
 		// do the rest
 		while(!empty($url_array))
-			$querystring[array_shift($url_array)] = array_shift($url_array);
+			$querystring[array_shift($url_array)] = count($url_array) !== 0 ? array_shift($url_array) : '';
 	}
 
 	return $querystring;
@@ -227,6 +231,10 @@ function pmxsef_Redirect(&$setLocation)
 
 	if(empty($modSettings['sef_enabled']))
 		return;
+
+	// load settings
+	if(!isset($pmxSEF['allactions']))
+		pmxsef_LoadSettings();
 
 	// Only do this if it's an URL for this board
 	if(strpos($setLocation, $boardurl) !== false)
@@ -296,6 +304,10 @@ function pmxsef_fixurl($url)
 	if(empty($modSettings['sef_enabled']))
 		return $url;
 
+	// load settings
+	if(!isset($pmxSEF['allactions']))
+		pmxsef_LoadSettings();
+
 	$url = create_sefurl($url);
 	return $url;
 }
@@ -310,6 +322,10 @@ function ob_pmxsef($buffer)
 
 	if(isset($_REQUEST['jscook']) || empty($modSettings['sef_enabled']))
 		return $buffer;
+
+	// load settings
+	if(!isset($pmxSEF['allactions']))
+		pmxsef_LoadSettings();
 
 	// fix expandable pagelinks
 	$buffer = str_replace('/index.php\'+\'?', '/index.php?', $buffer);
@@ -391,9 +407,6 @@ function create_sefurl($url)
 
 	if(empty($modSettings['sef_enabled']))
 		return $url;
-
-	// load settings
-	pmxsef_LoadSettings();
 
 	// Init..
 	$sefstring = $sefstring1 = $sefstring2 = '';

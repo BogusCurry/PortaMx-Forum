@@ -70,11 +70,11 @@ function showAttachment()
 	}
 
 	// Use cache when possible.
-	if (($cache = $pmxCacheFunc['get']('attachment_lookup_id-'. $attachId)) != null)
+	if ((empty($preview) || $attachTopic != 0) && ($cache = $pmxCacheFunc['get']('attachment_lookup_id-'. $attachId)) != null)
 		list($file, $thumbFile) = $cache;
 
 	// Get the info from the DB.
-	if(empty($file) || empty($thumbFile) && !empty($file['id_thumb']))
+	if (empty($file) || empty($thumbFile) && !empty($file['id_thumb']))
 	{
 		// Do we have a hook wanting to use our attachment system? We use $attachRequest to prevent accidental usage of $request.
 		$attachRequest = null;
@@ -114,7 +114,7 @@ function showAttachment()
 		}
 
 		// Previews doesn't have this info.
-		if (empty($preview))
+		if (empty($preview) && !empty($attachTopic))
 		{
 			$request2 = $pmxcFunc['db_query']('', '
 				SELECT a.id_msg

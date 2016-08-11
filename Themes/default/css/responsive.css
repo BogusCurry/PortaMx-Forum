@@ -458,6 +458,8 @@
 		width: 100% !important;
 		border-left: 0;
 		border-right: 0;
+		border-bottom-left-radius: 0 !important;
+		border-bottom-right-radius: 0 !important;
 	}
 	#top_section, #footer {
 		padding-left: 0;
