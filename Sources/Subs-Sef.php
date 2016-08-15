@@ -124,24 +124,46 @@ function pmxsef_query($query)
 		// cleanup the url
 		$url_array = explode('/', trim(str_replace(array(';', '..'), '', $query), '/'));
 
-		// check the actions
-		if(array_search(current($url_array), $pmxSEF['allactions'], true) !== false)
+		// check all the actions
+		if(($act = array_intersect($url_array, $pmxSEF['allactions'])) !== array())
 		{
-			$querystring['action'] = array_shift($url_array);
+			$querystring['action'] = array_values($act)[0];
+			array_splice($url_array, array_keys($act)[0], 1);
 
-			// check for subaction
-			$fnd = array_search('sa', $url_array, true);
-			if($fnd !== false && isset($url_array[$fnd +1]))
+			// if is a dlattach action?
+			if($querystring['action'] == 'dlattach')
 			{
-				$querystring['sa'] = $url_array[$fnd +1];
-				array_splice($url_array, $fnd, 2);
+				if(($isAtt = array_search('attach', $url_array, true)) !== false)
+				{
+					$querystring[$url_array[$isAtt]] = $url_array[$isAtt +1];
+					array_splice($url_array, $isAtt, 2);
+
+					// image attach ?
+					if($url_array[$isAtt] == 'image')
+					{
+						$querystring[$url_array[$isAtt]] = '';
+						array_splice($url_array, $isAtt, 1);
+					}
+
+					// any other attach
+					elseif($url_array[$isAtt] == 'type')
+					{
+						$querystring[$url_array[$isAtt]] = $url_array[$isAtt +1];
+						array_splice($url_array, $isAtt, 2);
+						if($url_array[$isAtt] == 'file')
+						{
+							$querystring[$url_array[$isAtt]] = '';
+							array_splice($url_array, $isAtt, 1);
+						}
+					}
+				}
 			}
 
-			// special handling for theme token
-			elseif($querystring['action'] == 'theme')
+			// check sub-actions
+			if(!empty($url_array) && ($subact = array_search('sa', $url_array, true)) !== false && count($url_array) >= 2)
 			{
-				unset($querystring['action']);
-				array_unshift($url_array, $tmp);
+				$querystring[$url_array[$subact]] = $url_array[$subact +1];
+				array_splice($url_array, $subact, 2);
 			}
 		}
 
@@ -158,13 +180,14 @@ function pmxsef_query($query)
 			// not a category .. check board or topic
 			else
 			{
-				// board or board/topic ?
+				// check board or board/topic
 				$value = false;
 				if(count($url_array) >= 1)
 				{
 					if(empty($pmxSEF['BoardNameList']))
 						getBoardNameList();
 
+					// is a board ?
 					if(($boardID = array_search(current($url_array), $pmxSEF['BoardNameList'], true)) !== false)
 					{
 						$boardName = current($url_array);
@@ -188,6 +211,7 @@ function pmxsef_query($query)
 							// have a topic?
 							if($topicID !== false)
 							{
+                                
 								$page = isset($url_array[1]) && preg_match('/msg([0-9]+)|[0-9]+/', $url_array[1], $msgPage) > 0 && $msgPage[0] == $url_array[1] ? strval($msgPage[0]) : '0';
 								$querystring['topic'] = $topicID .'.'. $page;
 								array_splice($url_array, 0, 1 + intval(!empty($page)));
@@ -196,12 +220,19 @@ function pmxsef_query($query)
  								unset($querystring['board']);
 							}
 						}
+
+						// we have a xxxSEEN request?
+						if(count($url_array) >= 1 && ($seen = array_intersect($url_array, array('topicseen', 'boardseen'))) !== array())
+						{ 
+							$querystring[array_values($seen)[0]] = true;
+							array_splice($url_array, array_keys($seen)[0], 1);
+						}
 					}
 				}
 			}
 		}
 
-		// username ?
+		// we have username ?
 		if(count($url_array) > 0)
 		{
 			if(empty($pmxSEF['UserNameList']))
@@ -327,8 +358,9 @@ function ob_pmxsef($buffer)
 	if(!isset($pmxSEF['allactions']))
 		pmxsef_LoadSettings();
 
-	// fix expandable pagelinks
+	// fix javascript and queryles url's
 	$buffer = str_replace('/index.php\'+\'?', '/index.php?', $buffer);
+	$buffer = str_replace($boardurl .'/?', $boardurl .'/index.php?', $buffer);
 
 	// Get all categories..
 	getCategorieNameList();
@@ -363,7 +395,7 @@ function ob_pmxsef($buffer)
 		$buffer = str_replace(array_keys($replacements), array_values($replacements), $buffer);
 	}
 
-	//	fix expandable page links
+	// fix expandable page links
 	preg_match_all('~\b(pmx_scripturl)(.*?)(topic=)([0-9\.]+)([\%\$d0-9]+)~', $buffer, $matches, PREG_SET_ORDER);
 	if(!empty($matches[0]))
 	{
@@ -428,7 +460,7 @@ function create_sefurl($url)
 		{
 			if(!in_array($params['action'], array_merge($pmxSEF['actions'], array('theme', 'language'))))
 			{
-				preg_match('/[a-zA-Z0-9\_\-]+/', $params['action'], $action);
+				preg_match('/[a-zA-Z0-9\_\-\.]+/', $params['action'], $action);
 				if(!empty($action[0]))
 					$pmxSEF['actions'][] = $action[0];
 			}
@@ -731,21 +763,6 @@ function CheckDupe($prefix, $search, $listNames)
 }
 
 /**
-* find and convert a url to Forum format
-* called from: pmxsef_query
-**/
-function getUrlParams($key, $hasval, &$url, &$result)
-{
-	$pos = array_search($key, $url);
-	if($pos === false)
-		return !empty($url);
-
-	$result[$key] = !empty($hasval) ? $url[$pos +1] : '';
-	array_splice($url, $pos, intval($hasval) +1);
-	return !empty($url);
-}
-
-/**
 * build the "normal" querystring
 * called from: pmxsef_query
 **/
@@ -790,8 +807,6 @@ function pmxsef_encode($string)
 
 	// make all strings to ISO-8859-1 or UTF-8 and if not, convert to UTF-8
 	$char_set = empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set'];
-	setlocale(LC_CTYPE, $txt['lang_locale']);
-
 	if($char_set != 'ISO-8859-1' || $char_set != 'UTF-8')
 	{
 		if(function_exists('mb_convert_encoding'))

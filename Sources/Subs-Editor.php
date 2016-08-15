@@ -1661,7 +1661,7 @@ function create_control_richedit($editorOptions)
 			if(!empty($modSettings['sef_enabled']))
 				$cururl = pmxsef_query(str_replace($boardurl, '', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $_SERVER['REQUEST_URL']));
 			else
-				$cururl = parse_url(rawurldecode(str_replace($scripturl .'?', '', $_SERVER['HTTP_REFERER'])));
+				$cururl = parse_url(rawurldecode(str_replace($scripturl .'?', '', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $_SERVER['REQUEST_URL'])));
 
 			if(!isset($cururl['action']) || (isset($cururl['action']) && !in_array($cururl['action'], array('post', 'post2')) && !isset($cururl['id_draft'])))
 			{

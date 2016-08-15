@@ -94,10 +94,6 @@
 		border-radius: 0;
 		left: 0;
 	}
-	#footer ul {
-		width: 100%;
-		float: none;
-	}
 	/* MessageIndex */
 	#main_content_section .pagelinks {
 		display: block;
@@ -461,7 +457,7 @@
 		border-bottom-left-radius: 0 !important;
 		border-bottom-right-radius: 0 !important;
 	}
-	#top_section, #footer {
+	#top_section {
 		padding-left: 0;
 		padding-right: 0;
 	}

@@ -360,21 +360,18 @@ function template_body_below()
 	echo '
 			</div>
 		</div>
-
 		<div id="footer">';
 
 	// There is now a global "Go to top" link at the right.
 	echo '
-			<ul>
-				<li class="floatright">', (!empty($modSettings['requireAgreement'])) ? '<a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a>' : '', ' | <a href="#head">', $txt['go_up'], ' &#9650;</a></li>
-				<li class="copyright">', theme_copyright(), '</li>
-			</ul>';
+			<div class="floatright">', (!empty($modSettings['requireAgreement'])) ? '<a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a>' : '', ' | <a href="#head">', $txt['go_up'], ' &#9650;</a></div>
+			<div>', theme_copyright(), '</div>';
 
 	// Show the load time?
 	if ($context['show_load_time'])
 	{
 		echo '
-			<p>';
+			<div>';
 
 		if(!empty($pmxCache['vals']['enabled']))
 		{
@@ -385,8 +382,10 @@ function template_body_below()
 				echo $keytxt . (in_array($key, array('loaded', 'saved')) ? sprintf("%0.3F", $values[$key] / 1024) . $txt['cache_kb'] : $values[$key]);
 			echo '<br />';
 		}
+
 		echo '
-		', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '</p>';
+		', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '
+			</div>';
 	}
 
 	echo '

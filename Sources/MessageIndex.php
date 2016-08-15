@@ -538,6 +538,11 @@ function MessageIndex()
 		if ($fake_ascending)
 			$context['topics'] = array_reverse($context['topics'], true);
 
+		// check we have new or unread topics
+		$context['have_new_topics'] = false;
+		foreach($context['topics'] as $t)
+			$context['have_new_topics'] += intval(!empty($t['new']));
+
 		if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'] && !empty($topic_ids))
 		{
 			$result = $pmxcFunc['db_query']('', '
@@ -622,7 +627,7 @@ function MessageIndex()
 	}
 
 	// Mark current and parent boards as seen.
-	if (!$user_info['is_guest'])
+	if (!$user_info['is_guest'] && empty($context['have_new_topics']))
 	{
 		$pmxcFunc['db_insert']('replace',
 			'{db_prefix}log_boards',

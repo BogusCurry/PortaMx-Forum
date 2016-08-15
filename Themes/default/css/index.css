@@ -176,6 +176,9 @@ ul#likes {
 	font-size: 0.9em;
 	padding-left: 0;
 }
+.like_count a {
+	font-weight: bold;
+}
 
 /* Buttons should be styled a bit differently, in order to make them look more button'ish. */
 #frmLogin input.button_submit, #guest_form input.button_submit, #calendar_navigation input.button_submit, #mergeSelectBoard input.button_submit {
@@ -1241,27 +1244,21 @@ ul li.greeting {
 #footer {
 	background: #3e5a80;
 	margin: 0 -1px 0 -1px;
-	padding: 10px 7px;
+	padding: 7px 10px;
 	border-top: 1px solid #777;
 	border-bottom: 1px solid #777;
 	border-radius: 0 0 8px 8px;
 	box-sizing: border-box;
 	box-shadow: 0 16px 20px rgba(255,255,255,0.15) inset;
+}
+#footer div,
+#footer div a,
+#footer div a:link,
+#footer div a:visited {
 	text-shadow: -1px -1px 1px rgba(0,0,0,0.2);
-}
-#footer li, #footer p, #footer a {
-	font-size: 0.9em;
+	font-size: 0.75rem;
+	font-family: Verdana, sans-serif;
 	color: #fff;
-}
-#footer ul {
-	padding: 0;
-}
-#footer ul, #footer p {
-	padding: 0 5px !important;
-}
-#footer li.copyright {
-	display: block;
-	font-family: Verdana, sans-serif; /* Copyright must be Verdana! */
 }
 
 /* the posting icons */
@@ -2979,9 +2976,6 @@ span.postby {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
-#description_board h3:after {
-	content: ' - ';
 }
 /* Topic list */
 #topic_header {
