@@ -11,8 +11,8 @@
  */
 
 // Version information...
-define('SMF_VERSION', '2.1 Beta 5');
-define('SMF_LANG_VERSION', '2.1 Beta 5');
+define('PMX_VERSION', '2.1 Beta 5');
+define('PMX_LANG_VERSION', '2.1 Beta 5');
 define('PMX', 1);
 
 $GLOBALS['required_php_version'] = '5.3.8';
@@ -822,7 +822,7 @@ function loadEssentialData()
 		@ini_set('session.save_handler', 'files');
 	@session_start();
 
-	if (empty($pmxcFunc))
+	if (!isset($pmxcFunc))
 		$pmxcFunc = array();
 
 	// We need this for authentication and some upgrade code
@@ -959,7 +959,9 @@ function initialize_inputs()
 
 		// 2.0 Language files not in 2.1+
 		foreach (glob(dirname(__FILE__) . '/Themes/default/languages/Wireless.*') as $filename)
-			@unlink($filename); 
+			@unlink($filename);
+		foreach (glob(dirname(__FILE__) . '/Themes/default/languages/Manual.*') as $filename)
+			@unlink($filename);
 
 		header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/Themes/default/images/blank.png');
 		exit;
@@ -1038,7 +1040,7 @@ function WelcomeLogin()
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file($boarddir . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
-	if (empty($match[1]) || (trim($match[1]) != SMF_VERSION))
+	if (empty($match[1]) || (trim($match[1]) != PMX_VERSION))
 		return throw_error('The upgrader found some old or outdated files.<br><br>Please make certain you uploaded the new versions of all the files included in the package.');
 
 	// What absolutely needs to be writable?
@@ -1080,13 +1082,13 @@ function WelcomeLogin()
 	require_once($sourcedir . '/Security.php');
 
 	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['smfVersion']) && !isset($_GET['lang']))
-		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br>SMF will not work without the primary language files installed.<br><br>Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
+		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br>PMX will not work without the primary language files installed.<br><br>Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
 		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
-		if (empty($match[1]) || $match[1] != SMF_LANG_VERSION)
+		if (empty($match[1]) || $match[1] != PMX_LANG_VERSION)
 			return throw_error('The upgrader found some old or outdated language files, for the forum default language, ' . $upcontext['language'] . '.<br><br>Please make certain you uploaded the new versions of all the files included in the package, even the theme and language files for the default theme.<br>&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?skiplang">SKIP</a>] [<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 	}
 
@@ -1659,7 +1661,7 @@ function DatabaseChanges()
 		array('upgrade_1-0.sql', '1.1', '1.1 RC0'),
 		array('upgrade_1-1.sql', '2.0', '2.0 a'),
 		array('upgrade_2-0_' . $type . '.sql', '2.1', '2.1 dev0'),
-		array('upgrade_2-1_' . $type . '.sql', '3.0', SMF_VERSION),
+		array('upgrade_2-1_' . $type . '.sql', '3.0', PMX_VERSION),
 	);
 
 	// How many files are there in total?
@@ -2106,12 +2108,12 @@ function DeleteUpgrade()
 
 	// Now is the perfect time to fetch the SM files.
 	if ($command_line)
-		cli_scheduled_fetchSMfiles();
+		cli_scheduled_fetchPMXfiles();
 	else
 	{
 		require_once($sourcedir . '/ScheduledTasks.php');
-		$forum_version = SMF_VERSION;  // The variable is usually defined in index.php so lets just use the constant to do it for us.
-		scheduled_fetchSMfiles(); // Now go get those files!
+		$forum_version = PMX_VERSION;  // The variable is usually defined in index.php so lets just use the constant to do it for us.
+		scheduled_fetchPMXfiles(); // Now go get those files!
 	}
 
 	// Log what we've done.
@@ -2156,7 +2158,7 @@ function DeleteUpgrade()
 }
 
 // Just like the built in one, but setup for CLI to not use themes.
-function cli_scheduled_fetchSMfiles()
+function cli_scheduled_fetchPMXfiles()
 {
 	global $sourcedir, $language, $forum_version, $modSettings, $pmxcFunc;
 
@@ -3247,10 +3249,10 @@ function cmdStep0()
 			echo 'SMF Command-line Upgrader
 Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
-    --language=LANG         Reset the forum\'s language to LANG.
-    --no-maintenance        Don\'t put the forum into maintenance mode.
-    --debug                 Output debugging information.
-    --backup                Create backups of tables with "backup_" prefix.';
+		--language=LANG         Reset the forum\'s language to LANG.
+		--no-maintenance        Don\'t put the forum into maintenance mode.
+		--debug                 Output debugging information.
+		--backup                Create backups of tables with "backup_" prefix.';
 			echo "\n";
 			exit;
 		}
@@ -3286,7 +3288,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file($boarddir . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
-	if (empty($match[1]) || (trim($match[1]) != SMF_VERSION))
+	if (empty($match[1]) || (trim($match[1]) != PMX_VERSION))
 		print_error('Error: Some files have not yet been updated properly.');
 
 	// Make sure Settings.php is writable.
@@ -3675,7 +3677,7 @@ function convertUtf8()
 
 		// Detect whether a fulltext index is set.
 		$request = $pmxcFunc['db_query']('', '
- 			SHOW INDEX
+			SHOW INDEX
 	  	    FROM {db_prefix}messages',
 			array(
 			)
@@ -3701,7 +3703,7 @@ function convertUtf8()
 			$upcontext['dropping_index'] = true;
 
 			$pmxcFunc['db_query']('', '
-  			ALTER TABLE {db_prefix}messages
+				ALTER TABLE {db_prefix}messages
 	  		DROP INDEX ' . implode(',
 		  	DROP INDEX ', $upcontext['fulltext_index']),
 				array(
@@ -4500,11 +4502,10 @@ function template_upgrade_above()
 		</script>
 	</head>
 	<body>
-	<div id="footerfix">
-		<div id="header">
-			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="smflogo" src="', $settings['default_theme_url'], '/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
-		</div>
+	<div id="header">
+		<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
+		<img id="pmxlogo" src="', $settings['default_theme_url'], '/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
+	</div>
 	<div id="wrapper">
 	<div id="upper_section">
 		<div id="main_content_section">
@@ -4599,13 +4600,11 @@ function template_upgrade_below()
 						</div>
 				</div>
 			</div>
+			<div id="footer">
+				<ul>
+					<li class="copyright"><a href="http://portamx.com/" title="PortaMx Forum" target="_blank" class="new_win">PortaMx Forum &copy; 2016, PortaMx</a></li>
+				</ul>
 			</div>
-		</div>
-		</div>
-		<div id="footer">
-			<ul>
-				<li class="copyright"><a href="http://www.simplemachines.org/" title="Simple Machines Forum" target="_blank" class="new_win">SMF &copy; 2016, Simple Machines</a></li>
-			</ul>
 		</div>
 	</body>
 </html>';
@@ -4640,7 +4639,7 @@ function template_xml_above()
 	global $upcontext;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-	<smf>';
+	<pmx>';
 
 	if (!empty($upcontext['get_data']))
 		foreach ($upcontext['get_data'] as $k => $v)
@@ -4651,7 +4650,7 @@ function template_xml_above()
 function template_xml_below()
 {
 	echo '
-		</smf>';
+		</pmx>';
 }
 
 function template_error_message()
@@ -4674,7 +4673,7 @@ function template_welcome_message()
 
 	echo '
 		<script src="http://docserver.portamx.com/pmxforum/infofiles/current-version.js"></script>
-		<script>document.cookie = "currentVersion=\'"+window.smfVersion+"\'";</script>';
+		<script>document.cookie = "currentVersion=\'"+window.pmxVersion+"\'";</script>';
 
 $forum_version = 'PortaMx-Forum 2.1 Beta 5';
 
@@ -4691,15 +4690,15 @@ $forum_version = 'PortaMx-Forum 2.1 Beta 5';
 		setcookie('currentVersion', '');
 
 	echo '
-		<script src="http://www.simplemachines.org/smf/current-version.js?version=' . SMF_VERSION . '"></script>
-			<h3>', sprintf($txt['upgrade_ready_proceed'], SMF_VERSION), '</h3>
+		<script src="http://docserver.portamx.com/pmxforum/infofiles/current-version.js"></script>
+			<h3>', sprintf($txt['upgrade_ready_proceed'], PMX_VERSION), '</h3>
 	<form action="', $upcontext['form_url'], '" method="post" name="upform" id="upform">
 		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '">
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br>
 			<div style="padding-left: 6ex;">
-				', sprintf($txt['upgrade_warning_out_of_date'], SMF_VERSION), '
+				', sprintf($txt['upgrade_warning_out_of_date'], PMX_VERSION), '
 			</div>
 		</div>';
 
@@ -4857,10 +4856,10 @@ $forum_version = 'PortaMx-Forum 2.1 Beta 5';
 				if (currentVersion < window.smfVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
-			addLoadEvent(smfCurrentVersion);
+			addLoadEvent(pmxCurrentVersion);
 
 			// This checks that the script file even exists!
-			if (typeof(smfSelectText) == \'undefined\')
+			if (typeof(pmxSelectText) == \'undefined\')
 				document.getElementById(\'js_script_missing_error\').style.display = \'\';
 
 		</script>';

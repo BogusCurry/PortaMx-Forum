@@ -309,7 +309,7 @@ function reloadSettings()
 		'<div>',
 	);
 
-	// These are the only valid image types for SMF, by default anyway.
+	// These are the only valid image types for PMX, by default anyway.
 	$context['validImageTypes'] = array(
 		1 => 'gif',
 		2 => 'jpeg',
@@ -1951,7 +1951,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// check if a Mobile device used
 	$useragent = strtolower($_SERVER['HTTP_USER_AGENT']);
 	$modSettings['isMobile'] = false;
-	if(preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|bo‌​ost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $useragent)) 
+	if(preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|bo‌​ost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $useragent))
 		$modSettings['isMobile'] = true;
 
 	// Set the top level linktree up.
@@ -1980,7 +1980,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Parent action => array of subactions
 	$simpleSubActions = array(
-		'pm' => array('popup',),
+		'pm' => array('popup'),
+		'signup' => array('usernamecheck')
 	);
 	// Actions that specifically uses XML output.
 	$xmlActions = array(
@@ -2063,13 +2064,31 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// And of course, let's load the default CSS file.
 	loadCSSFile('index.css', array('minimize' => true), 'pmx_index');
 
-	// Here is my luvly Responsive CSS
+	// Here is my luvly Mobile CSS
 	if(!empty($modSettings['isMobile']))
 	{
 		if(!empty($modSettings['minimize_files']))
-			loadCSSFile('minified.responsive.css', array('validate' => false));
+		{
+			if(($pmxCacheFunc['get']('minified_mobile_css')) === null)
+			{
+				$path = '';
+				if(file_exists($settings['theme_dir'] .'/css/mobile.css'))
+					$path = $settings['theme_dir'] .'/css/';
+				elseif(file_exists($settings['default_theme_dir'] .'/css/mobile.css'))
+					$path = $settings['default_theme_dir'] .'/css/';
+
+				if(!empty($path))
+				{
+					static $fnd = array('~/\*[^*]*\*+([^/][^*]*\*+)*/~', '~[\n\r]+~m', '~[\s\t]+~m', '~[\s]+\{~m', '~\{[\s]+~m', '~[\s]+\}~m', '~\}[\s]+~m', '~[\s]+\(~m', '~\([\s]+~m', '~[\s]+\)~m', '~\)[\s]+~m', '~[\s]+\,~m', '~\,[\s]+~m', '~[\s]+\:~m', '~\:[\s]+~m', '~[\s]+\;~m', '~\;[\s]+~m', '~\}~m', '~\}\n\}\n~m', '~\}\nto\{~m');
+					static $repl = array('', '', ' ', '{', '{', '}', '}', ' (', '(', ')', ') ', ',', ',', ':', ':', ';', ';', "}", "}}", "}to{");
+					file_put_contents($path .'minified.mobile.css', trim(preg_replace($fnd, $repl, file_get_contents($path .'mobile.css')), "\n\r\t"));
+					$pmxCacheFunc['put']('minified_mobile_css', 'minified.mobile.css', 60*60*24);
+				}
+			}
+			loadCSSFile('minified.mobile.css', array(), 'pmx_mobile');
+		}
 		else
-			loadCSSFile('responsive.css', array('validate' => false));
+			loadCSSFile('mobile.css', array(), 'pmx_mobile');
 	}
 
 	if ($context['right_to_left'])
@@ -2170,13 +2189,22 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadCSSFile('lightbox.css', array(), 'lightbox');
 		loadJavascriptFile('lightbox.js', array(), 'lightbox');
 	}
+
 	// add favicon?
 	if (!empty($modSettings['add_favicon_to_links']))
 		addInlineJavascript('
 	function fSetFavicon(jQuery){$(\':not(.signature)>.bbc_link,.ecl_link\').each(function(){var url=$(this).attr(\'href\'),domain=url.match(/:\/\/(.[^/]+)/)[1],schema=url.match(/^(http[s]*):\/\//)[1];$(this).css({\'background-image\':\'url(//www.google.com/s2/favicons?domain=\'+schema+\'://\'+domain+\')\',\'background-repeat\':\'no-repeat\',\'padding-left\':\'20px\',\'background-position\':\'1px\'});});}
 	$(document).ready(fSetFavicon);');
+
+	// handle automatic sceen resize
+	addInlineCss('
+	body{margin:0;padding:0 0 20px 0;}
+	#footer div{height:20px;}');
+
 	addInlineJavascript('
-	function fSetWrapper(){document.getElementById(\'content_section\').style.minHeight=window.innerHeight-(document.getElementById(\'content_section\').offsetTop+document.getElementById(\'footer\').offsetHeight+25)+"px";}');
+	var footerOffset='. (!empty($modSettings['showCacheStatus']) && !empty($modSettings['timeLoadPageEnable']) ? '102' : (!empty($modSettings['showCacheStatus']) || !empty($modSettings['timeLoadPageEnable']) ? '82' : '62')) .';
+	function fSetScreenSize(){document.getElementById(\'content_section\').style.minHeight=window.innerHeight-(document.getElementById(\'content_section\').offsetTop+footerOffset)+\'px\';}
+	$(window).on(\'resize\', fSetScreenSize);');
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -2198,11 +2226,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
 			addInlineJavascript('
-		function smfAutoTask()
-		{
-			$.get(pmx_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '");
-		}
-		window.setTimeout("smfAutoTask();", 1);');
+	function pmxAutoTask(){$.get(pmx_scripturl + "?scheduled='. $type . ';ts='. $ts .'");} window.setTimeout("pmxAutoTask();", 1);');
 		}
 	}
 
@@ -2212,10 +2236,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$ts = time();
 		$ts -= $ts % 15;
 		addInlineJavaScript('
-	function triggerCron()
-	{
-		$.get(' . JavaScriptEscape($boardurl) . ' + "/cron.php?ts=' . $ts . '");
-	}
+	function triggerCron(){$.get('. JavaScriptEscape($boardurl) .' + "/cron.php?ts='. $ts .'");}
 	window.setTimeout(triggerCron, 1);', true);
 	}
 
@@ -2431,18 +2452,6 @@ function loadCSSFile($fileName, $params = array(), $id = '')
 		{
 			$fileUrl = $settings[$themeRef . '_url'] . '/css/' . $fileName . ($has_seed ? '' : $params['seed']);
 			$filePath = $settings[$themeRef . '_dir'] . '/css/' . $fileName;
-
-			// minify responsive.css if need
-			if ($fileName == 'minified.responsive.css')
-			{
-				if (($pmxCacheFunc['get']('minified_responsive_css')) === null || !file_exists($filePath))
-				{
-					static $fnd = array('~/\*[^*]*\*+([^/][^*]*\*+)*/~', '~[\n\r]+~m', '~[\s\t]+~m', '~[\s]+\{~m', '~\{[\s]+~m', '~[\s]+\}~m', '~\}[\s]+~m', '~[\s]+\(~m', '~\([\s]+~m', '~[\s]+\)~m', '~\)[\s]+~m', '~[\s]+\,~m', '~\,[\s]+~m', '~[\s]+\:~m', '~\:[\s]+~m', '~[\s]+\;~m', '~\;[\s]+~m', '~\}~m', '~\}\n\}\n~m', '~\}\nto\{~m');
-					static $repl = array('', '', ' ', '{', '{', '}', '}', ' (', '(', ')', ') ', ',', ',', ':', ':', ';', ';', "}", "}}", "}to{");
-					file_put_contents($filePath, trim(preg_replace($fnd, $repl, file_get_contents(str_replace('minified.', '', $filePath))), "\n\r\t"));
-					$pmxCacheFunc['put']('minified_responsive_css', $filePath, 60*60*24);
-				}
-			}
 		}
 	}
 

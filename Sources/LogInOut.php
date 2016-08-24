@@ -82,12 +82,12 @@ function getLoginURL()
 				$_SESSION['login_url'] = $scripturl .'?'. pmxsef_build_query($query);
 		}
 		else
-		{   
+		{
 			if (isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'dlattach') === false && preg_match('~(board|topic)[=,]~', $_SESSION['old_url']) != 0)
 				$_SESSION['login_url'] = $_SESSION['old_url'];
 		}
 	}
-} 
+}
 
 /**
  * Actually logs you in.
@@ -353,7 +353,7 @@ function Login2()
 		elseif (strlen($user_settings['passwd']) == 40)
 		{
 			// Maybe they are using a hash from before the password fix.
-			// This is also valid for SMF 1.1 to 2.0 style of hashing, changed to bcrypt in SMF 2.1
+			// This is also valid for SMF 1.1 to 2.0 style of hashing, changed to bcrypt in PMX 2.1
 			$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
 
 			// BurningBoard3 style of hashing.
@@ -373,7 +373,7 @@ function Login2()
 			}
 		}
 
-		// SMF's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
+		// PMX's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 		if (stripos(PHP_OS, 'win') !== 0 && strlen($user_settings['passwd']) < hash_length())
 		{
 			require_once($sourcedir . '/Subs-Compat.php');
@@ -383,7 +383,7 @@ function Login2()
 		// Allows mods to easily extend the $other_passwords array
 		call_integration_hook('integrate_other_passwords', array(&$other_passwords));
 
-		// Whichever encryption it was using, let's make it use SMF's now ;).
+		// Whichever encryption it was using, let's make it use PMX's now ;).
 		if (in_array($user_settings['passwd'], $other_passwords))
 		{
 			$user_settings['passwd'] = hash_password($user_settings['member_name'], un_htmlspecialchars($_POST['passwrd']));

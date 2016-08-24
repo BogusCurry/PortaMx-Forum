@@ -220,9 +220,9 @@ if (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings
 
 // No need to do this if we already did it previously...
 if (empty($modSettings['json_done']))
-  $is_done = false;
+	$is_done = false;
 else
-  $is_done = true;
+	$is_done = true;
 
 while (!$is_done)
 {
@@ -804,6 +804,7 @@ VALUES
 	('sef_lowercase', '1'),
 	('sef_spacechar', '-'),
 	('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',",/,?,\,|'),
+	('pmxVersion', '{$pmx_version}'),
 	('news', 'PortaMx Forum - Just Installed!');
 ---#
 
@@ -2063,9 +2064,9 @@ CREATE OR REPLACE FUNCTION migrate_inet(val IN anyelement) RETURNS inet
 AS
 $$
 BEGIN
-   RETURN (trim(val))::inet;
+	 RETURN (trim(val))::inet;
 EXCEPTION
-   WHEN OTHERS THEN RETURN NULL;
+	 WHEN OTHERS THEN RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 ---#
@@ -2134,7 +2135,7 @@ ALTER TABLE {$db_prefix}log_floodcontrol
 
 ---# add pk
 ALTER TABLE {$db_prefix}log_floodcontrol
-  ADD CONSTRAINT {$db_prefix}log_floodcontrol_pkey PRIMARY KEY(ip, log_type);
+	ADD CONSTRAINT {$db_prefix}log_floodcontrol_pkey PRIMARY KEY(ip, log_type);
 ---#
 
 /******************************************************************************/

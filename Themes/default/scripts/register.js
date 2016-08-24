@@ -1,4 +1,4 @@
-function smfRegister(formID, passwordDifficultyLevel, regTextStrings)
+function pmxRegister(formID, passwordDifficultyLevel, regTextStrings)
 {
 	this.addVerify = addVerificationField;
 	this.autoSetup = autoSetup;

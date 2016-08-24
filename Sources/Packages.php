@@ -1512,7 +1512,7 @@ function PackageBrowse()
 
 	$context['emulation_versions'] = preg_replace('~^PortaMx-Forum ~', 'PMX ', $items);
 
-	// Current SMF version, which is selected by default
+	// Current PMX version, which is selected by default
 	$context['default_version'] = preg_replace('~^PortaMx-Forum ~', 'PMX ', $forum_version);
 
 	// Version we're currently emulating, if any

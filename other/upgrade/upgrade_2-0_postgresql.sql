@@ -191,11 +191,11 @@ CREATE INDEX {$db_prefix}log_spider_hits_processed ON {$db_prefix}log_spider_hit
 
 ---# Creating spider statistic table.
 CREATE TABLE {$db_prefix}log_spider_stats (
-  id_spider smallint NOT NULL default '0',
-  page_hits smallint NOT NULL default '0',
-  last_seen int NOT NULL default '0',
-  stat_date date NOT NULL default '0001-01-01',
-  PRIMARY KEY (stat_date, id_spider)
+	id_spider smallint NOT NULL default '0',
+	page_hits smallint NOT NULL default '0',
+	last_seen int NOT NULL default '0',
+	stat_date date NOT NULL default '0001-01-01',
+	PRIMARY KEY (stat_date, id_spider)
 );
 ---#
 
@@ -249,13 +249,13 @@ ALTER TABLE {$db_prefix}log_online DROP CONSTRAINT {$db_prefix}log_online_log_ti
 ALTER TABLE {$db_prefix}log_online DROP CONSTRAINT {$db_prefix}log_online_id_member;
 DROP TABLE {$db_prefix}log_online;
 CREATE TABLE {$db_prefix}log_online (
-  session varchar(32) NOT NULL default '',
-  log_time int NOT NULL default '0',
-  id_member int NOT NULL default '0',
-  id_spider smallint NOT NULL default '0',
-  ip bigint NOT NULL default '0',
-  url text NOT NULL,
-  PRIMARY KEY (session)
+	session varchar(32) NOT NULL default '',
+	log_time int NOT NULL default '0',
+	id_member int NOT NULL default '0',
+	id_spider smallint NOT NULL default '0',
+	ip bigint NOT NULL default '0',
+	url text NOT NULL,
+	PRIMARY KEY (session)
 );
 CREATE INDEX {$db_prefix}log_online_log_time ON {$db_prefix}log_online (log_time);
 CREATE INDEX {$db_prefix}log_online_id_member ON {$db_prefix}log_online (id_member);
@@ -361,6 +361,15 @@ else
 --- Adding weekly maintenance task.
 /******************************************************************************/
 
+---# Deleting old scheduled task items...
+DELETE FROM {$db_prefix}scheduled_tasks
+WHERE task = 'clean_cache';
+---#
+---# Deleting old scheduled task items...
+DELETE FROM {$db_prefix}scheduled_tasks
+WHERE task = 'fetchSMfiles';
+---#
+
 ---# Adding weekly maintenance task...
 INSERT INTO {$db_prefix}scheduled_tasks (next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (0, 0, 1, 'w', 0, 'weekly_maintenance');
 ---#
@@ -394,6 +403,7 @@ if (!isset($modSettings['birthday_email']))
 			('sef_lowercase', '1'),
 			('sef_spacechar', '-'),
 			('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',\",/,?,\,|'),
+			('pmxVersion', '{$pmx_version}'),
 			('news', 'PortaMx Forum - Just Installed!')");
 ---}
 ---#
@@ -756,7 +766,7 @@ while ($request && $row = $pmxcFunc['db_fetch_assoc']($request))
 
 ---# Changing inet_aton function to use bigint instead of int...
 CREATE OR REPLACE FUNCTION INET_ATON(text) RETURNS bigint AS
-  'SELECT
+	'SELECT
 	CASE WHEN
 		$1 !~ ''^[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?$'' THEN 0
 	ELSE
@@ -774,7 +784,7 @@ LANGUAGE 'sql';
 
 ---# Adding an IFNULL to handle 8-bit integers returned by inet_aton
 CREATE OR REPLACE FUNCTION IFNULL(int8, int8) RETURNS int8 AS
-  'SELECT COALESCE($1, $2) AS result'
+	'SELECT COALESCE($1, $2) AS result'
 LANGUAGE 'sql';
 ---#
 
@@ -948,14 +958,14 @@ if (!isset($modSettings['attachment_thumb_png']))
 
 ---# Creating repository table ...
 CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
-  id_file tinyint(4) unsigned NOT NULL auto_increment,
-  filename varchar(255) NOT NULL default '',
-  path varchar(255) NOT NULL default '',
-  parameters varchar(255) NOT NULL default '',
-  data text NOT NULL,
-  filetype varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_file),
-  KEY filename (filename(30))
+	id_file tinyint(4) unsigned NOT NULL auto_increment,
+	filename varchar(255) NOT NULL default '',
+	path varchar(255) NOT NULL default '',
+	parameters varchar(255) NOT NULL default '',
+	data text NOT NULL,
+	filetype varchar(255) NOT NULL default '',
+	PRIMARY KEY (id_file),
+	KEY filename (filename(30))
 ) ENGINE=MyISAM{$db_collation};
 ---#
 
@@ -1249,7 +1259,7 @@ else
 }
 ---}
 CREATE OR REPLACE FUNCTION INSTR(text, text) RETURNS integer AS
-  'SELECT POSITION($2 IN $1) AS result'
+	'SELECT POSITION($2 IN $1) AS result'
 LANGUAGE 'sql';
 ---#
 
@@ -1264,31 +1274,31 @@ LANGUAGE 'sql';
 
 ---# Adding day()
 CREATE OR REPLACE FUNCTION day(date) RETURNS integer AS
-  'SELECT EXTRACT(DAY FROM DATE($1))::integer AS result'
+	'SELECT EXTRACT(DAY FROM DATE($1))::integer AS result'
 LANGUAGE 'sql';
 ---#
 
 ---# Adding IFNULL(varying, varying)
 CREATE OR REPLACE FUNCTION IFNULL (character varying, character varying) RETURNS character varying AS
-  'SELECT COALESCE($1, $2) AS result'
+	'SELECT COALESCE($1, $2) AS result'
 LANGUAGE 'sql';
 ---#
 
 ---# Adding IFNULL(varying, bool)
 CREATE OR REPLACE FUNCTION IFNULL(character varying, boolean) RETURNS character varying AS
-  'SELECT COALESCE($1, CAST(CAST($2 AS int) AS varchar)) AS result'
+	'SELECT COALESCE($1, CAST(CAST($2 AS int) AS varchar)) AS result'
 LANGUAGE 'sql';
 ---#
 
 ---# Adding IFNULL(int, bool)
 CREATE OR REPLACE FUNCTION IFNULL(int, boolean) RETURNS int AS
-  'SELECT COALESCE($1, CAST($2 AS int)) AS result'
+	'SELECT COALESCE($1, CAST($2 AS int)) AS result'
 LANGUAGE 'sql';
 ---#
 
 ---# Adding bool_not_eq_int()
 CREATE OR REPLACE FUNCTION bool_not_eq_int (boolean, integer) RETURNS boolean AS
-  'SELECT CAST($1 AS integer) != $2 AS result'
+	'SELECT CAST($1 AS integer) != $2 AS result'
 LANGUAGE 'sql';
 ---#
 
@@ -1353,7 +1363,7 @@ LANGUAGE 'sql';
 
 ---# Updating TO_DAYS()
 CREATE OR REPLACE FUNCTION TO_DAYS (timestamp) RETURNS integer AS
-  'SELECT DATE_PART(''DAY'', $1 - ''0001-01-01bc'')::integer AS result'
+	'SELECT DATE_PART(''DAY'', $1 - ''0001-01-01bc'')::integer AS result'
 LANGUAGE 'sql';
 ---#
 

@@ -17,11 +17,11 @@ if (!defined('PMX'))
 
 /**
 * Handle javascript (jscook) requests
-* params: mode[get, set, test, clr], name, value, type[empty, ecl]
+* params: mode[get, set, test, clr], name, value, type[ecl, format, cache or empty]
 */
-function jsCookieHandling()    
+function jsCookieHandling()
 {
-	global $modSettings;
+	global $modSettings, $pmxCacheFunc;
 
 	if(isset($_REQUEST['jscook']))
 	{
@@ -60,15 +60,20 @@ function jsCookieHandling()
 		}
 		elseif($_REQUEST['mode'] == 'clr')
 		{
-			$parts = eclCookieparts();
-			setcookie($_REQUEST['name'], $_REQUEST['value'], time()-3600, $parts['path'], $parts['host'], !empty($modSettings['secureCookies']), !empty($modSettings['httponlyCookies']));
+			if($_REQUEST['type'] == 'cache')
+				$pmxCacheFunc['clean']();
+			else
+			{
+				$parts = eclCookieparts();
+				setcookie($_REQUEST['name'], $_REQUEST['value'], time()-3600, $parts['path'], $parts['host'], !empty($modSettings['secureCookies']), !empty($modSettings['httponlyCookies']));
+			}
 		}
 
 		// resturn result
 		ob_end_clean();
 		ob_start();
 		echo $result;
-		obExit(false);
+		ob_end_flush();
 		die;
 	}
 }
@@ -1335,7 +1340,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						{
 							if (!empty($modSettings['attachmentShowImages']))
 								$returnContext = '<a class="lb-link" href="'. $currentAttachment['href'] .'" title="'. $txt['lightbox_expand'] .'" data-lightbox="'. $context['lbimage_data']['lightbox_id'] .'" data-title="'. $currentAttachment['name'] .'"><img src="'. ($currentAttachment['thumbnail']['has_thumb'] ? $currentAttachment['thumbnail']['href'] : $currentAttachment['href']) .'"'. $alt . $width . $height . $class .' oncontextmenu="return false"></a>';
-						}    
+						}
 					}
 
 					// No image. Show a link.
@@ -1583,7 +1588,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					if (isset($_REQUEST['preview']) || !isset($context['lbimage_data']['lightbox_id']))
 						$data = '<img src="'. $data  .'"'. $class .' oncontextmenu="return false">';
 					else
-						$data = '<a class="lb-link" href="'. $data .'" title="'. $txt['lightbox_expand'] .'" data-lightbox="'. $context['lbimage_data']['lightbox_id'] .'" data-title="'. substr($data, strrpos($data, '/')+1) .'" oncontextmenu="return false"><img src="'. $data  .'" id="'. $context['lbimage_data']['lightbox_id'] .'"'. $class .'></a>';  
+						$data = '<a class="lb-link" href="'. $data .'" title="'. $txt['lightbox_expand'] .'" data-lightbox="'. $context['lbimage_data']['lightbox_id'] .'" data-title="'. substr($data, strrpos($data, '/')+1) .'" oncontextmenu="return false"><img src="'. $data  .'" id="'. $context['lbimage_data']['lightbox_id'] .'"'. $class .'></a>';
 				},
 				'disabled_content' => '$1',
 			),
@@ -2910,7 +2915,7 @@ function redirectexit($setLocation = '', $refresh = false, $permanent = false)
 	// Set the header.
 	$header = str_replace(' ', '%20', $setLocation);
 	header("Location: $header", true, $permanent ? 301 : 302);
- 
+
 	obExit(false);
 }
 
@@ -3229,7 +3234,7 @@ function setupThemeContext($forceload = false)
 	// Now add the capping code for avatars.
 	if (!empty($modSettings['avatar_max_width_external']) && !empty($modSettings['avatar_max_height_external']) && !empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] == 'option_css_resize')
 		addInlineCss('
-img.avatar { max-width: ' . $modSettings['avatar_max_width_external'] . 'px; max-height: ' . $modSettings['avatar_max_height_external'] . 'px; }');
+	img.avatar{max-width:' . $modSettings['avatar_max_width_external'] . 'px;max-height:' . $modSettings['avatar_max_height_external'] . 'px;}');
 
 	// This looks weird, but it's because BoardIndex.php references the variable.
 	$context['common_stats']['latest_member'] = array(
@@ -3255,6 +3260,30 @@ img.avatar { max-width: ' . $modSettings['avatar_max_width_external'] . 'px; max
 	// Set some specific vars.
 	$context['page_title_html_safe'] = $pmxcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? $pmxcFunc['htmlspecialchars']($modSettings['meta_keywords']) : '';
+
+	// Content related meta tags, including Open Graph
+	$context['meta_tags'][] = array('property' => 'og:site_name', 'content' => $context['forum_name']);
+	$context['meta_tags'][] = array('property' => 'og:title', 'content' => $context['page_title_html_safe']);
+
+	if (!empty($context['meta_keywords']))
+		$context['meta_tags'][] = array('name' => 'keywords', 'content' => $context['meta_keywords']);
+	if (!empty($context['canonical_url']))
+		$context['meta_tags'][] = array('property' => 'og:url', 'content' => $context['canonical_url']);
+
+	if (!empty($settings['og_image']))
+		$context['meta_tags'][] = array('property' => 'og:image', 'content' => $settings['og_image']);
+
+	if (!empty($context['meta_description']))
+	{
+		$context['meta_tags'][] = array('property' => 'og:description', 'content' => $context['meta_description']);
+		$context['meta_tags'][] = array('name' => 'description', 'content' => $context['meta_description']);
+	}
+	else
+	{
+		$context['meta_tags'][] = array('property' => 'og:description', 'content' => $context['page_title_html_safe']);
+		$context['meta_tags'][] = array('name' => 'description', 'content' => $context['page_title_html_safe']);
+	}
+
 	call_integration_hook('integrate_theme_context');
 }
 
@@ -3459,7 +3488,7 @@ function template_header()
 /**
  * Show the copyright.
  */
-function theme_copyright()
+function theme_copyright($result = false)
 {
 	global $forum_copyright, $software_year, $forum_version;
 
@@ -3468,7 +3497,10 @@ function theme_copyright()
 		return;
 
 	// Put in the version...
-	printf($forum_copyright, $forum_version, $software_year);
+	if(!empty($result))
+		return sprintf($forum_copyright, $forum_version, $software_year);
+	else
+		printf($forum_copyright, $forum_version, $software_year);
 }
 
 /**
@@ -3667,8 +3699,7 @@ function template_css()
 	<style>';
 
 		foreach ($context['css_header'] as $css)
-			echo $css .'
-	';
+			echo $css;
 
 		echo'
 	</style>';
@@ -4572,7 +4603,7 @@ function remove_integration_function($hook, $function, $permanent = true, $file 
 
 /**
  * Receives a string and tries to figure it out if its a method or a function.
- * If a method is found, it looks for a "#" which indicates SMF should create a new instance of the given class.
+ * If a method is found, it looks for a "#" which indicates PMX should create a new instance of the given class.
  * Checks the string/array for is_callable() and return false/fatal_lang_error is the given value results in a non callable string/array.
  * Prepare and returns a callable depending on the type of method/function found.
  *
@@ -5447,7 +5478,7 @@ function pmx_is_JSON($data)
 /**
  * Wrapper function for pmx_json_decode() with error handling.
  * @param string $json The string to decode.
- * @param bool $returnAsArray To return the decoded string as an array or an object, SMF only uses Arrays but to keep on compatibility with json_decode its set to false as default.
+ * @param bool $returnAsArray To return the decoded string as an array or an object, PMX only uses Arrays but to keep on compatibility with json_decode its set to false as default.
  * @param bool $logIt To specify if the error will be logged if h}theres an error.
  * @return array Either an empty array or the decoded data as an array.
  */

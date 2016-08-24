@@ -1,10 +1,9 @@
 <?php
 /**
  * PortaMx Forum
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2016 Simple Machines and individual contributors
+ * @package PortaMx
+ * @author PortaMx & Simple Machines
+ * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 Beta 5
@@ -107,7 +106,6 @@ function template_main()
 						<a href="', $scripturl, '?action=moderate;area=postmod;sa=', ($board['unapproved_topics'] > 0 ? 'topics' : 'posts'), ';brd=', $board['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', sprintf($txt['unapproved_posts'], $board['unapproved_topics'], $board['unapproved_posts']), '" class="moderation_link">(!)</a>';
 
 				echo '
-
 						<p class="board_description">', $board['description'] , '</p>';
 
 				// Show the "Moderators: ". Each has name, href, link, and id. (but we're gonna use link_moderators.)
@@ -190,19 +188,16 @@ function template_info_center()
 {
 	global $context, $options, $txt;
 
-	if (empty($context['info_center']))
-		return;
-
 	// Here's where the "Info Center" starts...
 	echo '
 	<div class="roundframe" id="info_center">
 		<div class="title_bar">
 			<h3 class="titlebg">
-				<span class="toggle_up floatright" id="upshrink_ic" title="', $txt['hide_infocenter'], '" style="display: none;"></span>
+				<span class="toggle_up floatright" id="upshrink_ic" title="', $txt['hide_infocenter'], '"></span>
 				<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 			</h3>
 		</div>
-		<div id="upshrinkHeaderIC"', ($context['user']['is_guest'] ? (!empty($_COOKIE['upshrinkIC']) ? ' style="display: none;"' : '') : (empty($options['collapse_header_ic']) ? '' : ' style="display: none;"')), '>';
+		<div id="upshrinkHeaderIC" style="'. ($context['user']['is_guest'] ? (empty($_COOKIE['upshrinkIC']) ? '' : 'none') : (empty($options['collapse_header_ic']) ? '' : 'none')) .'">';
 
 	foreach ($context['info_center'] as $block)
 	{
@@ -221,33 +216,26 @@ function template_info_center()
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: '. ($context['user']['is_guest'] ? (empty($_COOKIE['upshrinkIC']) ? 'false' : 'true') : (empty($options['collapse_header_ic']) ? 'false' : 'true')) .',
 			aSwappableContainers: [
-				\'upshrinkHeaderIC\'
-			],
-			aSwapImages: [
-				{
-					sId: \'upshrink_ic\',
-					altExpanded: ', JavaScriptEscape($txt['hide_infocenter']), ',
-					altCollapsed: ', JavaScriptEscape($txt['show_infocenter']), '
-				}
-			],
-			aSwapLinks: [
-				{
-					sId: \'upshrink_link\',
-					msgExpanded: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), ',
-					msgCollapsed: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), '
-				}
-			],
-			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'collapse_header_ic\',
-				sSessionId: pmx_session_id,
-				sSessionVar: pmx_session_var,
-			},
-			oCookieOptions: {
-				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
-				sCookieName: \'upshrinkIC\'
-			}
-		});
+				\'upshrinkHeaderIC\'],
+		aSwapImages: [{
+			sId: \'upshrink_ic\',
+			altExpanded: ', JavaScriptEscape($txt['hide_infocenter']), ',
+			altCollapsed: ', JavaScriptEscape($txt['show_infocenter']), '
+		}],
+		aSwapLinks: [{
+			sId: \'upshrink_link\',
+			msgExpanded: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), ',
+			msgCollapsed: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), '
+		}],
+		oThemeOptions: {
+			bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+			sOptionName: \'collapse_header_ic\',
+			sSessionId: pmx_session_id,
+			sSessionVar: pmx_session_var},
+		oCookieOptions: {
+			bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
+			sCookieName: \'upshrinkIC\'}
+	});
 	</script>';
 }
 

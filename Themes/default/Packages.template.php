@@ -533,13 +533,13 @@ function template_browse()
 			</div>
 
 			<script>
-				window.smfForum_scripturl = pmx_scripturl;
-				window.smfForum_sessionid = pmx_session_id;
-				window.smfForum_sessionvar = pmx_session_var;';
+				window.pmxForum_scripturl = pmx_scripturl;
+				window.pmxForum_sessionid = pmx_session_id;
+				window.pmxForum_sessionvar = pmx_session_var;';
 
 	// Make a list of already installed mods so nothing is listed twice ;).
 	echo '
-				window.smfInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
+				window.pmxInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
 				window.pmxVersion = "', $context['forum_version'], '";
 			</script>
 			<div id="yourVersion" style="display:none">', $context['forum_version'], '</div>';
@@ -665,7 +665,7 @@ function template_browse()
 		{
 			var default_version = "', $context['default_version'], '";
 			$("#ve").find("option").filter(function(index) {
-    			return default_version === $(this).text();
+					return default_version === $(this).text();
 			}).attr("selected", "selected");
 			return false;
 		}

@@ -2,7 +2,7 @@ $(document).ready(function() {
 	$('ul.dropmenu, ul.quickbuttons').superfish({delay : 250, speed: 100, sensitivity : 8, interval : 50, timeout : 1});
 
 	// tooltips
-	$('.preview').SMFtooltip();
+	$('.preview').PMXtooltip();
 
 	// find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');

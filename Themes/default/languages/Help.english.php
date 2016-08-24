@@ -272,6 +272,7 @@ $helptxt['compactTopicPagesEnable'] = 'This will just show a selection of the nu
 		&quot;3&quot; to display: 1 ... 4 [5] 6 ... 9 <br>
 		&quot;5&quot; to display: 1 ... 3 4 [5] 6 7 ... 9';
 $helptxt['timeLoadPageEnable'] = 'This will show the time in seconds PortaMx Forum took to create the page at the bottom of the board.';
+$helptxt['showCacheStatus'] = 'This will show the cache status (load, save as kilobytes and the time as milliseconds) for the current page at the bottom of the board if the cache enabled. <br>As Admin you have a <em>quick cache clear</em> link, simpe click on the word <b>Cache</b>.';
 $helptxt['removeNestedQuotes'] = 'This will strip nested quotes from a post when citing the post in question via a quote link.';
 $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted pictures. Pictures smaller than the maximum will not be affected. This also determines how attached images are displayed when a thumbnail is clicked on.';
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP. PHP doesn\'t support using authentication with SMTP (which many hosts now require), so if you want that you should select SMTP. Please note that SMTP can be slower, and some servers will not accept usernames and passwords.<br><br>You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';

@@ -15,11 +15,11 @@
 if (!defined('PMX'))
 	die('No direct access...');
 
-// This defines two version types for checking the API's are compatible with this version of SMF.
+// This defines two version types for checking the API's are compatible with this version of PMX.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
 	'forum_version' => 'PortaMx-Forum 2.1 Beta 5',
-	// This is the minimum version of SMF that an API could have been written for to work. (strtr to stop accidentally updating version on release)
+	// This is the minimum version of PMX that an API could have been written for to work. (strtr to stop accidentally updating version on release)
 	'search_version' => strtr('PortaMx-Forum 2+1=Beta=5', array('+' => '.', '=' => ' ')),
 );
 

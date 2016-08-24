@@ -10,7 +10,7 @@
  * @version 2.1 Beta 5
  */
 
-$GLOBALS['current_pmx_version'] = 'PortaMx Forum 2.1 Beta 5';
+$GLOBALS['current_pmx_version'] = 'PortaMx-Forum 2.1 Beta 5';
 $GLOBALS['db_script_version'] = '2-1';
 
 $GLOBALS['required_php_version'] = '5.3.8';
@@ -94,7 +94,7 @@ load_lang_file();
 
 // This is what we are.
 $installurl = $_SERVER['PHP_SELF'];
-// This is where SMF is.
+// This is where PortaMx is.
 $pmxsite = 'http://portamx.com';
 
 // All the steps in detail.
@@ -286,6 +286,7 @@ function load_lang_file()
 <html>
 	<head>
 		<title>PortaMx Forum Installer: Error!</title>
+		<meta charset="UTF-8" />
 	</head>
 	<body style="font-family: sans-serif;"><div style="width: 600px;">
 		<h1 style="font-size: 14pt;">A critical error has occurred.</h1>
@@ -428,7 +429,7 @@ function Welcome()
 		{
 			if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
 				$probably_installed++;
-			if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/smf\';~', $line))
+			if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/portamx\';~', $line))
 				$probably_installed++;
 		}
 
@@ -478,7 +479,7 @@ function Welcome()
 	if (isset($error))
 		$incontext['error'] = $txt[$error];
 
-	// Mod_security blocks everything that smells funny. Let SMF handle security.
+	// Mod_security blocks everything that smells funny. Let PortaMx handle security.
 	if (!fixModSecurity() && !isset($_GET['overmodsecurity']))
 		$incontext['error'] = $txt['error_mod_security'] . '<br><br><a href="' . $installurl . '?overmodsecurity=true">' . $txt['error_message_click'] . '</a> ' . $txt['error_message_bad_try_again'];
 
@@ -501,9 +502,12 @@ function CheckFilesWritable()
 		'Smileys',
 		'Themes',
 		'agreement.txt',
-		'Settings.php',
-		'Settings_bak.php'
+		'Settings.php'
 	);
+
+	if (file_exists(dirname(__FILE__) . '/Settings_bak.php'))
+		$writable_files[] = 'Settings_bak.php';
+
 	foreach ($incontext['detected_languages'] as $lang => $temp)
 		$extra_files[] = 'Themes/default/languages/' . $lang;
 
@@ -1006,7 +1010,7 @@ function DatabasePopulation()
 		$pmxcFunc['db_free_result']($result);
 
 		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] != $GLOBALS['current_pmx_version'])
+		if (!isset($modSettings['pmxVersion']) || $modSettings['pmxVersion'] != $GLOBALS['current_pmx_version'])
 		{
 			$incontext['error'] = $txt['error_versions_do_not_match'];
 			return false;
@@ -1024,7 +1028,7 @@ function DatabasePopulation()
 			)
 		);
 
-	// Windows likes to leave the trailing slash, which yields to C:\path\to\SMF\/attachments...
+	// Windows likes to leave the trailing slash, which yields to C:\path\to\PMX\/attachments...
 	if (substr(__DIR__, -1) == '\\')
 		$attachdir = __DIR__ . 'attachments';
 	else
@@ -1086,8 +1090,8 @@ function DatabasePopulation()
 			$replaces['START TRANSACTION;'] = '';
 			$replaces['COMMIT;'] = '';
 		}
-	} 
-	else 
+	}
+	else
 	{
 		$has_innodb = false;
 	}
@@ -1104,7 +1108,7 @@ function DatabasePopulation()
 				$pg_version = $row['server_version_num'];
 			$pmxcFunc['db_free_result']($result);
 		}
-		
+
 		if(isset($pg_version) && $pg_version >= 90100)
 			$replaces['{$unlogged}'] = 'UNLOGGED';
 		else
@@ -1261,11 +1265,11 @@ function DatabasePopulation()
 			}
 		}
 	}
-	
-	// MySQL specific stuff 
+
+	// MySQL specific stuff
 	if (substr($db_type, 0, 5) != 'mysql')
 		return false;
-	
+
 	// Find database user privileges.
 	$privs = array();
 	$get_privs = $pmxcFunc['db_query']('', 'SHOW PRIVILEGES', array());
@@ -1609,7 +1613,7 @@ function DeleteInstall()
 	if (isset($modSettings['recycle_board']))
 	{
 		$forum_version = $current_pmx_version;  // The variable is usually defined in index.php so lets just use our variable to do it for us.
-		scheduled_fetchSMfiles(); // Now go get those files!
+		scheduled_fetchPMXfiles(); // Now go get those files!
 
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
@@ -2062,12 +2066,12 @@ function updateDbLastError()
 	return true;
 }
 
-// Create an .htaccess file to prevent mod_security. SMF has filtering built-in.
+// Create an .htaccess file to prevent mod_security. PMX has filtering built-in.
 function fixModSecurity()
 {
 	$htaccess_addition = '
 <IfModule mod_security.c>
-	# Turn off mod_security filtering.  SMF is a big boy, it doesn\'t need its hands held.
+	# Turn off mod_security filtering.  PMX is a big boy, it doesn\'t need its hands held.
 	SecFilterEngine Off
 
 	# The below probably isn\'t needed, but better safe than sorry.
@@ -2126,13 +2130,13 @@ function template_install_above()
 		<link rel="stylesheet" href="Themes/default/css/install.css?alp21">
 		', $txt['lang_rtl'] == true ? '<link rel="stylesheet" href="Themes/default/css/rtl.css?alp21">' : '' , '
 
-		<script src="Themes/default/scripts/jquery-2.1.3.min.js"></script>
+		<script src="Themes/default/scripts/jquery-2.2.4.min.js"></script>
 		<script src="Themes/default/scripts/script.js"></script>
 	</head>
-	<body><div id="footerfix">
+	<body>
 		<div id="header">
 			<h1 class="forumtitle">', $txt['pmx_installer'], '</h1>
-			<img id="smflogo" src="Themes/default/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
+			<img id="pmxlogo" src="Themes/default/images/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">
 		</div>
 		<div id="wrapper">
 			<div id="upper_section">
@@ -2194,16 +2198,16 @@ function template_install_below()
 	if (!empty($incontext['continue']) || !empty($incontext['skip']))
 	{
 		echo '
-								<div>';
+							<div>';
 
 		if (!empty($incontext['continue']))
 			echo '
-									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
+								<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		if (!empty($incontext['skip']))
 			echo '
-									<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
+								<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		echo '
-								</div>';
+							</div>';
 	}
 
 	// Show the closing form tag and other data only if not in the last step
@@ -2216,11 +2220,11 @@ function template_install_below()
 					</div>
 				</div>
 			</div>
-		</div></div>
-		<div id="footer">
-			<ul>
-				<li class="copyright"><a href="http://portamx.com/" title="PortaMx Forum" target="_blank" class="new_win">PortaMx Forum &copy; 2016, PortaMx</a></li>
-			</ul>
+			<div id="footer">
+				<ul>
+					<li class="copyright"><a href="http://portamx.com/" title="PortaMx Forum" target="_blank" class="new_win">PortaMx Forum &copy; 2016, PortaMx</a></li>
+				</ul>
+			</div>
 		</div>
 	</body>
 </html>';
@@ -2256,9 +2260,9 @@ function template_welcome_message()
 	echo '
 		<script>
 			// Latest version?
-			function smfCurrentVersion()
+			function pmxCurrentVersion()
 			{
-				var smfVer, yourVer;
+				var pmxVer, yourVer;
 
 				if (!(\'pmxVersion\' in window))
 					return;

@@ -845,7 +845,7 @@ function registerMember(&$regOptions, $return_errors = false)
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
-	global $modSettings, $pmxcFunc;
+	global $modSettings, $pmxcFunc, $txt;
 
 	$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
 	$checkName = $pmxcFunc['strtolower']($name);
@@ -872,31 +872,50 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 
 			// If it's not just entire word, check for it in there somewhere...
 			if ($checkMe == $reservedCheck || ($pmxcFunc['strpos']($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
-				if ($fatal)
-					fatal_lang_error('username_reserved', 'password', array($reserved));
-				else
-					return true;
+			{
+				if ($fatal && !isset($_SESSION['fatal_logged']) || (isset($_SESSION['fatal_logged']) && $_SESSION['fatal_logged'] != $name))
+				{
+					log_error(sprintf($txt['illegal_username'], $name));
+					$_SESSION['fatal_logged'] = $name;
+				}
+				return true;
+			}
 		}
 
 		$censor_name = $name;
 		if (censorText($censor_name) != $name)
+		{
 			if ($fatal)
-				fatal_lang_error('name_censored', 'password', array($name));
-			else
-				return true;
+			{
+				if ($fatal && !isset($_SESSION['fatal_logged']) || (isset($_SESSION['fatal_logged']) && $_SESSION['fatal_logged'] != $name))
+				{
+					log_error(sprintf($txt['illegal_username'], $name));
+					$_SESSION['fatal_logged'] = $name;
+				}
+			}
+			return true;
+		}
 	}
 
 	// Characters we just shouldn't allow, regardless.
 	foreach (array('*') as $char)
+	{
 		if (strpos($checkName, $char) !== false)
+		{
 			if ($fatal)
-				fatal_lang_error('username_reserved', 'password', array($char));
-			else
-				return true;
-
+			{
+				if ($fatal && !isset($_SESSION['fatal_logged']) || (isset($_SESSION['fatal_logged']) && $_SESSION['fatal_logged'] != $name))
+				{
+					log_error(sprintf($txt['illegal_username'], $name));
+					$_SESSION['fatal_logged'] = $name;
+				}
+			}
+			return true;
+		}
+	}
 	// Get rid of any SQL parts of the reserved name...
 	$checkName = strtr($name, array('_' => '\\_', '%' => '\\%'));
-	
+
 	//when we got no wildcard we can use equal -> fast
 	$operator = (strpos($checkName, '%') || strpos($checkName, '_') ? 'LIKE' : '=' );
 
@@ -905,8 +924,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
-			AND ') . '({raw:real_name} {raw:operator} LOWER({string:check_name}) OR {raw:member_name} {raw:operator} LOWER({string:check_name}))
-		LIMIT 1',
+			AND ') . '({raw:real_name} {raw:operator} LOWER({string:check_name}) OR {raw:member_name} {raw:operator} LOWER({string:check_name}))',
 		array(
 			'real_name' => $pmxcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name',
 			'member_name' => $pmxcFunc['db_case_sensitive'] ? 'LOWER(member_name)' : 'member_name',
@@ -925,8 +943,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$request = $pmxcFunc['db_query']('', '
 		SELECT id_group
 		FROM {db_prefix}membergroups
-		WHERE {raw:group_name} LIKE {string:check_name}
-		LIMIT 1',
+		WHERE {raw:group_name} LIKE {string:check_name}',
 		array(
 			'group_name' => $pmxcFunc['db_case_sensitive'] ? 'LOWER(group_name)' : 'group_name',
 			'check_name' => $checkName,
@@ -1232,7 +1249,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	}
 
 	// Allow mods with their own post tables to reattribute posts as well :)
- 	call_integration_hook('integrate_reattribute_posts', array($memID, $email, $membername, $post_count, &$updated));
+	call_integration_hook('integrate_reattribute_posts', array($memID, $email, $membername, $post_count, &$updated));
 
 	return $updated;
 }
@@ -1454,7 +1471,7 @@ function populateDuplicateMembers(&$members)
 	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		$row['poster_ip'] = inet_dtop($row['poster_ip']);
-		
+
 		// Don't collect lots of the same.
 		if (isset($had_ips[$row['poster_ip']]) && in_array($row['id_member'], $had_ips[$row['poster_ip']]))
 			continue;

@@ -21,7 +21,6 @@ global $pmxCache, $pmxCacheFunc, $cache_enable, $cachedir, $boardurl, $cache_acc
 $pmxCache['key'] = md5($boardurl . filemtime(__FILE__)) .'-pmx_';
 $pmxCache['vals'] = array(
 	'enabled' => $cache_enable,
-	'mode' => '',
 	'loaded' => 0,
 	'saved' => 0,
 	'time' => 0
@@ -42,8 +41,6 @@ switch ($cache_accelerator)
 	*/
 	case 'memcache':
 	{
-		$pmxCache['vals']['mode'] = 'Memcache';
-
 		// Get key data from cache
 		function pmxCacheGet($key, $null_array = false, $useMember = false)
 		{
@@ -160,8 +157,6 @@ switch ($cache_accelerator)
 	*/
 	case 'zend':
 	{
-		$pmxCache['vals']['mode'] = 'Zend';
-
 		// Get key data from cache
 		function pmxCacheGet($key, $useMember = false)
 		{
@@ -231,8 +226,6 @@ switch ($cache_accelerator)
 	*/
 	case 'apc':
 	{
-		$pmxCache['vals']['mode'] = 'APC';
-
 		// Get key data from cache
 		function pmxCacheGet($key, $useMember = false)
 		{
@@ -296,8 +289,6 @@ switch ($cache_accelerator)
 	*/
 	case 'file':
 	{
-		$pmxCache['vals']['mode'] = 'File';
-
 		// Get key data from cache
 		function pmxCacheGet($key, $useMember = false)
 		{
@@ -352,7 +343,7 @@ switch ($cache_accelerator)
 			}
 			else
 			{
- 				@unlink($fname);
+				@unlink($fname);
 				$pmxCache['vals']['time'] += microtime(true) - $st;
 			}
 		}
@@ -401,7 +392,7 @@ switch ($cache_accelerator)
 
 /**
 * if usegroups given, clear all groups cache
-* else clear the give key cache 
+* else clear the give key cache
 */
 function pmxCacheDrop($key, $usegroups = false)
 {
@@ -470,7 +461,7 @@ function pmxCache_getGroups()
 	// guest & normal members
 	$result = array('-1', '0');
 
-	// get SMF membergroups
+	// get PMX membergroups
 	$request = $pmxcFunc['db_query']('', '
 		SELECT id_group
 		FROM {db_prefix}membergroups

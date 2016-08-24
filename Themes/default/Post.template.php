@@ -679,7 +679,7 @@ function template_main()
 				}
 
 				// Show the preview section.
-				var preview = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'preview\')[0];
+				var preview = XMLDoc.getElementsByTagName(\'pmx\')[0].getElementsByTagName(\'preview\')[0];
 				setInnerHTML(document.getElementById(\'preview_subject\'), preview.getElementsByTagName(\'subject\')[0].firstChild.nodeValue);
 
 				var bodyText = \'\';
@@ -691,7 +691,7 @@ function template_main()
 				document.getElementById(\'preview_body\').className = \'windowbg\';
 
 				// Show a list of errors (if any).
-				var errors = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'errors\')[0];
+				var errors = XMLDoc.getElementsByTagName(\'pmx\')[0].getElementsByTagName(\'errors\')[0];
 				var errorList = new Array();
 				for (var i = 0, numErrors = errors.getElementsByTagName(\'error\').length; i < numErrors; i++)
 					errorList[errorList.length] = errors.getElementsByTagName(\'error\')[i].firstChild.nodeValue;
@@ -718,7 +718,7 @@ function template_main()
 
 				// Set the new last message id.
 				if (\'last_msg\' in document.forms.postmodify)
-					document.forms.postmodify.last_msg.value = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'last_msg\')[0].firstChild.nodeValue;
+					document.forms.postmodify.last_msg.value = XMLDoc.getElementsByTagName(\'pmx\')[0].getElementsByTagName(\'last_msg\')[0].firstChild.nodeValue;
 
 				// Remove the new image from old-new replies!
 				for (i = 0; i < new_replies.length; i++)
@@ -726,7 +726,7 @@ function template_main()
 				new_replies = new Array();
 
 				var ignored_replies = new Array(), ignoring;
-				var newPosts = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'new_posts\')[0] ? XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'new_posts\')[0].getElementsByTagName(\'post\') : {length: 0};
+				var newPosts = XMLDoc.getElementsByTagName(\'pmx\')[0].getElementsByTagName(\'new_posts\')[0] ? XMLDoc.getElementsByTagName(\'pmx\')[0].getElementsByTagName(\'new_posts\')[0].getElementsByTagName(\'post\') : {length: 0};
 				var numNewPosts = newPosts.length;
 				if (numNewPosts != 0)
 				{
@@ -1056,13 +1056,13 @@ function template_quotefast()
 
 			if (\'DOMParser\' in window && !(\'opera\' in window))
 			{
-				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_") + "</temp>", "text/xml");
-				quote = xmldoc.childNodes[0].textContent.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_PMX-BREAK_").replace(/\t/g, "_PMX-TAB_") + "</temp>", "text/xml");
+				quote = xmldoc.childNodes[0].textContent.replace(/_PMX-BREAK_/g, "\n").replace(/_PMX-TAB_/g, "\t");
 			}
 			else if (\'innerText\' in stage)
 			{
-				setInnerHTML(stage, quote.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-				quote = stage.innerText.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				setInnerHTML(stage, quote.replace(/\n/g, "_PMX-BREAK_").replace(/\t/g, "_PMX-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+				quote = stage.innerText.replace(/_PMX-BREAK_/g, "\n").replace(/_PMX-TAB_/g, "\t");
 			}
 
 			if (\'opera\' in window)

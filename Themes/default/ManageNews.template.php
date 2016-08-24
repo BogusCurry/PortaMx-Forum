@@ -320,7 +320,7 @@ function template_email_members_compose()
 				}
 
 				// Show the preview section.
-				var preview = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'preview\')[0];
+				var preview = XMLDoc.getElementsByTagName(\'pmx\')[0].getElementsByTagName(\'preview\')[0];
 				setInnerHTML(document.getElementById(\'preview_subject\'), preview.getElementsByTagName(\'subject\')[0].firstChild.nodeValue);
 
 				var bodyText = \'\';
@@ -331,7 +331,7 @@ function template_email_members_compose()
 				document.getElementById(\'preview_body\').className = \'post\';
 
 				// Show a list of errors (if any).
-				var errors = XMLDoc.getElementsByTagName(\'smf\')[0].getElementsByTagName(\'errors\')[0];
+				var errors = XMLDoc.getElementsByTagName(\'pmx\')[0].getElementsByTagName(\'errors\')[0];
 				var errorList = new Array();
 				for (var i = 0, numErrors = errors.getElementsByTagName(\'error\').length; i < numErrors; i++)
 					errorList[errorList.length] = errors.getElementsByTagName(\'error\')[i].firstChild.nodeValue;

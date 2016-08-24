@@ -181,7 +181,7 @@ function ShowXmlFeed()
 	);
 
 	// Easy adding of sub actions
- 	call_integration_hook('integrate_xmlfeeds', array(&$subActions));
+	call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
 	if (empty($_GET['sa']) || !isset($subActions[$_GET['sa']]))
 		$_GET['sa'] = 'recent';
@@ -222,7 +222,7 @@ function ShowXmlFeed()
 	else
 		ob_start();
 
-	if ($xml_format == 'smf' || isset($_REQUEST['debug']))
+	if ($xml_format == 'pmx' || isset($_REQUEST['debug']))
 		header('Content-Type: text/xml; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
 	elseif ($xml_format == 'rss' || $xml_format == 'rss2')
 		header('Content-Type: application/rss+xml; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));
@@ -313,13 +313,13 @@ function ShowXmlFeed()
 	else
 	{
 		echo '
-<smf:xml-feed xmlns:smf="http://www.simplemachines.org/" xmlns="http://www.simplemachines.org/xml/', $_GET['sa'], '" xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">';
+<pmx:xml-feed xmlns:pmx="http://portamx.com/" xmlns="http://portamx.com/xml/', $_GET['sa'], '" xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">';
 
 		// Dump out that associative array.  Indent properly.... and use the right names for the base elements.
 		dumpTags($xml, 1, $subActions[$_GET['sa']][1], $xml_format);
 
 		echo '
-</smf:xml-feed>';
+</pmx:xml-feed>';
 }
 
 	obExit(false);

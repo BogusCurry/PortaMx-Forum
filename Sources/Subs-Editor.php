@@ -479,7 +479,7 @@ function html_to_bbc($text)
 		// Keep track of the number of nested list levels.
 		$listDepth = 0;
 
-		// Map what we can expect from the HTML to what is supported by SMF.
+		// Map what we can expect from the HTML to what is supported by PMX.
 		$listTypeMapping = array(
 			'1' => 'decimal',
 			'A' => 'upper-alpha',
@@ -1649,7 +1649,7 @@ function create_control_richedit($editorOptions)
 		'labels' => !empty($editorOptions['labels']) ? $editorOptions['labels'] : array(),
 		'locale' => !empty($txt['lang_locale']) && substr($txt['lang_locale'], 0, 5) != 'en_US' ? $txt['lang_locale'] : '',
 		'required' => !empty($editorOptions['required']),
- 	);
+	);
 
 	// prepare the cancel link
 	$isQuickReply = $editorOptions['id'] == 'quickReply';
@@ -2087,7 +2087,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	if ($context['controls']['verification'][$verificationOptions['id']]['show_visual'])
 		$context['insert_after_template'] .= '
 			<script>
-				var verification' . $verificationOptions['id'] . 'Handle = new smfCaptcha("' . $thisVerification['image_href'] . '", "' . $verificationOptions['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');
+				var verification' . $verificationOptions['id'] . 'Handle = new pmxCaptcha("' . $thisVerification['image_href'] . '", "' . $verificationOptions['id'] . '", ' . ($context['use_graphic_library'] ? 1 : 0) . ');
 			</script>';
 
 	// Is there actually going to be anything?
@@ -2320,7 +2320,7 @@ function AutoSuggestHandler($checkRegistered = null)
 	$searchTypes = array(
 		'member' => 'Member',
 		'membergroups' => 'MemberGroups',
-		'versions' => 'SMFVersions',
+		'versions' => 'PMXVersions',
 	);
 
 	call_integration_hook('integrate_autosuggest', array(&$searchTypes));
@@ -2444,11 +2444,11 @@ function AutoSuggest_Search_MemberGroups()
 }
 
 /**
- * Provides a list of possible SMF versions to use in emulation
+ * Provides a list of possible PMX versions to use in emulation
  *
  * @return array An array of data for displaying the suggestions
  */
-function AutoSuggest_Search_SMFVersions()
+function AutoSuggest_Search_PMXVersions()
 {
 	global $pmxcFunc;
 

@@ -128,7 +128,7 @@ function template_admin()
 							sAnnouncementContainerId: \'pmxAnnouncements\',
 
 							bLoadVersions: true,
-							sSmfVersionContainerId: \'pmxVersion\',
+							sPmxVersionContainerId: \'pmxVersion\',
 							sYourVersionContainerId: \'yourVersion\',
 							sVersionOutdatedTemplate: ', JavaScriptEscape('
 								<span class="alert">%currentVersion%</span>
@@ -241,14 +241,14 @@ function template_credits()
 	// This makes all the support information available to the support script...
 	echo '
 						<script>
-							var smfSupportVersions = {};
+							var pmxSupportVersions = {};
 
-							smfSupportVersions.forum = "', $context['forum_version'], '";';
+							pmxSupportVersions.forum = "', $context['forum_version'], '";';
 
 	// Don't worry, none of this is logged, it's just used to give information that might be of use.
 	foreach ($context['current_versions'] as $variable => $version)
 		echo '
-							smfSupportVersions.', $variable, ' = "', $version['version'], '";';
+							pmxSupportVersions.', $variable, ' = "', $version['version'], '";';
 
 	// Now we just have to include the script and wait ;).
 	echo '
@@ -259,26 +259,26 @@ function template_credits()
 	// This sets the latest support stuff.
 	echo '
 						<script>
-							function smfCurrentVersion()
+							function pmxCurrentVersion()
 							{
-								var smfVer, yourVer;
+								var pmxVer, yourVer;
 
 								if (!window.pmxVersion)
 									return;
 
-								smfVer = document.getElementById("pmxVersion");
+								pmxVer = document.getElementById("pmxVersion");
 								yourVer = document.getElementById("yourVersion");
 
-								setInnerHTML(smfVer, window.pmxVersion);
+								setInnerHTML(pmxVer, window.pmxVersion);
 
 								var currentVersion = getInnerHTML(yourVer);
 								if (currentVersion != window.pmxVersion)
 									setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
 								else
-									setInnerHTML(smfVer, window.pmxVersion);
+									setInnerHTML(pmxVer, window.pmxVersion);
 							}
 
-							addLoadEvent(smfCurrentVersion)
+							addLoadEvent(pmxCurrentVersion)
 						</script>';
 }
 
@@ -302,7 +302,7 @@ function template_view_versions()
 								<thead>
 									<tr class="title_bar">
 										<th class="half_table">
-											<strong>', $txt['admin_smffile'], '</strong>
+											<strong>', $txt['admin_pmxfile'], '</strong>
 										</th>
 										<th class="quarter_table">
 											<strong>', $txt['dvc_your'], '</strong>
@@ -314,14 +314,14 @@ function template_view_versions()
 								</thead>
 								<tbody>';
 
-	// The current version of the core SMF package.
+	// The current version of the core PMX package.
 	echo '
 									<tr class="windowbg">
 										<td class="half_table">
-											', $txt['admin_smfpackage'], '
+											', $txt['admin_pmxpackage'], '
 										</td>
 										<td class="quarter_table">
-											<em id="yourSMF">', $context['forum_version'], '</em>
+											<em id="yourPMX">', $context['forum_version'], '</em>
 										</td>
 										<td class="quarter_table">
 											<em id="yourVersion">??</em>
@@ -918,7 +918,7 @@ function template_show_settings()
 					// The step - only set if incrementing by something other than 1 for int or 0.1 for float
 					$step = isset($config_var['step']) ? ' step="' . $config_var['step'] . '"' : ($config_var['type'] == 'float' ? ' step="0.1"' : '');
 
-					// Minimum allowed value for this setting. SMF forces a default of 0 if not specified in the settings
+					// Minimum allowed value for this setting. PMX forces a default of 0 if not specified in the settings
 					$min = isset($config_var['min']) ? ' min="' . $config_var['min'] . '"' : '';
 
 					// Maximum allowed value for this setting.

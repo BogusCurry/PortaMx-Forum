@@ -664,7 +664,7 @@ function pmx_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
 	global $db_in_transact, $pmxcFunc, $db_connection, $db_prefix;
 
 	$connection = $connection === null ? $db_connection : $connection;
-	
+
 	$replace = '';
 
 	if (empty($data))
@@ -690,7 +690,7 @@ function pmx_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
 		$col_str = '';
 		static $pg_version;
 		static $replace_support;
-		
+
 		if(empty($pg_version))
 		{
 			db_extend();
@@ -705,11 +705,11 @@ function pmx_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
 
 			$replace_support = (version_compare($pg_version,'9.5.0','>=') ? true : false);
 		}
-		
+
 		$count = 0;
 		$where = '';
 		$count_pk = 0;
-		
+
 		If($replace_support)
 		{
 			foreach ($columns as $columnName => $type)
@@ -722,14 +722,14 @@ function pmx_db_insert($method = 'replace', $table, $columns, $data, $keys, $dis
 					$count_pk++;
 				}
 				else //normal field
-				{					
+				{
 					$col_str .= ($count > 0 ? ',' : '');
 					$col_str .= $columnName.' = EXCLUDED.'.$columnName;
 					$count++;
 				}
 			}
 			$replace = ' ON CONFLICT ('.$key_str.') DO UPDATE SET '.$col_str;
-		} 
+		}
 		else
 		{
 			foreach ($columns as $columnName => $type)

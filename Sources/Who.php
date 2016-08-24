@@ -576,6 +576,7 @@ function Credits($in_admin = false)
 		'graphics' => array(
 			'<a href="http://p.yusukekamiyamane.com/">Fugue Icons</a> | &copy; 2012 Yusuke Kamiyamane | These icons are licensed under a Creative Commons Attribution 3.0 License',
 			'<a href="https://techbase.kde.org/Projects/Oxygen/Licensing#Use_on_Websites">Oxygen Icons</a> | These icons are licensed under <a href="http://www.gnu.org/copyleft/lesser.html">GNU LGPLv3</a>',
+			'<br>',
 		),
 		'software' => array(
 			'<a href="http://jquery.org/">JQuery</a> | &copy; John Resig | Licensed under <a href="http://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt">The MIT License (MIT)</a>',
@@ -584,12 +585,14 @@ function Credits($in_admin = false)
 			'<a href="http://wayfarerweb.com/jquery/plugins/animadrag/">animaDrag</a> | &copy; Abel Mohler | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="https://github.com/mzubala/jquery-custom-scrollbar">jQuery Custom Scrollbar</a> | &copy; Maciej Zubala | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="http://slippry.com/">jQuery Responsive Slider</a> | &copy; booncon ROCKETS | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
+			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="http://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
 			'<a href="https://github.com/ichord/At.js">At.js</a> | &copy; chord.luo@gmail.com | Licensed under <a href="https://github.com/ichord/At.js/blob/master/LICENSE-MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">HTML5 Desktop Notifications</a> | &copy; Tsvetan Tsvetkov | Licensed under <a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications/blob/master/License.txt">The Apache License Version 2.0</a>',
 			'<a href="https://github.com/enygma/gauth">GAuth Code Generator/Validator</a> | &copy; Chris Cornutt | Licensed under <a href="https://github.com/enygma/gauth/blob/master/LICENSE">The MIT License (MIT)</a>',
 			'<a href="https://github.com/enyo/dropzone">Dropzone.js</a> | &copy; Matias Meno | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="https://github.com/matthiasmullie/minify">Minify</a> | &copy; Matthias Mullie | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="https://github.com/lokesh/lightbox2">Lightbox2</a> | &copy; Lokesh Dhakar | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
+			'<br>',
 		),
 		'fonts' => array(
 			'<a href="http://openfontlibrary.org/en/font/anonymous-pro"> Anonymous Pro</a> | &copy; 2009 | This font is licensed under the SIL Open Font License, Version 1.1',

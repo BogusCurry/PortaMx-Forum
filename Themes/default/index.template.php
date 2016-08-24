@@ -1,10 +1,9 @@
 <?php
 /**
  * PortaMx Forum
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2016 Simple Machines and individual contributors
+ * @package PortaMx
+ * @author PortaMx & Simple Machines
+ * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 Beta 5
@@ -44,7 +43,7 @@ function template_init()
 
 	/* $context, $options and $txt may be available for use, but may not be fully populated yet. */
 
-	// The version this template/theme is for. This should probably be the version of SMF it was created for.
+	// The version this template/theme is for. This should probably be the version of PMX it was created for.
 	$settings['theme_version'] = '2.1';
 
 	// Use plain buttons - as opposed to text buttons?
@@ -71,7 +70,7 @@ function template_init()
 	);
 
 	// Allow css/js files to be disable for this specific theme.
-	// Add the identifier as an array key. IE array('pmx_script'); Some external files might not add identifiers, on those cases SMF uses its filename as reference.
+	// Add the identifier as an array key. IE array('pmx_script'); Some external files might not add identifiers, on those cases PMX uses its filename as reference.
 	if (!isset($settings['disable_files']))
 		$settings['disable_files'] = array();
 }
@@ -87,13 +86,7 @@ function template_html_above()
 	echo '<!DOCTYPE html>
 	<html', $context['right_to_left'] ? ' dir="rtl"' : '', !empty($txt['lang_locale']) ? ' lang="' . str_replace("_", "-", substr($txt['lang_locale'], 0, strcspn($txt['lang_locale'], "."))) . '"' : '' , '>
 <head>
-	<meta http-equiv="Content-type" content="text/html; charset=', $context['character_set'], '" />';
-
-	// You don't need to manually load index.css, this will be set up for you. You can, of course, add
-	// any other files you want, after template_css() has been run. Note that RTL will also be loaded for you.
-
-	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
-	// If you've set them up properly (through $settings['theme_variants'], loadCSSFile will load the variant files for you.
+	<meta charset="', $context['character_set'], '" />';
 
 	// load in any css from mods or themes so they can overwrite if wanted
 	template_css();
@@ -102,18 +95,21 @@ function template_html_above()
 	template_javascript();
 
 	echo '
-	<meta name="description" content="', !empty($context['meta_description']) ? $context['meta_description'] : $context['page_title_html_safe'], '">', !empty($context['meta_keywords']) ? '
-	<meta name="keywords" content="' . $context['meta_keywords'] . '">' : '', '
-	<title>', $context['page_title_html_safe'], '</title>
+	<title>', $context['page_title_html_safe'], '</title>';
+
+	if(!empty($modSettings['isMobile']))
+		echo '
 	<meta name="viewport" content="width=device-width, initial-scale=1">';
 
-	// Some Open Graph?
-	echo '
-	<meta property="og:site_name" content="', $mbname,'">
-	<meta property="og:title" content="', $context['page_title_html_safe'],'">
-	', !empty($context['canonical_url']) ? '<meta property="og:url" content="'. $context['canonical_url'].'">' : '',
-	!empty($settings['og_image']) ? '<meta property="og:image" content="'. $settings['og_image'].'">' : '','
-	<meta property="og:description" content="',!empty($context['meta_description']) ? $context['meta_description'] : $context['page_title_html_safe'],'">';
+	// Content related meta tags, like description, keywords, Open Graph stuff, etc...
+	foreach ($context['meta_tags'] as $meta_tag)
+	{
+		echo '
+	<meta';
+		foreach ($meta_tag as $meta_key => $meta_value)
+			echo ' ', $meta_key, '="', $meta_value, '"';
+		echo '>';
+	}
 
 	/* What is your Lollipop's color?
 	Theme Authors you can change here to make sure your theme's main color got visible on tab */
@@ -165,8 +161,8 @@ function template_html_above()
 
 	echo '
 </head>
-<body id="', $context['browser_body_id'], '" class="action_', !empty($context['current_action']) ? $context['current_action'] : (!empty($context['current_board']) ?
-		'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')), !empty($context['current_board']) ? ' board_' . $context['current_board'] : '', '">';
+<body id="', (!empty($context['browser_body_id']) ? $context['browser_body_id'] : 'unknown'), '" class="action_', !empty($context['current_action']) ? $context['current_action'] : (!empty($context['current_board']) ?
+		'messageindex' : (!empty($context['current_topic']) ? 'display' : 'boardindex')), !empty($context['current_board']) ? ' board_' . $context['current_board'] : '', '">';
 }
 
 /**
@@ -178,7 +174,8 @@ function template_body_above()
 
 	// Wrapper div now echoes permanently for better layout options. h1 a is now target for "Go up" links.
 	echo '
-	<div id="top_section"><span id="head"></span>';
+	<div id="top_section">
+		<span id="head"></span>';
 
 	// If the user is logged in, display some things that might be useful.
 	if ($context['user']['is_logged'])
@@ -220,7 +217,7 @@ function template_body_above()
 		echo '
 		<ul class="floatleft welcome">
 			<li>', sprintf($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest'], $txt['guest_title'], $context['forum_name_html_safe'], $scripturl . (empty($maintenance) ? '?action=login' : ''), (empty($maintenance) ? ('return reqOverlayDiv(this.href, ' . JavaScriptEscape($txt['login']) . ');') : ''), $scripturl . '?action=signup'), '</li>
-	</ul>';
+		</ul>';
 
 	if (!empty($modSettings['userLanguage']) && !empty($context['languages']) && count($context['languages']) > 1)
 	{
@@ -262,12 +259,12 @@ function template_body_above()
 		if (!empty($context['current_board']))
 			echo '
 				<option value="board"', ($selected == 'current_board' ? ' selected' : ''), '>', $txt['search_thisbrd'], '</option>';
-		
+
 		// Can't search for members if we can't see the memberlist
 		if (!empty($context['allow_memberlist']))
 			echo '
 				<option value="members"', ($selected == 'members' ? ' selected' : ''), '>', $txt['search_members'], ' </option>';
-				
+
 		echo '
 			</select>';
 
@@ -296,7 +293,7 @@ function template_body_above()
 		</h1>';
 
 	echo '
-		', empty($settings['site_slogan']) ? '<img id="smflogo" src="' . $settings['images_url'] . '/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+		', empty($settings['site_slogan']) ? '<img id="pmxlogo" src="' . $settings['images_url'] . '/portamxlogo.png" alt="PortaMx Forum" title="PortaMx Forum">' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	echo'
 	</div>
@@ -333,7 +330,9 @@ function template_body_above()
 	// Show the menu here, according to the menu sub template, followed by the navigation tree.
 	echo '
 	<div id="main_menu">';
-		template_menu();
+
+	template_menu();
+
 
 	echo '
 	</div>';
@@ -343,11 +342,11 @@ function template_body_above()
 			</div>
 		</div>';
 
-
 	// The main content should go here.
 	echo '
 		<div id="content_section">
-			<div id="main_content_section">';
+			<div id="main_content_section">
+				<script>fSetScreenSize();</script>';
 }
 
 /**
@@ -355,7 +354,7 @@ function template_body_above()
  */
 function template_body_below()
 {
-	global $context, $txt, $scripturl, $modSettings, $pmxCache;
+	global $context, $txt, $scripturl, $boardurl, $modSettings, $user_info, $pmxCache;
 
 	echo '
 			</div>
@@ -363,30 +362,37 @@ function template_body_below()
 		<div id="footer">';
 
 	// There is now a global "Go to top" link at the right.
+	$copyright = theme_copyright(true);
 	echo '
-			<div class="floatright">', (!empty($modSettings['requireAgreement'])) ? '<a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a>' : '', ' | <a href="#head">', $txt['go_up'], ' &#9650;</a></div>
-			<div>', theme_copyright(), '</div>';
-
-	// Show the load time?
-	if ($context['show_load_time'])
-	{
-		echo '
-			<div>';
-
-		if(!empty($pmxCache['vals']['enabled']))
-		{
-			$values = $pmxCache['vals'];
-			$values['time'] = sprintf("%0.3F", $values['time'] * 1000) . $txt['cache_msec'];
-			echo $txt['cache'];
-			foreach($txt['cachestats'] as $key => $keytxt)
-				echo $keytxt . (in_array($key, array('loaded', 'saved')) ? sprintf("%0.3F", $values[$key] / 1024) . $txt['cache_kb'] : $values[$key]);
-			echo '<br />';
-		}
-
-		echo '
-		', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '
+			<div>
+				<span class="footer_link">', preg_replace('~class[a-zA-Z0-9\_\-\.\"\=\s]+~', '', $copyright), '</span>
+				<span class="footer_link floatright"><a href="'. $scripturl. '?action=help;sa=rules">'. $txt['terms_and_rules']. '</a> | <a href="#head">', $txt['go_up'], ' &#9650;</a></span>
 			</div>';
+
+	// Show the cache status?
+	if (!empty($modSettings['showCacheStatus']) && !empty($pmxCache['vals']['enabled']))
+	{
+		if($user_info['is_admin'])
+			echo '
+			<span class="footer_info"><span class="footer_link_href" onclick="pmxCookie(\'clr\', \'\', \'\', \'cache\');" title="'. $txt['footer_clear_cache'] .'">'. trim($txt['cache']) .'</span>';
+		else
+			echo '
+			<span class="footer_info">'. $txt['cache'];
+
+		echo '&nbsp;<span class="footer_link" id="cachevals">';
+
+		$values = $pmxCache['vals'];
+		$values['time'] = sprintf("%0.3F", $values['time'] * 1000) . $txt['cache_msec'];
+
+		foreach($txt['cachestats'] as $key => $keytxt)
+			echo $keytxt . (in_array($key, array('loaded', 'saved')) ? sprintf("%0.3F", $values[$key] / 1024) . $txt['cache_kb'] : $values[$key]);
+
+		echo '</span></span>';
 	}
+
+	if (!empty($context['show_load_time']))
+		echo '
+			<span class="footer_info">', sprintf($txt['page_created_full'], $context['load_time'], $context['load_queries']), '</span>';
 
 	echo '
 		</div>
@@ -402,7 +408,6 @@ function template_html_below()
 	template_javascript(true);
 
 	echo '
-	<script>window.addEventListener("resize", fSetWrapper);fSetWrapper();</script>
 </body>
 </html>';
 }
@@ -637,7 +642,6 @@ function template_maint_warning_above()
  */
 function template_maint_warning_below()
 {
-
 }
 
 ?>

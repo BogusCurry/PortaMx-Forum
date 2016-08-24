@@ -181,10 +181,10 @@ function template_main()
 
 	echo '
 	<script>
-		window.smfForum_scripturl = pmx_scripturl;
-		window.smfForum_sessionid = pmx_session_id;
-		window.smfForum_sessionvar = pmx_session_var;
-		window.smfThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
+		window.pmxForum_scripturl = pmx_scripturl;
+		window.pmxForum_sessionid = pmx_session_id;
+		window.pmxForum_sessionvar = pmx_session_var;
+		window.pmxThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
 	</script>';
 }
 
@@ -620,7 +620,7 @@ function template_set_settings()
 					</dd>';
 		}
 		// A Textarea?
-        	elseif ($setting['type'] == 'textarea')
+					elseif ($setting['type'] == 'textarea')
 		{
 			echo '
 					<dt>
@@ -633,8 +633,8 @@ function template_set_settings()
 					</dt>
 					<dd>
 						<textarea rows="4" style="width: 95%;" cols="40" name="', !empty($setting['default']) ? 'default_' : '','options[', $setting['id'], ']" id="', $setting['id'], '">', $setting['value'], '</textarea>';
-                echo '
-                			</dd>';
+								echo '
+											</dd>';
 		}
 		// A regular input box, then?
 		else

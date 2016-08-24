@@ -270,7 +270,7 @@ function checkImagick()
  */
  function checkMagickWand()
  {
- 	return function_exists('newMagickWand');
+	return function_exists('newMagickWand');
  }
 
 /**

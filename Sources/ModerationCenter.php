@@ -1798,9 +1798,9 @@ function ViewWarningTemplates()
 }
 
 /**
-  * Callback for createList().
-  * @return int The total number of warning templates
-  */
+	* Callback for createList().
+	* @return int The total number of warning templates
+	*/
 function list_getWarningTemplateCount()
 {
 	global $pmxcFunc, $user_info;

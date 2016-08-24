@@ -474,11 +474,11 @@ function BrowseFiles()
 						{
 							if ($rowData['attachment_type'] == 3)
 								$link .= ';image" class="lb-link" title="'. $txt['lightbox_expand_short'] .'"  data-title=" " data-lightbox="manage-avatar';
-							else                                
+							else
 								$link .= ';image" class="lb-link" title="'. $txt['lightbox_expand_short'] .'"  data-title="'. $pmxcFunc['htmlspecialchars']($rowData['filename']) .'" data-lightbox="manage-attach';
 						}
 
-						$link .= '"'; 
+						$link .= '"';
 						$link .= sprintf('>%1$s</a>', preg_replace('~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\\\1;', $pmxcFunc['htmlspecialchars']($rowData['filename'])));
 
 						// Show the dimensions.

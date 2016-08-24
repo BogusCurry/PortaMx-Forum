@@ -81,7 +81,6 @@ function cleanRequest()
 		$_SERVER['QUERY_STRING'] = substr($_SERVER['QUERY_STRING'], 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $_SERVER['QUERY_STRING'];
 
 		// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
-		// @todo smflib
 		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
 		// Magic quotes still applies with parse_str - so clean it up.
@@ -127,7 +126,6 @@ function cleanRequest()
 		else
 			$request = $_SERVER['REQUEST_URI'];
 
-		// @todo smflib.
 		// Replace 'index.php/a,b,c/d/e,f' with 'a=b,c&d=&e=f' and parse it into $_GET.
 		if (strpos($request, basename($scripturl) . '/') !== false)
 		{
@@ -330,7 +328,7 @@ function isValidIPv6($ip)
 	//looking for :
 	if (strpos($ip , ':') === false )
 		return false;
-	
+
 	//check valid address
 	return inet_pton($ip);
 }
@@ -424,8 +422,8 @@ function expandIPv6($addr, $strict_check = true)
 */
 function matchIPtoCIDR($ip_address, $cidr_address)
 {
-    list ($cidr_network, $cidr_subnetmask) = preg_split('/', $cidr_address);
-    return (ip2long($ip_address) & (~((1 << (32 - $cidr_subnetmask)) - 1))) == ip2long($cidr_network);
+		list ($cidr_network, $cidr_subnetmask) = preg_split('/', $cidr_address);
+		return (ip2long($ip_address) & (~((1 << (32 - $cidr_subnetmask)) - 1))) == ip2long($cidr_network);
 }
 
 /**
@@ -648,7 +646,6 @@ function ob_sessrewrite($buffer)
 		return $buffer;
 
 	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().  This doesn't work below PHP 4.3.0, because it makes the output buffer bigger.
-	// @todo smflib
 	if (empty($_COOKIE) && SID != '' && !isBrowser('possibly_robot'))
 		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
 	// Debugging templates, are we?

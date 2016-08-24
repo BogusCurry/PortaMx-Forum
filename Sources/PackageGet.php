@@ -402,7 +402,7 @@ function PackageGBrowse()
 				$package['is_current'] = $package['is_installed'] && ($installed_mods[$package['id']] == $package['version']);
 				$package['is_newer'] = $package['is_installed'] && ($installed_mods[$package['id']] > $package['version']);
 
-				// This package is either not installed, or installed but old.  Is it supported on this version of SMF?
+				// This package is either not installed, or installed but old.  Is it supported on this version of PMX?
 				if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
 				{
 					if ($thisPackage->exists('version/@for'))

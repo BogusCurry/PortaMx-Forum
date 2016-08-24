@@ -897,7 +897,7 @@ function parseAttachBBC($attachID = 0)
 		return 'attachments_not_enable';
 
 	// Previewing much? no msg ID has been set yet.
-	if (!empty($context['preview_message'])) // || (isset($_POST['topic']) && $_POST['topic'] == 0))
+	if (!empty($context['preview_message']))
 	{
 		$allAttachments = getAttachsByMsg(0);
 

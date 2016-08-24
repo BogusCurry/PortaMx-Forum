@@ -1936,7 +1936,7 @@ function loadSubscriptions()
  * Load all the payment gateways.
  * Checks the Sources directory for any files fitting the format of a payment gateway,
  * loads each file to check it's valid, includes each file and returns the
- * function name and whether it should work with this version of SMF.
+ * function name and whether it should work with this version of PMX.
  *
  * @return array An array of information about available payment gateways
  */

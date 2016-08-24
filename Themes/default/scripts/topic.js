@@ -174,7 +174,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 
 	// redo tips if they are on since we just pulled the rug out on this one
 	if ($.isFunction($.fn.SMFtooltip));
-		$('.preview').SMFtooltip().pmx_tooltip_off;
+		$('.preview').PMXtooltip().pmx_tooltip_off;
 
 	return false;
 }
@@ -496,7 +496,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	ajax_indicator(false);
 
 	// If we didn't get a valid document, just cancel.
-	if (!XMLDoc || !XMLDoc.getElementsByTagName('smf')[0])
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('pmx')[0])
 	{
 		// Mozilla will nicely tell us what's wrong.
 		if (XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName == 'parsererror')
@@ -506,7 +506,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		return;
 	}
 
-	var message = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
+	var message = XMLDoc.getElementsByTagName('pmx')[0].getElementsByTagName('message')[0];
 	var body = message.getElementsByTagName('body')[0];
 	var error = message.getElementsByTagName('error')[0];
 

@@ -47,6 +47,7 @@ $txt['save'] = 'Save';
 $txt['upload'] = 'Upload';
 $txt['upload_all'] = 'Upload All';
 $txt['processing'] = 'Processing...';
+$txt['footer_clear_cache'] = 'Clear the cache';
 
 $txt['modify'] = 'Modify';
 $txt['forum_index'] = '%1$s - Index';
@@ -70,6 +71,7 @@ $txt['password'] = 'Password';
 
 $txt['username_no_exist'] = 'That username does not exist.';
 $txt['no_user_with_email'] = 'There are no usernames associated with that email.';
+$txt['illegal_username'] = '[Sign Up] - Reserved name used (%s)';
 
 $txt['board_moderator'] = 'Board Moderator';
 $txt['remove_topic'] = 'Remove Topic';
@@ -224,8 +226,7 @@ $txt['error_invalid_characters_username'] = 'Invalid character used in Username.
 
 $txt['welcome_guest'] = 'Welcome, <strong>%1$s</strong>. Please <a href="%3$s" onclick="%4$s">login</a>.';
 
-//$txt['welcome_guest_register'] = 'Welcome, <strong>%1$s</strong>. Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
-$txt['welcome_guest_register'] = 'Welcome to <strong>%2$s</strong>. Please <a href="%3$s" onclick="%4$s">login</a> or <a href="%5$s">sign up</a>.';
+$txt['welcome_guest_register'] = 'Welcome to <strong>%2$s</strong>. Please <a href="%3$s" onclick="%4$s"><b>login</b></a> or <a href="%5$s"><b>sign up</b></a>.';
 
 $txt['please_login'] = 'Please <a href="' . $scripturl . '?action=login">login</a>.';
 $txt['login_or_register'] = 'Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=signup">signup</a>.';
@@ -489,15 +490,13 @@ $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
 $forum_copyright = '<a href="' . $scripturl . '?action=credits" title="License" target="_blank" class="new_win">%1$s &copy; %2$s</a>, <a href="http://portamx.com" title="PortaMx Forum" target="_blank" class="new_win">PortaMx</a>';
-$txt['cache'] = 'Cache: ';
+$txt['cache'] = 'Cache:';
 $txt['cachestats'] = array(
-	'mode' => '',
-	'loaded' => ', Loaded: ',
-	'saved' => ', Saved: ',
-	'time' => ', Time: '
+	'loaded' => 'Loaded ',
+	'saved' => ', Saved ',
+	'time' => ', Time '
 );
-$txt['cache_sec'] = ' seconds';
-$txt['cache_msec'] = ' msec';
+$txt['cache_msec'] = ' ms';
 $txt['cache_kb'] = ' kb';
 
 $txt['birthdays'] = 'Birthdays:';

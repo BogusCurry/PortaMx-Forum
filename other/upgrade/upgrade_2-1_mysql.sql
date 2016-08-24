@@ -239,9 +239,9 @@ if (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings
 
 // No need to do this if we already did it previously...
 if (empty($modSettings['json_done']))
-  $is_done = false;
+	$is_done = false;
 else
-  $is_done = true;
+	$is_done = true;
 
 while (!$is_done)
 {
@@ -1192,6 +1192,7 @@ VALUES
 	('sef_lowercase', '1'),
 	('sef_spacechar', '-'),
 	('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',",/,?,\,|'),
+	('pmxVersion', '{$pmx_version}'),
 	('news', 'PortaMx Forum - Just Installed!');
 
 INSERT INTO {$db_prefix}themes
@@ -1994,17 +1995,17 @@ ADD COLUMN ip_high varbinary(16);
 ---# Convert data for ban_items
 UPDATE IGNORE {$db_prefix}ban_items
 SET ip_low =
-    UNHEX(
-        hex(
-            INET_ATON(concat(ip_low1,'.',ip_low2,'.',ip_low3,'.',ip_low4))
-        )
-    ),
+		UNHEX(
+				hex(
+						INET_ATON(concat(ip_low1,'.',ip_low2,'.',ip_low3,'.',ip_low4))
+				)
+		),
 ip_high =
-    UNHEX(
-        hex(
-            INET_ATON(concat(ip_high1,'.',ip_high2,'.',ip_high3,'.',ip_high4))
-        )
-    )
+		UNHEX(
+				hex(
+						INET_ATON(concat(ip_high1,'.',ip_high2,'.',ip_high3,'.',ip_high4))
+				)
+		)
 where ip_low1 > 0;
 ---#
 

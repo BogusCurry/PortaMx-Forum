@@ -145,7 +145,7 @@ pmx_StatsCenter.prototype.init = function ()
 
 pmx_StatsCenter.prototype.onBeforeCollapseYear = function (oToggle)
 {
-	// Tell SMF that all underlying months have disappeared.
+	// Tell PMX that all underlying months have disappeared.
 	for (var sMonth in this.oYears[oToggle.opt.sYearId].oMonths)
 		if (this.oYears[oToggle.opt.sYearId].oMonths[sMonth].oToggle.opt.aSwappableContainers.length > 0)
 			this.oYears[oToggle.opt.sYearId].oMonths[sMonth].oToggle.changeState(true);
@@ -156,7 +156,7 @@ pmx_StatsCenter.prototype.onBeforeCollapseMonth = function (oToggle)
 {
 	if (!oToggle.bCollapsed)
 	{
-		// Tell SMF that it the state has changed.
+		// Tell PMX that it the state has changed.
 		getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + 'action=stats;collapse=' + oToggle.opt.sMonthId + ';xml');
 
 		// Remove the month rows from the year toggle.
@@ -188,7 +188,7 @@ pmx_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
 		this.bIsLoading = true;
 	}
 
-	// Silently let SMF know this one is expanded.
+	// Silently let PMX know this one is expanded.
 	else
 		getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';xml');
 }

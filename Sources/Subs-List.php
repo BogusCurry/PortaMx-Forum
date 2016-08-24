@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains a standard way of displaying lists for SMF.
+ * This file contains a standard way of displaying lists for PMX.
  * PortaMx Forum
  * @package PortaMx
  * @author PortaMx & Simple Machines

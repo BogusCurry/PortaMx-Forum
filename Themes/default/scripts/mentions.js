@@ -41,7 +41,7 @@ var atwhoConfig = {
 					suggest_type: 'member'
 				},
 				success: function (data) {
-					var members = $(data).find('smf > items > item');
+					var members = $(data).find('pmx > items > item');
 					if (members.length == 0)
 						fails[fails.length] = query;
 

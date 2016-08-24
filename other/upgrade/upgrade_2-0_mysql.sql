@@ -772,6 +772,7 @@ upgrade_query("
 		('sef_lowercase', '1'),
 		('sef_spacechar', '-'),
 		('sef_stripchars', '&,<,>,~,!,@,#,$,%,^,&,*,(,),-,=,+,;,:,\',\",/,?,\,|'),
+		('pmxVersion', '{$pmx_version}'),
 		('news', 'PortaMx Forum - Just Installed!')");
 
 upgrade_query("
@@ -1718,6 +1719,15 @@ VALUES
 	(0, 120, 1, 'd', 0, 'paid_subscriptions');
 ---#
 
+---# Deleting old scheduled task items...
+DELETE FROM {$db_prefix}scheduled_tasks
+WHERE task = 'clean_cache';
+---#
+---# Deleting old scheduled task items...
+DELETE FROM {$db_prefix}scheduled_tasks
+WHERE task = 'fetchSMfiles';
+---#
+
 ---# Adding the simple machines scheduled task.
 ---{
 // Randomise the time.
@@ -1726,13 +1736,8 @@ upgrade_query("
 	INSERT IGNORE INTO {$db_prefix}scheduled_tasks
 		(next_time, time_offset, time_regularity, time_unit, disabled, task)
 	VALUES
-		(0, {$randomTime}, 1, 'd', 0, 'fetchSMfiles')");
+		(0, {$randomTime}, 1, 'd', 0, 'fetchPMXfiles')");
 ---}
----#
-
----# Deleting old scheduled task items...
-DELETE FROM {$db_prefix}scheduled_tasks
-WHERE task = 'clean_cache';
 ---#
 
 ---# Moving auto optimise settings to scheduled task...
@@ -2249,14 +2254,14 @@ unset($_GET['m']);
 
 ---# Creating repository table ...
 CREATE TABLE IF NOT EXISTS {$db_prefix}admin_info_files (
-  id_file tinyint(4) unsigned NOT NULL auto_increment,
-  filename varchar(255) NOT NULL default '',
-  path varchar(255) NOT NULL default '',
-  parameters varchar(255) NOT NULL default '',
-  data text NOT NULL,
-  filetype varchar(255) NOT NULL default '',
-  PRIMARY KEY (id_file),
-  KEY filename (filename(30))
+	id_file tinyint(4) unsigned NOT NULL auto_increment,
+	filename varchar(255) NOT NULL default '',
+	path varchar(255) NOT NULL default '',
+	parameters varchar(255) NOT NULL default '',
+	data text NOT NULL,
+	filetype varchar(255) NOT NULL default '',
+	PRIMARY KEY (id_file),
+	KEY filename (filename(30))
 ) ENGINE=MyISAM{$db_collation};
 ---#
 

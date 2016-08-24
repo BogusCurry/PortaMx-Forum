@@ -341,7 +341,7 @@ function setup_fatal_error_context($error_message, $error_code = null)
 	obExit(null, true, false, true);
 
 	/* DO NOT IGNORE:
-		If you are creating a bridge to SMF or modifying this function, you MUST
+		If you are creating a bridge to PMX or modifying this function, you MUST
 		make ABSOLUTELY SURE that this function quits and DOES NOT RETURN TO NORMAL
 		PROGRAM FLOW.  Otherwise, security error messages will not be shown, and
 		your forum will be in a very easily hackable state.

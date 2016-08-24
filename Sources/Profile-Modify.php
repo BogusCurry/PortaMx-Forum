@@ -292,7 +292,7 @@ function loadProfileFields($force_reload = false)
 						validateUsername($context['id_member'], trim(preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $value)));
 						updateMemberData($context['id_member'], array('member_name' => $value));
 
-						// Call this here so any integrated systems will know about the name change (resetPassword() takes care of this if we're letting SMF generate the password)
+						// Call this here so any integrated systems will know about the name change (resetPassword() takes care of this if we're letting PMX generate the password)
 						call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $value, $_POST['passwrd1']));
 					}
 				}
@@ -2994,8 +2994,8 @@ function profileLoadAvatarData()
 			'external' => 'http://'
 		);
 		$context['member']['avatar']['href'] = empty($cur_profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $cur_profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename'];
-        $context['member']['avatar']['id_attach'] = empty($cur_profile['attachment_type']) ? '' : $cur_profile['id_attach'];
-    }
+				$context['member']['avatar']['id_attach'] = empty($cur_profile['attachment_type']) ? '' : $cur_profile['id_attach'];
+		}
 	elseif ((stristr($cur_profile['avatar'], 'http://') || stristr($cur_profile['avatar'], 'https://')) && $context['member']['avatar']['allow_external'])
 		$context['member']['avatar'] += array(
 			'choice' => 'external',
@@ -4009,7 +4009,7 @@ function groupMembership2($profile_vars, $post_errors, $memID)
 }
 
 /**
- * Provides interface to setup Two Factor Auth in SMF
+ * Provides interface to setup Two Factor Auth in PMX
  *
  * @param int $memID The ID of the member
  */

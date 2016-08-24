@@ -1,4 +1,3 @@
-/* You can find detailed information at http://wiki.simplemachines.org/smf/Curve2_CSS
 /* Index */
 html {
 	background: #e9eef2;
@@ -8,8 +7,6 @@ body {
 	background: #e9eef2;
 	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Nimbus Sans L", Arial, "Liberation Sans", sans-serif;
 	color: #4d4d4d;
-	margin: 0;
-	padding: 0 0 10px 0;
 }
 /* <p> is a possible exception for margins. Must test that one a bit. */
 p, ul, ol, li, dl, dd ,dt, fieldset, form {
@@ -998,14 +995,13 @@ img.sort, .sort {
 ------------------------------------------------------- */
 /* Do all these here to save repetition. */
 #header, #top_section, #upper_wrap, #upper_section, #upper_section .user,
-#upper_section .news, .navigate_section, #content_section, #main_content_section,
-#footer {
+#upper_section .news, .navigate_section, #content_section, #main_content_section, #footer {
 	box-sizing: border-box;
 }
 
 /* Box-shadow only on this one. */
 #wrapper {
-	margin: 0 auto 1em auto;
+	margin: 0 auto;
 	width: 94%;
 	clear: both;
 	background: #fff;
@@ -1107,15 +1103,15 @@ h1.forumtitle a {
 	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
 }
 /* Float these items to the right */
-#siteslogan, img#smflogo {
+#siteslogan, img#pmxlogo {
 	margin: 0;
 	padding-right: 6px;
 	float: right;
 	line-height: 50px;
 	font-size: 1.8em;
 }
-/* Tweak the SMF logo */
-img#smflogo {
+/* Tweak the PMX logo */
+img#pmxlogo {
 	margin: 10px -4px 4px 0;
 }
 /* Even guests need to be aligned */
@@ -1244,21 +1240,40 @@ ul li.greeting {
 #footer {
 	background: #3e5a80;
 	margin: 0 -1px 0 -1px;
-	padding: 7px 10px;
+	padding: 8px 12px 10px 12px;
 	border-top: 1px solid #777;
 	border-bottom: 1px solid #777;
 	border-radius: 0 0 8px 8px;
-	box-sizing: border-box;
 	box-shadow: 0 16px 20px rgba(255,255,255,0.15) inset;
-}
-#footer div,
-#footer div a,
-#footer div a:link,
-#footer div a:visited {
 	text-shadow: -1px -1px 1px rgba(0,0,0,0.2);
-	font-size: 0.75rem;
-	font-family: Verdana, sans-serif;
+	font-size: 13px;
+}
+#footer div {
+	height: 20px;
+}
+.footer_link,
+.footer_link_href,
+.footer_link a {
+	color: #fff !important;
+	font-size: 13px !important;
+}
+.footer_link_href {
+	cursor: pointer;
+}
+.footer_link_href:hover {
+	text-decoration: underline;
+}
+.footer_info {
 	color: #fff;
+	font-size: 13px;
+	height: 20px;
+	display: flex;
+	overflow: hidden;
+}
+@media (max-width: 500px) {
+	.footer_link.floatright {
+		display: none;
+	}
 }
 
 /* the posting icons */
@@ -1396,8 +1411,7 @@ ul li.greeting {
 .quickbuttons ul li:hover a:focus, .quickbuttons ul li a:focus {
 	margin: 0;
 }
-/* Fixes for quickbuttons
-   Fix for quote on reply box */
+/* Fixes for quickbuttons and quote on reply box */
 #post_modify {
 	border-radius: 4px;
 }
@@ -2120,7 +2134,7 @@ img.avatar {
 	max-width: 65px;
 	max-height:65px;
 }
-#avatar_server_stored >div > img {
+#avatar_server_stored > div > img {
 	margin-left: 10px;
 }
 
@@ -2832,8 +2846,9 @@ h3 .collapse {
 	min-width: 60px;
 }
 .info {
-	width: 50%;
+	width: 60%;
 	margin: 10px 0 5px 0;
+	padding-right: 5px;
 }
 .info .subject {
 	font-weight: 600;
@@ -2841,9 +2856,10 @@ h3 .collapse {
 	color: #A85400;
 }
 .board_stats {
-	width: 14%;
+	width: 18%;
 	padding: 10px;
 	font-size: 0.9em;
+	white-space: nowrap;
 }
 .board_stats p {
 	border-left: 1px solid #DDD;
@@ -2853,7 +2869,7 @@ h3 .collapse {
 	margin: 3px 0 0;
 }
 .lastpost {
-	width: 25%;
+	min-width: 220px;
 	font-size: 0.9em;
 }
 .lastpost p {
@@ -2996,8 +3012,9 @@ span.postby {
 	border: 1px solid #ddd;
 	border-top: none;
 }
-#topic_container .board_icon, #topic_container .info, #topic_container .windowbg2, 
-#topic_container .windowbg, #topic_container .board_stats, #topic_container .lastpost {
+#topic_container .board_icon, #topic_container .info, #topic_container .windowbg2,
+#topic_container .windowbg, #topic_container .board_stats, #topic_container .lastpost,
+#topic_header .board_stats, #topic_header .lastpost {
 	box-shadow: none;
 	border-radius: 0;
 	padding: 0;
@@ -3017,7 +3034,7 @@ span.postby {
 .moderation {
 	display: table-cell;
 	width: 5%;
-	min-width: 34px;
+	min-width: 45px;
 	vertical-align: middle;
 	text-align: center;
 	padding: 0 5px 0 0 !important;
@@ -3432,7 +3449,9 @@ ul.post_options li {
 	padding: 12px 0;
 }
 #post_confirm_buttons .smalltext {
-	padding: 0 10px;
+	padding: 0;
+	max-width: 50%;
+	float: left;
 }
 .post_verification {
 	margin-top: 6px;

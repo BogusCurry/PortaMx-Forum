@@ -6,9 +6,9 @@ Options -Indexes
 # settings lock
 DirectoryIndex index.php
 <FilesMatch "(Settings|Settings_bak)\.php$">
-  Order deny,allow
-  Deny from all
-  Allow from localhost
+	Order deny,allow
+	Deny from all
+	Allow from localhost
 </FilesMatch>
 #
 # php security

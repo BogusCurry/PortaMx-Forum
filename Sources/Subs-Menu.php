@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains a standard way of displaying side/drop down menus for SMF.
+ * This file contains a standard way of displaying side/drop down menus for PMX.
  *
  * PortaMx Forum
  * @package PortaMx

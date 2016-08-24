@@ -18,12 +18,12 @@
 class Buddy_Notify_Background extends PMX_BackgroundTask
 {
 	/**
-     * This executes the task - loads up the info, sets the alerts and loads up the email queue.
+		 * This executes the task - loads up the info, sets the alerts and loads up the email queue.
 	 * @return bool Always returns true
 	 */
 	public function execute()
- 	{
- 		global $pmxcFunc, $sourcedir;
+	{
+		global $pmxcFunc, $sourcedir;
 
 		// Figure out if the user wants to be notified.
 		require_once($sourcedir . '/Subs-Notify.php');

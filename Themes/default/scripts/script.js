@@ -971,9 +971,9 @@ function create_ajax_indicator_ele()
 
 function createEventListener(oTarget)
 {
-	if (!('addEventListener' in oTarget))
+	if (typeof oTarget !== 'undefined' && !('addEventListener' in oTarget))
 	{
-		if (oTarget.attachEvent)
+		if (typeof oTarget.attachEvent !== 'undefined')
 		{
 			oTarget.addEventListener = function (sEvent, funcHandler, bCapture) {
 				oTarget.attachEvent('on' + sEvent, funcHandler);
@@ -1005,7 +1005,7 @@ function grabJumpToContent(elem)
 
 	if (oXMLDoc.responseXML)
 	{
-		var items = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('item');
+		var items = oXMLDoc.responseXML.getElementsByTagName('pmx')[0].getElementsByTagName('item');
 		for (var i = 0, n = items.length; i < n; i++)
 		{
 			aBoardsAndCategories[aBoardsAndCategories.length] = {
@@ -1203,7 +1203,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 // Setup the list of icons once it is received through xmlHTTP.
 IconList.prototype.onIconsReceived = function (oXMLDoc)
 {
-	var icons = oXMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('icon');
+	var icons = oXMLDoc.getElementsByTagName('pmx')[0].getElementsByTagName('icon');
 	var sItems = '';
 
 	for (var i = 0, n = icons.length; i < n; i++)
@@ -1243,7 +1243,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		delete this.tmpMethod;
 		ajax_indicator(false);
 
-		var oMessage = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
+		var oMessage = oXMLDoc.responseXML.getElementsByTagName('pmx')[0].getElementsByTagName('message')[0];
 		if (oMessage.getElementsByTagName('error').length == 0)
 			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
 	}
@@ -1349,13 +1349,13 @@ function addLoadEvent(fNewOnload)
 		aOnloadEvents[aOnloadEvents.length] = fNewOnload;
 }
 
-function smfFooterHighlight(element, value)
+function pmxFooterHighlight(element, value)
 {
 	element.src = pmx_images_url + '/' + (value ? 'h_' : '') + element.id + '.png';
 }
 
 // Get the text in a code tag.
-function smfSelectText(oCurElement, bActOnElement)
+function pmxSelectText(oCurElement, bActOnElement)
 {
 	// The place we're looking for is one div up, and next door - if it's auto detect.
 	if (typeof(bActOnElement) == 'boolean' && bActOnElement)
@@ -1586,7 +1586,7 @@ $(function()
 		return confirm(custom_message ? custom_message.replace(/-n-/g, "\n") : pmx_you_sure);
 	});
 
-	// Generic event for smfSelectText()
+	// Generic event for pmxSelectText()
 	$('.pmx_select_text').on('click', function(e) {
 
 		e.preventDefault();
@@ -1594,7 +1594,7 @@ $(function()
 		// Do you want to target yourself?
 		var actOnElement = $(this).attr('data-actonelement');
 
-		return typeof actOnElement !== "undefined" ? smfSelectText(actOnElement, true) : smfSelectText(this);
+		return typeof actOnElement !== "undefined" ? pmxSelectText(actOnElement, true) : pmxSelectText(this);
 	});
 });
 
@@ -1602,7 +1602,8 @@ $(function()
 // sMode can be 'get', 'set', 'clr' or 'test'
 // sName is the cookie name
 // sValue is the cookie value
-// sType can by 'ecl', empty or any other string (for mod's as example)
+// sType can by 'ecl', 'format', 'cache', empty or any other string (for mod's as example)
+// bAsync cat be true (async request) or false (sycron request [default])
 // *notes*
 // 1. value on set with type ecl is ignored
 // 2. test returns a value of '1' if true, empty string if false
@@ -1613,6 +1614,14 @@ function pmxCookie(sMode, sName, sValue, sType, bAsync)
 	sValue = sValue == undefined ? '' : sValue;
 	bAsync = bAsync == undefined ? false : bAsync;
 	var sResult = '';
+
 	$.ajax({type: 'GET', async:bAsync, url:pmx_scripturl +'?jscook', data:{mode:sMode, name:sName, value:sValue, type:sType}, success:function(data){sResult = data;}});
+
+	if(sType == 'cache')
+	{
+		var cachedata = document.getElementById('cachevals').innerText;
+		document.getElementById('cachevals').innerText = cachedata.replace(/[0-9\.]+/g, '0.000');
+	}
+
 	return sResult;
 }

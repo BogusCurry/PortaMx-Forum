@@ -332,7 +332,7 @@ function template_add_language()
 			</div>
 			<div class="windowbg2">
 				<fieldset>
-					<legend>', $txt['add_language_smf'], '</legend>
+					<legend>', $txt['add_language_pmx'], '</legend>
 					<label class="smalltext">', $txt['add_language_pmx_browse'], '</label>
 					<input type="text" name="pmx_add" size="40" value="', !empty($context['pmx_search_term']) ? $context['pmx_search_term'] : '', '" class="input_text">';
 

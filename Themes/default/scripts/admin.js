@@ -40,7 +40,7 @@ pmx_AdminIndex.prototype.loadAdminIndex = function ()
 	if (this.opt.bLoadAnnouncements)
 		this.setAnnouncements();
 
-	// Load the current SMF and your SMF version numbers.
+	// Load the current PMX and your PMX version numbers.
 	if (this.opt.bLoadVersions)
 		this.showCurrentVersion();
 
@@ -67,10 +67,10 @@ pmx_AdminIndex.prototype.showCurrentVersion = function ()
 	if (!('pmxVersion' in window))
 		return;
 
-	var oSmfVersionContainer = document.getElementById(this.opt.sSmfVersionContainerId);
+	var oPmxVersionContainer = document.getElementById(this.opt.sPmxVersionContainerId);
 	var oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId);
 
-	setInnerHTML(oSmfVersionContainer, window.pmxVersion);
+	setInnerHTML(oPmxVersionContainer, window.pmxVersion);
 
 	var sCurrentVersion = getInnerHTML(oYourVersionContainer);
 	if (sCurrentVersion != window.pmxVersion)
@@ -79,21 +79,21 @@ pmx_AdminIndex.prototype.showCurrentVersion = function ()
 
 pmx_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
-	if (!('smfUpdatePackage' in window))
+	if (!('pmxUpdatePackage' in window))
 		return;
 
 	var oContainer = document.getElementById(this.opt.sUpdateNotificationContainerId);
 
 	// Are we setting a custom title and message?
-	var sTitle = 'smfUpdateTitle' in window ? window.smfUpdateTitle : this.opt.sUpdateNotificationDefaultTitle;
-	var sMessage = 'smfUpdateNotice' in window ? window.smfUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
+	var sTitle = 'pmxUpdateTitle' in window ? window.pmxUpdateTitle : this.opt.sUpdateNotificationDefaultTitle;
+	var sMessage = 'pmxUpdateNotice' in window ? window.pmxUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
 
 	setInnerHTML(oContainer, this.opt.sUpdateNotificationTemplate.replace('%title%', sTitle).replace('%message%', sMessage));
 
 	// Parse in the package download URL if it exists in the string.
-	document.getElementById('update-link').href = this.opt.sUpdateNotificationLink.replace('%package%', window.smfUpdatePackage);
+	document.getElementById('update-link').href = this.opt.sUpdateNotificationLink.replace('%package%', window.pmxUpdatePackage);
 
-	oContainer.className = ('smfUpdateCritical' in window) ? 'errorbox' : 'noticebox';
+	oContainer.className = ('pmxUpdateCritical' in window) ? 'errorbox' : 'noticebox';
 }
 
 function pmx_ViewVersions (oOptions)
@@ -273,27 +273,27 @@ pmx_ViewVersions.prototype.determineVersions = function ()
 		setInnerHTML(document.getElementById('your' + sFilename), sYourVersion);
 	}
 
-	if (!('smfLanguageVersions' in window))
-		window.smfLanguageVersions = {};
+	if (!('pmxLanguageVersions' in window))
+		window.pmxLanguageVersions = {};
 
-	for (sFilename in window.smfLanguageVersions)
+	for (sFilename in window.pmxLanguageVersions)
 	{
 		for (var i = 0; i < this.opt.aKnownLanguages.length; i++)
 		{
 			if (!document.getElementById('current' + sFilename + this.opt.aKnownLanguages[i]))
 				continue;
 
-			setInnerHTML(document.getElementById('current' + sFilename + this.opt.aKnownLanguages[i]), smfLanguageVersions[sFilename]);
+			setInnerHTML(document.getElementById('current' + sFilename + this.opt.aKnownLanguages[i]), pmxLanguageVersions[sFilename]);
 
 			sYourVersion = getInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]));
 			setInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]), sYourVersion);
 
 			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages == '??') && !oLowVersion.Languages)
 				oHighYour.Languages = sYourVersion;
-			if (this.compareVersions(oHighCurrent.Languages, smfLanguageVersions[sFilename]) || oHighCurrent.Languages == '??')
-				oHighCurrent.Languages = smfLanguageVersions[sFilename];
+			if (this.compareVersions(oHighCurrent.Languages, pmxLanguageVersions[sFilename]) || oHighCurrent.Languages == '??')
+				oHighCurrent.Languages = pmxLanguageVersions[sFilename];
 
-			if (this.compareVersions(sYourVersion, smfLanguageVersions[sFilename]))
+			if (this.compareVersions(sYourVersion, pmxLanguageVersions[sFilename]))
 			{
 				oLowVersion.Languages = sYourVersion;
 				document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).style.color = 'red';
@@ -410,10 +410,10 @@ function createNamedElement(type, name, customFields)
 	return element;
 }
 
-function smfSetLatestThemes()
+function pmxSetLatestThemes()
 {
-	if (typeof(window.smfLatestThemes) != "undefined")
-		setInnerHTML(document.getElementById("themeLatest"), window.smfLatestThemes);
+	if (typeof(window.pmxLatestThemes) != "undefined")
+		setInnerHTML(document.getElementById("themeLatest"), window.pmxLatestThemes);
 
 	if (tempOldOnload)
 		tempOldOnload();
@@ -580,7 +580,7 @@ function toggleCache ()
 	var memcache = document.getElementById('cache_memcached');
 	var cachedir = document.getElementById('cachedir');
 	memcache.disabled = cache_type.value != "memcached";
-	cachedir.disabled = cache_type.value != "smf";
+	cachedir.disabled = cache_type.value != "pmx";
 }
 
 /*

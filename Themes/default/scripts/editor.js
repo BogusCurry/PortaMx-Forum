@@ -1,6 +1,6 @@
 // *** pmxc_Editor class.
 /*
- Kept for compatibility with SMF 2.0 editor
+ Kept for compatibility
  */
 function pmxc_Editor(oOptions)
 {

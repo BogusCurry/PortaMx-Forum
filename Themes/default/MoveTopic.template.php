@@ -51,7 +51,7 @@ function template_move()
 	echo '
 					</dl>
 					<label for="reset_subject"><input type="checkbox" name="reset_subject" id="reset_subject" onclick="document.getElementById(\'subjectArea\').style.display = this.checked ? \'block\' : \'none\';" class="input_check"> ', $txt['movetopic_change_subject'], '.</label><br>
-   					<fieldset id="subjectArea" style="display: none;">
+						<fieldset id="subjectArea" style="display: none;">
 						<dl class="settings">
 							<dt><strong>', $txt['movetopic_new_subject'], ':</strong></dt>
 							<dd><input type="text" name="custom_subject" size="30" value="', $context['subject'], '" class="input_text"></dd>
@@ -62,7 +62,7 @@ function template_move()
 	// Stick our "create a redirection topic" template in here...
 	template_redirect_options('move');
 
-    echo '
+		echo '
 					<input type="submit" value="', $txt['move_topic'], '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit">
 				</div>
 			</div>';
@@ -85,9 +85,9 @@ function template_move()
  */
 function template_redirect_options($type)
 {
-    global $txt, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
-    echo '
+		echo '
 					<label for="postRedirect"><input type="checkbox" name="postRedirect" id="postRedirect"', $context['is_approved'] ? ' checked' : '', ' onclick="', $context['is_approved'] ? '' : 'if (this.checked && !confirm(\'' . $txt[$type . '_topic_unapproved_js'] . '\')) return false; ', 'document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" class="input_check"> ', $txt['post_redirection'], '.</label>
 					<fieldset id="reasonArea" style="margin-top: 1ex;', $context['is_approved'] ? '' : 'display: none;', '">
 						<dl class="settings">

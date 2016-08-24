@@ -484,7 +484,7 @@ function MessageFolder()
 	$labelQuery = '';
 	$labelQuery2 = '';
 
-	// SMF logic: If you're viewing a label, it's still the inbox
+	// PMX logic: If you're viewing a label, it's still the inbox
 	if ($context['folder'] == 'inbox' && $context['current_label_id'] == -1)
 	{
 		$labelQuery = '
@@ -697,7 +697,7 @@ function MessageFolder()
 					'pmsg' => isset($pmsg) ? (int) $pmsg : 0,
 				)
 		);
-		
+
 	}
 	// This is kinda simple!
 	else
@@ -1104,7 +1104,7 @@ function prepareMessageContext($type = 'subject', $reset = false)
 				default:
 					$output['custom_fields']['standard'][] = $custom;
 			}
-	
+
 	call_integration_hook('integrate_prepare_pm_context', array(&$output, &$message, $counter));
 
 	return $output;
@@ -1700,7 +1700,7 @@ function MessageSearch2()
 		}
 		$pmxcFunc['db_free_result']($request);
 	}
-	
+
 	call_integration_hook('integrate_search_pm_context');
 
 	// Finish off the context.
@@ -1997,7 +1997,7 @@ function MessagePost()
 		$context['require_verification'] = create_control_verification($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
-	
+
 	call_integration_hook('integrate_pm_post');
 
 	// Register this form and get a sequence number in $context.
@@ -2196,7 +2196,7 @@ function messagePostError($error_types, $named_recipients, $recipient_ids = arra
 
 	$context['to_value'] = empty($named_recipients['to']) ? '' : '&quot;' . implode('&quot;, &quot;', $named_recipients['to']) . '&quot;';
 	$context['bcc_value'] = empty($named_recipients['bcc']) ? '' : '&quot;' . implode('&quot;, &quot;', $named_recipients['bcc']) . '&quot;';
-	
+
 	call_integration_hook('integrate_pm_error');
 
 	// No check for the previous submission is needed.

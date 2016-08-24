@@ -83,7 +83,7 @@ function AutoTask()
 			if (!empty($row['callable']))
 				$task_string = $row['callable'];
 
-			// Default SMF task or old mods?
+			// Default PMX task or old mods?
 			elseif (function_exists('scheduled_' . $row['task']))
 				$task_string = 'scheduled_' . $row['task'];
 
@@ -1211,9 +1211,9 @@ function loadEssentialThemeData()
 }
 
 /**
- * This retieves data (e.g. last version of SMF) from sm.org
+ * This retieves data (e.g. last version of PMX) from portamx.com
  */
-function scheduled_fetchSMfiles()
+function scheduled_fetchPMXfiles()
 {
 	global $sourcedir, $txt, $language, $forum_version, $modSettings, $pmxcFunc, $context;
 
@@ -1257,7 +1257,7 @@ function scheduled_fetchSMfiles()
 		// If we got an error - give up - the site might be down. And if we should happen to be coming from elsewhere, let's also make a note of it.
 		if ($file_data === false)
 		{
-			$context['scheduled_errors']['fetchSMfiles'][] = sprintf($txt['st_cannot_retrieve_file'], $url);
+			$context['scheduled_errors']['fetchPMXfiles'][] = sprintf($txt['st_cannot_retrieve_file'], $url);
 			log_error(sprintf($txt['st_cannot_retrieve_file'], $url));
 			return false;
 		}

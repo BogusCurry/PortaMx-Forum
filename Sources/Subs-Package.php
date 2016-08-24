@@ -1148,7 +1148,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 		// They specified certain versions this part is for.
 		if ($this_method->exists('@for'))
 		{
-			// Don't keep going if this won't work for this version of SMF.
+			// Don't keep going if this won't work for this version of PMX.
 			if (!matchPackageVersion($the_version, $this_method->fetch('@for')))
 				continue;
 		}
@@ -1558,7 +1558,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * - supports lower and upper bounds. (1.0-1.2)
  * - returns true if the version matched.
  *
- * @param string $versions The SMF versions
+ * @param string $versions The PMX versions
  * @param boolean $reset Whether to reset $near_version
  * @param string $the_version
  * @return string|bool Highest install value string or false

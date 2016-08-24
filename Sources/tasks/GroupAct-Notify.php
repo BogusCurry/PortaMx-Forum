@@ -18,10 +18,10 @@
  */
 class GroupAct_Notify_Background extends PMX_BackgroundTask
 {
-    /**
-     * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
-     * @return bool Always returns true
-     */
+		/**
+		 * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
+		 * @return bool Always returns true
+		 */
 	public function execute()
 	{
 		global $sourcedir, $pmxcFunc, $language, $modSettings;

@@ -19,12 +19,12 @@
 class EventNew_Notify_Background extends PMX_BackgroundTask
 {
 	/**
-     * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
+		 * This executes the task - loads up the information, puts the email in the queue and inserts alerts as needed.
 	 * @return bool Always returns true
 	 */
 	public function execute()
- 	{
- 		global $sourcedir, $pmxcFunc, $user_profile;
+	{
+		global $sourcedir, $pmxcFunc, $user_profile;
 
 		// Get everyone who could be notified - those are the people who can see the calendar.
 		require_once($sourcedir . '/Subs-Members.php');

@@ -84,6 +84,7 @@ $txt['yesterday_today'] = 'Today &amp; Yesterday';
 $txt['onlineEnable'] = 'Show online/offline in posts and PMs';
 $txt['defaultMaxMembers'] = 'Members per page in member list';
 $txt['timeLoadPageEnable'] = 'Display time taken to create every page';
+$txt['showCacheStatus'] = 'Display the Cache status for every page';
 $txt['disableHostnameLookup'] = 'Disable hostname lookups';
 $txt['who_enabled'] = 'Enable who\'s online list';
 $txt['meta_keywords'] = 'Meta keywords associated with forum';
@@ -306,7 +307,7 @@ $txt['lang_entries_not_writable'] = '<strong>Warning:</strong> The language file
 $txt['languages_ltr'] = 'Right to Left';
 
 $txt['add_language'] = 'Add Language';
-$txt['add_language_smf'] = 'Download from PortaMx';
+$txt['add_language_pmx'] = 'Download from PortaMx';
 $txt['add_language_pmx_browse'] = 'Type name of language to search for or leave blank to search for all.';
 $txt['add_language_pmx_install'] = 'Install';
 $txt['add_language_found_title'] = 'Found Languages';

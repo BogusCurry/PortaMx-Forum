@@ -3,8 +3,7 @@
 /**
  * The settings file contains all of the basic settings that need to be present when a database/cache is not available.
  *
- * PortaMx/SMF Forum
- *
+ * PortaMx Forum
  * @package PortaMx/SMF
  * @author PortaMx & Simple Machines
  * @copyright 2016 PortaMx,  Simple Machines and individual contributors
@@ -50,7 +49,7 @@ $language = 'english';
  * URL to your forum's folder. (without the trailing /!)
  * @var string
  */
-$boardurl = 'http://127.0.0.1/smf';
+$boardurl = 'http://127.0.0.1/portamx';
 /**
  * Email address to send emails from. (like noreply@yourdomain.com.)
  * @var string
@@ -119,7 +118,7 @@ $db_error_send = 0;
 ########## Cache Info ##########
 /**
  * Select a cache system. You want to leave this up to the cache area of the admin panel for
- * proper detection of apc, memcache, output_cache, smf, or xcache
+ * proper detection of apc, memcache, output_cache, file, or xcache
  * (you can add more with a mod).
  * @var string
  */
@@ -135,7 +134,7 @@ $cache_enable = 0;
  */
 $cache_memcached = '';
 /**
- * This is only for the 'smf' file cache system. It is the path to the cache directory.
+ * This is only for the 'portamx' file cache system. It is the path to the cache directory.
  * It is also recommended that you place this in /tmp/ if you are going to use this.
  * @var string
  */
@@ -153,7 +152,7 @@ $image_proxy_enabled = true;
  * Secret key to be used by the proxy
  * @var string
  */
-$image_proxy_secret = 'smfisawesome';
+$image_proxy_secret = 'pmxisawesome';
 
 /**
  * Maximum file size (in KB) for indiviudal files

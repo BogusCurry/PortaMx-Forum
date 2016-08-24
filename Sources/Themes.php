@@ -1447,19 +1447,19 @@ function InstallCopy()
 
 	// Lets add a theme_info.xml to this theme.
 	$xml_info = '<' . '?xml version="1.0"?' . '>
-<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:smf="http://www.simplemachines.org/">
+<theme-info xmlns="http://portamx.com/xml/theme-info" xmlns:pmx="http://portamx.com/">
 <!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-<id>smf:' . $pmxcFunc['strtolower']($context['to_install']['name']) . '</id>
+<id>pmx:' . $pmxcFunc['strtolower']($context['to_install']['name']) . '</id>
 <!-- The theme\'s version, please try to use semantic versioning. -->
 <version>1.0</version>
-<!-- Install for, the SMF versions this theme was designed for. Uses the same wildcards used in the packager manager. This field is mandatory. -->
+<!-- Install for, the PMX versions this theme was designed for. Uses the same wildcards used in the packager manager. This field is mandatory. -->
 <install for="'. $context['to_install']['install_for'] .'" />
 <!-- Theme name, used purely for aesthetics. -->
 <name>' . $context['to_install']['name'] . '</name>
 <!-- Author: your email address or contact information. The name attribute is optional. -->
-<author name="Simple Machines">info@simplemachines.org</author>
+<author name="PortaMx">info@portamx.com</author>
 <!-- Website... where to get updates and more information. -->
-<website>http://www.simplemachines.org/</website>
+<website>http://portamx.com/</website>
 <!-- Template layers to use, defaults to "html,body". -->
 <layers>' . $context['to_install']['theme_layers'] . '</layers>
 <!-- Templates to load on startup. Default is "index". -->

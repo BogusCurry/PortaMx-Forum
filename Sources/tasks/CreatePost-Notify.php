@@ -17,7 +17,7 @@
 class CreatePost_Notify_Background extends PMX_BackgroundTask
 {
 	/**
-     * This handles notifications when a new post is created - new topic, reply, quotes and mentions.
+		 * This handles notifications when a new post is created - new topic, reply, quotes and mentions.
 	 * @return bool Always returns true
 	 */
 	public function execute()

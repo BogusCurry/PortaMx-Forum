@@ -19,12 +19,12 @@
 class GroupReq_Notify_Background extends PMX_BackgroundTask
 {
 	/**
-     * This executes the task - loads up the information, puts the email in the queue and inserts any alerts as needed.
+		 * This executes the task - loads up the information, puts the email in the queue and inserts any alerts as needed.
 	 * @return bool Always returns true.
 	 */
 	public function execute()
- 	{
- 		global $sourcedir, $pmxcFunc, $language, $modSettings, $scripturl;
+	{
+		global $sourcedir, $pmxcFunc, $language, $modSettings, $scripturl;
 
 		// Do we have any group moderators?
 		$request = $pmxcFunc['db_query']('', '

@@ -10,7 +10,7 @@
  * @version 2.1 Beta 5
  */
 
-// Don't do anything if Portamx/SMF is already loaded.
+// Don't do anything if Portamx is already loaded.
 if (defined('PMX'))
 	return true;
 
@@ -44,7 +44,7 @@ if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/c
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
 	false:	Default, will just load the error sub template and die - not putting any theme layers around it.
-	true:	Will load the error sub template AND put the SMF layers around it (Not useful if on total custom pages).
+	true:	Will load the error sub template AND put the PMX layers around it (Not useful if on total custom pages).
 	string:	Name of a callback function to call in the event of an error to allow you to define your own methods. Will die after function returns.
 */
 $ssi_on_error_method = false;
@@ -69,7 +69,7 @@ require_once($sourcedir . '/Security.php');
 require_once($sourcedir . '/Class-BrowserDetect.php');
 require_once($sourcedir . '/Subs-Auth.php');
 
-// Create a variable to store some SMF specific functions in.
+// Create a variable to store some PMX specific functions in.
 $pmxcFunc = array();
 
 // Initiate the database connection and define some database functions to use.
@@ -440,7 +440,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			);
 	}
 	$pmxcFunc['db_free_result']($request);
-	
+
 	// If mods want to do somthing with this list of posts, let them do that now.
 	call_integration_hook('integrate_ssi_queryPosts', array(&$posts));
 
@@ -605,7 +605,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		);
 	}
 	$pmxcFunc['db_free_result']($request);
-	
+
 	// If mods want to do somthing with this list of topics, let them do that now.
 	call_integration_hook('integrate_ssi_recentTopics', array(&$posts));
 
@@ -663,7 +663,7 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 			'posts' => $row['posts']
 		);
 	$pmxcFunc['db_free_result']($request);
-	
+
 	// If mods want to do somthing with this list of members, let them do that now.
 	call_integration_hook('integrate_ssi_topPoster', array(&$return));
 
@@ -717,7 +717,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>'
 		);
 	$pmxcFunc['db_free_result']($request);
-	
+
 	// If mods want to do somthing with this list of boards, let them do that now.
 	call_integration_hook('integrate_ssi_topBoards', array(&$boards));
 
@@ -811,7 +811,7 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		);
 	}
 	$pmxcFunc['db_free_result']($request);
-	
+
 	// If mods want to do somthing with this list of topics, let them do that now.
 	call_integration_hook('integrate_ssi_topTopics', array(&$topics, $type));
 
@@ -1011,7 +1011,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 
 	if (empty($members))
 		return array();
-	
+
 	// If mods want to do somthing with this list of members, let them do that now.
 	call_integration_hook('integrate_ssi_queryMembers', array(&$members));
 
@@ -1089,7 +1089,7 @@ function ssi_boardStats($output_method = 'echo')
 	);
 	list ($totals['categories']) = $pmxcFunc['db_fetch_row']($result);
 	$pmxcFunc['db_free_result']($result);
-	
+
 	// If mods want to do somthing with the board stats, let them do that now.
 	call_integration_hook('integrate_ssi_boardStats', array(&$totals));
 
@@ -1118,7 +1118,7 @@ function ssi_whosOnline($output_method = 'echo')
 		'show_hidden' => allowedTo('moderate_forum'),
 	);
 	$return = getMembersOnlineStats($membersOnlineOptions);
-	
+
 	// If mods want to do somthing with the list of who is online, let them do that now.
 	call_integration_hook('integrate_ssi_whosOnline', array(&$return));
 
@@ -1337,7 +1337,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	}
 
 	$return['allowed_warning'] = $row['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($sOptions), $row['max_votes'])) : '';
-	
+
 	// If mods want to do somthing with this list of polls, let them do that now.
 	call_integration_hook('integrate_ssi_recentPoll', array(&$return, $topPollInstead));
 
@@ -1505,7 +1505,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 	}
 
 	$return['allowed_warning'] = $row['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($sOptions), $row['max_votes'])) : '';
-	
+
 	// If mods want to do somthing with this poll, let them do that now.
 	call_integration_hook('integrate_ssi_showPoll', array(&$return));
 
@@ -1705,7 +1705,7 @@ function ssi_news($output_method = 'echo')
 	global $context;
 
 	$context['random_news_line'] = !empty($context['news_lines']) ? $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)] : '';
-	
+
 	// If mods want to do somthing with the news, let them do that now. Don't need to pass the news line itself, since it is already in $context.
 	call_integration_hook('integrate_ssi_news');
 
@@ -1732,7 +1732,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
-	
+
 	// The ssi_todaysCalendar variants all use the same hook and just pass on $eventOptions so the hooked code can distinguish different cases if necessary
 	call_integration_hook('integrate_ssi_calendar', array(&$return, $eventOptions));
 
@@ -1761,7 +1761,7 @@ function ssi_todaysHolidays($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
-	
+
 	// The ssi_todaysCalendar variants all use the same hook and just pass on $eventOptions so the hooked code can distinguish different cases if necessary
 	call_integration_hook('integrate_ssi_calendar', array(&$return, $eventOptions));
 
@@ -1788,7 +1788,7 @@ function ssi_todaysEvents($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
-	
+
 	// The ssi_todaysCalendar variants all use the same hook and just pass on $eventOptions so the hooked code can distinguish different cases if necessary
 	call_integration_hook('integrate_ssi_calendar', array(&$return, $eventOptions));
 
@@ -1824,7 +1824,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'Subs-Calendar.php', 'cache_getRecentEvents', array($eventOptions));
-	
+
 	// The ssi_todaysCalendar variants all use the same hook and just pass on $eventOptions so the hooked code can distinguish different cases if necessary
 	call_integration_hook('integrate_ssi_calendar', array(&$return, $eventOptions));
 
@@ -2039,7 +2039,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		return $return;
 
 	$return[count($return) - 1]['is_last'] = true;
-	
+
 	// If mods want to do somthing with this list of posts, let them do that now.
 	call_integration_hook('integrate_ssi_boardNews', array(&$return));
 
@@ -2172,7 +2172,7 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 
 	foreach ($return as $mday => $array)
 		$return[$mday][count($array) - 1]['is_last'] = true;
-	
+
 	// If mods want to do somthing with this list of events, let them do that now.
 	call_integration_hook('integrate_ssi_recentEvents', array(&$return));
 
@@ -2291,7 +2291,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 				'filesize' => round($row['filesize'] /1024, 2) . $txt['kilobyte'],
 				'downloads' => $row['downloads'],
 				'href' => $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'],
-				'link' => '<img src="' . $settings['images_url'] . '/icons/clip.png" alt=""> <a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $filename . '</a>',
+				'link' => '<img src="' . $settings['images_url'] . '/icons/clip.png" alt=""> <a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '" oncontextmenu="return false">' . $filename . '</a>',
 				'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
 			),
 			'topic' => array(
@@ -2311,15 +2311,15 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 				'id' => $id_thumb,
 				'width' => $row['width'],
 				'height' => $row['height'],
-				'img' => '<img src="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . ';image" alt="' . $filename . '">',
-				'thumb' => '<img src="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $id_thumb . ';image" alt="' . $filename . '">',
+				'img' => '<img src="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . ';image" alt="' . $filename . '" oncontextmenu="return false">',
+				'thumb' => '<img src="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $id_thumb . ';image" alt="' . $filename . '" oncontextmenu="return false">',
 				'href' => $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $id_thumb . ';image',
-				'link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . ';image"><img src="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $id_thumb . ';image" alt="' . $filename . '"></a>',
+				'link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . ';image"><img src="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $id_thumb . ';image" alt="' . $filename . '" oncontextmenu="return false"></a>',
 			);
 		}
 	}
 	$pmxcFunc['db_free_result']($request);
-	
+
 	// If mods want to do somthing with this list of attachments, let them do that now.
 	call_integration_hook('integrate_ssi_recentAttachments', array(&$attachments));
 

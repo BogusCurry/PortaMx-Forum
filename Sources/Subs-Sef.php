@@ -97,7 +97,7 @@ function pmxsef_LoadSettings()
 	{
 		$pmxSEF = array(
 			'actions' => array_unique(explode(',', $modSettings['sef_actions'])),
-			'ignoreactions' => array_unique(array_merge(array('admin', 'viewpmxfile', 'uploadAttach'), explode(',', $modSettings['sef_ignoreactions']))),
+			'ignoreactions' => array_unique(array_merge(array('admin', 'viewpmxfile', 'uploadAttach', 'verificationcode'), explode(',', $modSettings['sef_ignoreactions']))),
 			'stripchars' => array_diff(explode(',', $modSettings['sef_stripchars']), array(trim($modSettings['sef_spacechar']))),
 			'spacechar' => trim($modSettings['sef_spacechar']),
 			'lowercase' => $modSettings['sef_lowercase'],
@@ -258,7 +258,7 @@ function pmxsef_query($query)
 ********************************************/
 function pmxsef_Redirect(&$setLocation)
 {
-	global $boardurl, $pmxSEF, $pmxCacheFunc, $modSettings;
+	global $scripturl, $pmxSEF, $pmxCacheFunc, $modSettings;
 
 	if(empty($modSettings['sef_enabled']))
 		return;
@@ -268,7 +268,7 @@ function pmxsef_Redirect(&$setLocation)
 		pmxsef_LoadSettings();
 
 	// Only do this if it's an URL for this board
-	if(strpos($setLocation, $boardurl) !== false)
+	if(strpos($setLocation, $scripturl) !== false)
 	{
 		$setLocation = create_sefurl($setLocation);
 

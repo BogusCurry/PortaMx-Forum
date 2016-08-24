@@ -1,10 +1,9 @@
 <?php
 /**
  * PortaMx Forum
- *
- * @package SMF
- * @author Simple Machines http://www.simplemachines.org
- * @copyright 2016 Simple Machines and individual contributors
+ * @package PortaMx
+ * @author PortaMx & Simple Machines
+ * @copyright 2016 PortaMx,  Simple Machines and individual contributors
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
  * @version 2.1 Beta 5
@@ -993,9 +992,9 @@ function template_quickreply()
 							function insertQuoteFast(messageid)
 							{
 								if (window.XMLHttpRequest)
-									getXMLDocument(smf_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), onDocReceived);
+									getXMLDocument(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';xml;pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), onDocReceived);
 								else
-									reqWin(smf_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), 240, 90);
+									reqWin(pmx_prepareScriptUrl(pmx_scripturl) + \'action=quotefast;quote=\' + messageid + \';pb=', $context['post_box_name'], ';mode=\' + (oEditorHandle_', $context['post_box_name'], '.bRichTextEnabled ? 1 : 0), 240, 90);
 								return false;
 							}
 							function onDocReceived(XMLDoc)
@@ -1040,7 +1039,7 @@ function template_quickreply()
 	if (!empty($context['drafts_autosave']))
 		echo '
 			<script>
-				var oDraftAutoSave = new smf_DraftAutoSave({
+				var oDraftAutoSave = new pmx_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',', !empty($context['post_box_name']) ? '

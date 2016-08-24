@@ -90,9 +90,9 @@ function pmx_db_optimize_table($table)
 	global $pmxcFunc, $db_prefix;
 
 	$table = str_replace('{db_prefix}', $db_prefix, $table);
-	
+
 	$pg_tables = array('pg_catalog','information_schema');
-	
+
 	$request = $pmxcFunc['db_query']('', '
 		SELECT pg_relation_size(C.oid) AS "size"
 		FROM pg_class C
@@ -104,10 +104,10 @@ function pmx_db_optimize_table($table)
 			'pg_tables' => $pg_tables,
 		)
 	);
-	
+
 	$row = $pmxcFunc['db_fetch_assoc']($request);
 	$pmxcFunc['db_free_result']($request);
-	
+
 	$old_size = $row['size'];
 
 	//pg below 9.0.0 is very slow on full vacuum
@@ -131,7 +131,7 @@ function pmx_db_optimize_table($table)
 				'table' => $table,
 			)
 		);
-	} 
+	}
 	else
 		$request = $pmxcFunc['db_query']('', '
 				VACUUM FULL ANALYZE {raw:table}',
@@ -139,10 +139,10 @@ function pmx_db_optimize_table($table)
 					'table' => $table,
 				)
 			);
-			
+
 	if (!$request)
 		return -1;
-	
+
 	$request = $pmxcFunc['db_query']('', '
 		SELECT pg_relation_size(C.oid) AS "size"
 		FROM pg_class C
@@ -154,7 +154,7 @@ function pmx_db_optimize_table($table)
 			'pg_tables' => $pg_tables,
 		)
 	);
-	
+
 
 	$row = $pmxcFunc['db_fetch_assoc']($request);
 	$pmxcFunc['db_free_result']($request);

@@ -1085,7 +1085,7 @@ function Post($post_errors = array())
 		'value' => $context['message'],
 		'labels' => array(
 			'post_button' => $context['submit_label'],
-			'cancel_button' => $txt['modify_cancel'], 
+			'cancel_button' => $txt['modify_cancel'],
 		),
 		// add height and width for the editor
 		'height' => '275px',
@@ -2461,7 +2461,7 @@ function getTopic()
 	while ($row = $pmxcFunc['db_fetch_assoc']($request))
 	{
 		// Censor, BBC, ...
-        $context['lbimage_data'] = array('lightbox_id' => (!empty($modSettings['dont_use_lightbox']) ? null : 'topic-'. $topic .'-msg-'. $row['id_msg']));
+				$context['lbimage_data'] = array('lightbox_id' => (!empty($modSettings['dont_use_lightbox']) ? null : 'topic-'. $topic .'-msg-'. $row['id_msg']));
 		censorText($row['body']);
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 

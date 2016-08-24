@@ -16,7 +16,7 @@ if (!defined('PMX'))
 	die('No direct access...');
 
 /**
- * Sets the SMF-style login cookie and session based on the id_member and password passed.
+ * Sets the PMX-style login cookie and session based on the id_member and password passed.
  * - password should be already encrypted with the cookie salt.
  * - logs the user out if id_member is zero.
  * - sets the cookie and session to last the number of seconds specified by cookie_length.
@@ -812,7 +812,7 @@ function rebuildModCache()
 
 /**
  * The same thing as setcookie but gives support for HTTP-Only cookies in PHP < 5.2
- * @todo We can remove this since SMF requires PHP >= 5.3.8 now
+ * @todo We can remove this since PMX requires PHP >= 5.3.8 now
  *
  * @param string $name
  * @param string $value = ''
@@ -873,7 +873,7 @@ function hash_salt($password, $salt)
 }
 
 /**
- * Verifies a raw SMF password against the bcrypt'd string
+ * Verifies a raw PMX password against the bcrypt'd string
  *
  * @param string $username The username
  * @param string $password The password

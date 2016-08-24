@@ -20,7 +20,7 @@ if (!defined('PMX'))
 
 
 /**
- * Define the old SMF sha1 function. Uses mhash if available
+ * Define the old PMX sha1 function. Uses mhash if available
  * @param string $str The string
  * @return string The sha1 hashed version of $str
  */

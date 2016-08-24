@@ -13,7 +13,7 @@
  * @version 2.1 Beta 5
  */
 
-// Start things rolling by getting SMF alive...
+// Start things rolling by getting PMX alive...
 $ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/SSI.php'))
 	die('Cannot find SSI.php');

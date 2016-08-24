@@ -159,11 +159,11 @@ h1.forumtitle {
 	float: right;
 }
 /* float these items to the left */
-#siteslogan, img#smflogo {
+#siteslogan, img#pmxlogo {
 	float: left;
 }
-/* Tweak the SMF logo */
-img#smflogo {
+/* Tweak the PMX logo */
+img#pmxlogo {
 	margin-right: 1em;
 }
 

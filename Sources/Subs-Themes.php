@@ -206,8 +206,8 @@ function get_theme_info($path)
 		fatal_lang_error('package_get_error_theme_not_compatible', false, $forum_version);
 	}
 
-	// So, we have an install tag which is cool and stuff but we also need to check it and match your current SMF version...
-	$the_version = strtr($forum_version, array('POrtaMx Forum ' => ''));
+	// So, we have an install tag which is cool and stuff but we also need to check it and match your current PMX version...
+	$the_version = strtr($forum_version, array('PortaMx Forum ' => ''));
 	$install_versions = $theme_info_xml->path('theme-info/install/@for');
 
 	// The theme isn't compatible with the current version.

@@ -2,7 +2,7 @@
 
 /**
  * This is perhaps the most important and probably most accessed file in all
- * of SMF.  This file controls topic, message, and attachment display.
+ * of PMX.  This file controls topic, message, and attachment display.
  *
  * PortaMx Forum
  * @package PortaMx
@@ -335,7 +335,7 @@ function Display()
 			$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
 		}
 	}
-    
+
 	// Create a previous next string if the selected theme has it as a selected option.
 	$context['previous_next'] = $modSettings['enablePreviousNext'] ? '<a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=prev#top">' . $txt['previous_next_back'] . '</a> - <a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=next#top">' . $txt['previous_next_forward'] . '</a>' : '';
 

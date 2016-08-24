@@ -38,11 +38,13 @@
 		min-width: 15%;
 		margin: 0 0 0 2px;
 	}
+/*
 	h1.forumtitle a, h1.forumtitle {
-		padding: 5px 0 0 4px !important;
+		padding: 5px 0 0 4px;
 		max-width: 300px;
 		margin: 10px 0;
 	}
+*/
 	span.board_moderators {
 		display: none !important;
 	}
@@ -61,7 +63,6 @@
 	}
 	.dropmenu li, .dropmenu li:hover,
 	.dropmenu li a, .dropmenu li a:hover,
-
 	.dropmenu li a.active, .dropmenu li a.active:hover,
 	.dropmenu li ul {
 		width: 100%;
@@ -94,6 +95,7 @@
 		border-radius: 0;
 		left: 0;
 	}
+
 	/* MessageIndex */
 	#main_content_section .pagelinks {
 		display: block;
@@ -106,6 +108,7 @@
 		display: block;
 		width: 100%;
 	}
+
 	/* Register Page */
 	#registration .button_submit {
 		font-size: 0.67em;
@@ -154,6 +157,7 @@
 	#quickReplyOptions #postmodify {
 		width: 100%;
 	}
+
 	/* Poll */
 	#poll_options dl.options {
 		padding: 0;
@@ -167,6 +171,7 @@
 	.move_topic {
 		width: 100%;
 	}
+
 	/* Stats Center */
 	.half_content {
 		width: 100%;
@@ -199,6 +204,7 @@
 	INPUT#searchfor.input_text, INPUT#userspec.input_text {
 		width: 75%;
 	}
+
 	/* Memberlist */
 	th.website_url,
 	td.website_url, td.reg_date, td.post_num, td.statsbar {
@@ -220,6 +226,7 @@
 	#mlist_search .input_text {
 		width: 93%;
 	}
+
 	/* Moderation */
 	.post_note input {
 		width: 75% !important;
@@ -227,6 +234,7 @@
 	.modbox .floatleft {
 		float: none;
 	}
+
 	/* Admin */
 	#live_news, #supportVersionsTable {
 		width: 100% !important;
@@ -287,6 +295,7 @@
 	.moderation {
 		min-width: 23px !important;
 	}
+
 	/* Display (Topic View) */
 	.poster {
 		float: none !important;
@@ -344,14 +353,33 @@
 	}
 }
 
-@media screen and (max-width: 410px) {
+@media screen and (max-width: 420px) {
 	#languages_form {
+		display: none;
+	}
+	.board_icon {
+		display: none;
+	}
+	.info {
+		padding: 0 7px 0 5px;
+		vertical-align: top !important;
+	}
+	.board_stats, .moderation {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.board_stats {
 		display: none;
 	}
 }
 
 /* We have shared things... */
 @media screen and (max-width: 720px) {
+	h1.forumtitle {
+		padding: 7px 12px 7px 6px;
+	}
 	#main_menu, .generic_menu {
 		display: none;
 	}
@@ -364,15 +392,17 @@
 	}
 	.navigate_section ul li span {
 		display: inline !important;
-	}	
+	}
 
 	.menu_icon {
 		display: inline-block;
 		background: url(../images/menu_icon.svg) no-repeat;
 		height: 20px;
 		width: 20px;
+		margin: -3px 0 3px 0;
 	}
-	/* New Mobile Action/Mod Pop (Test) */
+
+	/* New Mobile Action/Mod Pop */
 	.moderationbuttons_check {
 		display: none;
 	}
@@ -498,31 +528,22 @@
 		display: none;
 	}
 	div.lastpost {
-		width: 100%;
-		padding: 0;
-		display: block;
 		min-height: 2em !important;
-	}
-	.lpr_border {
-		border-top: 1px solid #DDD;
+		padding-right: 5px !important;
+		min-width: 135px;
+		vertical-align: middle;
 	}
 	div.lastpost p {
-		margin: 5px;
+		margin: 0;
 	}
 	span.postby {
 		display: inline-block;
 	}
 
 	/* MessageIndex */
-	#messageindex .board_icon, #messageindex .lastpost {
-		display: none;
-	}
 	#messageindex .info {
 		padding: 5px;
-	}
-	.info_block {
-		display: block;
-		width: 95%;
+		width: 100%;
 	}
 	.moderation a {
 		padding: 3px;
@@ -559,6 +580,7 @@
 	#basicinfo {
 		margin: 0 0 5px 0; /* For UX */
 	}
+
 	/* Post Screen */
 	form#postmodify .roundframe {
 		padding: 5px !important;
@@ -580,12 +602,13 @@
 		margin: 2px 5px 0 0;
 		width: 48%;
 	}
+
 	/* Calendar */
 	#event_main .input_text {
 		width: 60%;
 	}
 	/* Hide me */
-	#inner_wrap, #smflogo, #message_index_jump_to, #display_jump_to,
+	#inner_wrap, #pmxlogo, #message_index_jump_to, #display_jump_to,
 	#siteslogan, th.website_url, th.registered,
 	td.centertext.website_url, td.centertext.reg_date, td.posts, td.statsbar.posts,
 	#main_content_section .navigate_section, .time, .hidden,
@@ -597,7 +620,7 @@
 		float: left;
 		margin-top: -2px !important;
 	}
- 
+
 	/* Admin */
 	.table_grid.half_content {
 		width: 100%;
@@ -625,16 +648,20 @@
 		padding: 0 6px;
 	}
 }
+
 /* Still not enough data or people to test this... */
 /* This needs more data and this range is probably for iPad Air (alike) tablets... */
 @media (min-width: 721px) and (max-width: 855px) {
 	div.lastpost {
 		margin: 0 0 0 20px !important;
 	}
-	.board_stats {
-		display: none;
+}
+@media (min-width: 600px) and (max-width: 1024px) {
+	.moderation {
+		display: table-cell;
 	}
 }
+
 /* Some very big stuff? Dunno... */
 @media (min-width: 856px) and (max-width: 1024px) {
 	div.lastpost {
@@ -645,6 +672,9 @@
 @media (max-width: 480px) {
 	#mobile_user_menu>div>div.popup_heading {
 		margin-bottom: 0px;
+	}
+	.footer_link.floatright {
+		display: none;
 	}
 }
 @media (max-width: 585px) {
@@ -668,6 +698,7 @@
 		margin-left:120px;
 	}
 }
+
 /* global on mobile */
 .navigate_section ul {
 	padding-top: 4px;

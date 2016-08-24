@@ -55,7 +55,8 @@ class browser_detector
 		$this->_browsers['needs_size_fix'] = false;
 
 		// One at a time, one at a time, and in this order too
-		if ($this->isOpera())
+		if ($this->isChrome())
+			$this->setupChrome();		if ($this->isOpera())
 			$this->setupOpera();
 		// Meh...
 		elseif ($this->isEdge())
@@ -101,6 +102,17 @@ class browser_detector
 	}
 
 	/**
+	* Determine if the browser is Chrome or not
+	* @return boolean Whether or not this is Chrome
+	*/
+	function isChrome()
+	{
+		if (!isset($this->_browsers['is_Crome']))
+			$this->_browsers['is_chrome'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome/') !== false;
+		return $this->_browsers['is_chrome'];
+	}
+
+	/**
 	* Determine if the browser is Opera or not
 	* @return boolean Whether or not this is Opera
 	*/
@@ -134,7 +146,7 @@ class browser_detector
 		if (!isset($this->_browsers['is_ie11']))
 			$this->_browsers['is_ie11'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Trident') !== false && $this->isGecko();
 		return $this->_browsers['is_ie11'];
- 	}
+	}
 
 	/**
 	* Determine if the browser is Edge or not
@@ -349,6 +361,15 @@ class browser_detector
 	}
 
 	/**
+	 * Sets the version number for Chrome.
+	 */
+	private function setupChrome()
+	{
+		if (preg_match('~Chrome[\/]([0-9]+[\.][0-9]+[\.][0-9]+[\.][0-9]+)~i', $_SERVER['HTTP_USER_AGENT'], $match) === 1)
+			$this->_browsers['is_chrome' . (int) $match[1]] = true;
+	}
+
+	/**
 	 * Sets the version number for MS edge.
 	 */
 	private function setupEdge()
@@ -367,39 +388,34 @@ class browser_detector
 	{
 		global $context;
 
-		if ($this->_is_mobile)
-			$context['browser_body_id'] = 'mobile';
-		else
-		{
-			// add in any specific detection conversions here if you want a special body id e.g. 'is_opera9' => 'opera9'
-			$browser_priority = array(
-				'is_ie6' => 'ie6',
-				'is_ie7' => 'ie7',
-				'is_ie8' => 'ie8',
-				'is_ie9' => 'ie9',
-				'is_ie10' => 'ie10',
-				'is_ie11' => 'ie11',
-				'is_ie' => 'ie',
-				'is_edge' => 'edge',
-				'is_firefox' => 'firefox',
-				'is_chrome' => 'chrome',
-				'is_safari' => 'safari',
-				'is_opera10' => 'opera10',
-				'is_opera11' => 'opera11',
-				'is_opera12' => 'opera12',
-				'is_opera' => 'opera',
-				'is_konqueror' => 'konqueror',
-			);
+		// add in any specific detection conversions here if you want a special body id e.g. 'is_opera9' => 'opera9'
+		$browser_priority = array(
+			'is_ie6' => 'ie6',
+			'is_ie7' => 'ie7',
+			'is_ie8' => 'ie8',
+			'is_ie9' => 'ie9',
+			'is_ie10' => 'ie10',
+			'is_ie11' => 'ie11',
+			'is_ie' => 'ie',
+			'is_edge' => 'edge',
+			'is_firefox' => 'firefox',
+			'is_chrome' => 'chrome',
+			'is_safari' => 'safari',
+			'is_opera10' => 'opera10',
+			'is_opera11' => 'opera11',
+			'is_opera12' => 'opera12',
+			'is_opera' => 'opera',
+			'is_konqueror' => 'konqueror',
+		);
 
-			$context['browser_body_id'] = 'smf';
-			$active = array_reverse(array_keys($this->_browsers, true));
-			foreach ($active as $browser)
+		$context['browser_body_id'] = '';
+		$active = array_reverse(array_keys($this->_browsers, true));
+		foreach ($active as $browser)
+		{
+			if (array_key_exists($browser, $browser_priority))
 			{
-				if (array_key_exists($browser, $browser_priority))
-				{
-					$context['browser_body_id'] = $browser_priority[$browser];
-					break;
-				}
+				$context['browser_body_id'] = $browser_priority[$browser];
+				break;
 			}
 		}
 	}

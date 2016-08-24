@@ -64,6 +64,7 @@ loadDatabase();
 // Load the settings from the settings table, and perform operations like optimizing.
 $context = array();
 reloadSettings();
+
 // Clean the request variables, add slashes, etc.
 cleanRequest();
 
@@ -118,7 +119,7 @@ obExit(null, null, true);
 function pmx_main()
 {
 	global $modSettings, $settings, $user_info, $board, $topic;
-	global $board_info, $maintenance, $sourcedir;
+	global $board_info, $maintenance, $sourcedir, $scripturl, $pmxCacheFunc;
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
@@ -139,15 +140,15 @@ function pmx_main()
 	// Load the current user's permissions.
 	loadPermissions();
 
+	// handle Javascript cookie requests
+	jsCookieHandling();
+
 	// Attachments don't require the entire theme to be loaded.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach')
 		detectBrowser();
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else
 		loadTheme();
-
-	// handle Javascript cookie requests
-	jsCookieHandling();    
 
 	// Check if the user should be disallowed access.
 	is_not_banned();

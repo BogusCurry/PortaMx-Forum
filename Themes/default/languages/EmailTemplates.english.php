@@ -4,8 +4,8 @@
 // Since all of these strings are being used in emails, numeric entities should be used.
 
 // Do not translate anything that is between {}, they are used as replacement variables and MUST remain exactly how they are.
-//   Additionally do not translate the @additioinal_parmas: line or the variable names in the lines that follow it. You may
-//   translate the description of the variable. Do not translate @description:, however you may translate the rest of that line.
+// Additionally do not translate the @additioinal_parmas: line or the variable names in the lines that follow it. You may
+// translate the description of the variable. Do not translate @description:, however you may translate the rest of that line.
 
 // Do not use block comments in this file, they will have special meaning.
 
@@ -491,7 +491,7 @@ Moderation center: {REPORTLINK}
 		REPORTERNAME: The name of the person reporting the profile
 		PROFILELINK: The link to the profile that was reported
 		COMMENT: The comment left by the reporter.
- 	@description: When a user's profile is reported
+	@description: When a user's profile is reported
 */
 $txt['report_member_profile_subject'] = 'Reported profile: {MEMBERNAME}';
 $txt['report_member_profile_body'] = 'The profile of "{MEMBERNAME}" has been reported by {REPORTERNAME}.
@@ -509,7 +509,7 @@ The reporter has made the following comment:
 		MEMBERNAME: The display name of the reported user
 		COMMENTERNAME: The name of the person who added the comment
 		PROFILELINK: The link to the profile that was reported
- 	@description: When someone replies to a report about a profile, this can be sent to others who replied
+	@description: When someone replies to a report about a profile, this can be sent to others who replied
 */
 $txt['reply_to_member_report_subject'] = 'Follow-up to reported profile: {MEMBERNAME}';
 $txt['reply_to_member_report_body'] = 'Previously, the profile of {MEMBERNAME} was reported.

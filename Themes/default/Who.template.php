@@ -240,7 +240,7 @@ function template_credits()
 		</div>';
 	}
 
-	// SMF itself
+	// PMX itself
 	echo '
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['credits_forum'],' ', $txt['credits_copyright'], '</h3>

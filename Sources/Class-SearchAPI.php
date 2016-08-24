@@ -141,12 +141,12 @@ interface search_api_interface
 abstract class search_api implements search_api_interface
 {
 	/**
-	 * @var string The last version of SMF that this was tested on. Helps protect against API changes.
+	 * @var string The last version of PMX that this was tested on. Helps protect against API changes.
 	 */
 	public $version_compatible = 'PMX 2.1 Beta 5';
 
 	/**
-	 * @var string The minimum SMF version that this will work with
+	 * @var string The minimum PMX version that this will work with
 	 */
 	public $min_pmx_version = 'PMX 2.1 Beta 5';
 

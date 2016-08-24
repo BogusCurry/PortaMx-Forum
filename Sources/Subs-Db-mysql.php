@@ -79,7 +79,7 @@ function pmx_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	if (empty($db_options['dont_select_db']) && !@mysql_select_db($db_name, $connection) && empty($db_options['non_fatal']))
 		display_db_error();
 
-	// This makes it possible to have SMF automatically change the sql_mode and autocommit if needed.
+	// This makes it possible to have PMX automatically change the sql_mode and autocommit if needed.
 	if (isset($mysql_set_mode) && $mysql_set_mode === true)
 		$pmxcFunc['db_query']('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 		array(),
@@ -220,7 +220,7 @@ function pmx_db_replacement__callback($matches)
 		break;
 
 		case 'identifier':
-			// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for SMF.
+			// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for PMX.
 			return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
 		break;
 
