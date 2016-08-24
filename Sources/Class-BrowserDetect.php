@@ -56,9 +56,9 @@ class browser_detector
 
 		// One at a time, one at a time, and in this order too
 		if ($this->isChrome())
-			$this->setupChrome();		if ($this->isOpera())
+			$this->setupChrome();
+		elseif ($this->isOpera())
 			$this->setupOpera();
-		// Meh...
 		elseif ($this->isEdge())
 			$this->setupEdge();
 		// Them webkits need to be set up too
