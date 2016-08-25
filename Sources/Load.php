@@ -2196,15 +2196,15 @@ function loadTheme($id_theme = 0, $initialize = true)
 	function fSetFavicon(jQuery){$(\':not(.signature)>.bbc_link,.ecl_link\').each(function(){var url=$(this).attr(\'href\'),domain=url.match(/:\/\/(.[^/]+)/)[1],schema=url.match(/^(http[s]*):\/\//)[1];$(this).css({\'background-image\':\'url(//www.google.com/s2/favicons?domain=\'+schema+\'://\'+domain+\')\',\'background-repeat\':\'no-repeat\',\'padding-left\':\'20px\',\'background-position\':\'1px\'});});}
 	$(document).ready(fSetFavicon);');
 
-	// handle automatic sceen resize
+	// handle screen resize
 	addInlineCss('
 	body{margin:0;padding:0 0 20px 0;}
 	#footer div{height:20px;}');
 
 	addInlineJavascript('
 	var footerOffset='. (!empty($modSettings['showCacheStatus']) && !empty($modSettings['timeLoadPageEnable']) ? '102' : (!empty($modSettings['showCacheStatus']) || !empty($modSettings['timeLoadPageEnable']) ? '82' : '62')) .';
-	function fSetScreenSize(){document.getElementById(\'content_section\').style.minHeight=window.innerHeight-(document.getElementById(\'content_section\').offsetTop+footerOffset)+\'px\';}
-	$(window).on(\'resize\', fSetScreenSize);');
+	function fSetContentHeight(){document.getElementById(\'content_section\').style.minHeight=window.innerHeight-(document.getElementById(\'content_section\').offsetTop+footerOffset)+\'px\';}
+	$(window).on(\'resize\', fSetContentHeight);');
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())

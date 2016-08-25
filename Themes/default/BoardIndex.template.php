@@ -37,15 +37,7 @@ function template_newsfader()
 		}
 
 		echo '
-		</ul>
-		<script>
-			jQuery("#pmx_slider").slippry({
-				pause: ', $settings['newsfader_time'],',
-				adaptiveHeight: 0,
-				captions: 0,
-				controls: 0,
-			});
-		</script>';
+		</ul>';
 	}
 }
 
@@ -188,6 +180,9 @@ function template_info_center()
 {
 	global $context, $options, $txt;
 
+	if (empty($context['info_center']))
+		return;
+
 	// Here's where the "Info Center" starts...
 	echo '
 	<div class="roundframe" id="info_center">
@@ -208,35 +203,6 @@ function template_info_center()
 	echo '
 		</div>
 	</div>';
-
-	// Info center collapse object.
-	echo '
-	<script>
-		var oInfoCenterToggle = new pmxc_Toggle({
-			bToggleEnabled: true,
-			bCurrentlyCollapsed: '. ($context['user']['is_guest'] ? (empty($_COOKIE['upshrinkIC']) ? 'false' : 'true') : (empty($options['collapse_header_ic']) ? 'false' : 'true')) .',
-			aSwappableContainers: [
-				\'upshrinkHeaderIC\'],
-		aSwapImages: [{
-			sId: \'upshrink_ic\',
-			altExpanded: ', JavaScriptEscape($txt['hide_infocenter']), ',
-			altCollapsed: ', JavaScriptEscape($txt['show_infocenter']), '
-		}],
-		aSwapLinks: [{
-			sId: \'upshrink_link\',
-			msgExpanded: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), ',
-			msgCollapsed: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), '
-		}],
-		oThemeOptions: {
-			bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-			sOptionName: \'collapse_header_ic\',
-			sSessionId: pmx_session_id,
-			sSessionVar: pmx_session_var},
-		oCookieOptions: {
-			bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
-			sCookieName: \'upshrinkIC\'}
-	});
-	</script>';
 }
 
 /**
@@ -250,7 +216,7 @@ function template_ic_block_recent()
 	echo '
 			<div class="sub_bar">
 				<h4 class="subbg">
-					<a href="', $scripturl, '?action=recent"><span class="xx"></span>', $txt['recent_posts'], '</a>
+					<a href="', $scripturl, '?action=recent"><span class="generic_icons xx"></span>', $txt['recent_posts'], '</a>
 				</h4>
 			</div>
 			<div id="recent_posts_content">';
@@ -261,7 +227,7 @@ function template_ic_block_recent()
 		// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
 		echo '
 				<p id="infocenter_onepost" class="inline">
-					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;&quot;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'], '&quot;'), ' (', $context['latest_post']['time'], ')<br>
+					'. sprintf($txt['is_recent_updated'], $context['latest_post']['link']), ' (', $context['latest_post']['time'], ')<br>
 				</p>';
 	}
 	// Show lots of posts.
@@ -361,7 +327,7 @@ function template_ic_block_stats()
 			</div>
 			<p class="inline">
 				', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - '. $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', '<br>
-				', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  (' . $context['latest_post']['time'] . ')<br>' : ''), '
+				', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong> (' . $context['latest_post']['time'] . ')<br>' : ''), '
 				<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
 			</p>';
 }
@@ -414,5 +380,4 @@ function template_ic_block_online()
 	echo '
 			</p>';
 }
-
 ?>

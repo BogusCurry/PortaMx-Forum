@@ -2928,10 +2928,13 @@ span.postby {
 #upshrinkHeaderIC {
 	margin-top: 4px;
 }
+#upshrinkHeaderIC .sub_bar h4.subbg {
+	padding-left: 0px;
+}
 #ic_recentposts {
 	line-height: 1.6em;
 	width: 98%;
-	margin: -2px 0 0 23px;
+	margin: -2px 0 0 18px;
 	font-size: 0.9em;
 }
 #ic_recentposts th {
@@ -2947,16 +2950,17 @@ span.postby {
 	border-top: none;
 }
 #ic_recentposts .recentpost strong {
-	width: 40%;
+	width: 35%;
 }
 #ic_recentposts .recentposter {
 	width: 15%;
 }
 #ic_recentposts .recentboard {
-	width: 20%;
+	width: 25%;
 }
 #ic_recentposts .recenttime {
 	width: 25%;
+	white-space: nowrap;
 }
 #ic_recentposts .recenttime strong {
 	color: #555;
@@ -2967,9 +2971,10 @@ span.postby {
 #upshrinkHeaderIC p.inline {
 	border: none;
 	margin: 0;
-	padding: 2px 29px;
+	padding: 2px 20px;
 	line-height: 1.6em;
 	font-size: 0.9em;
+	display: table-cell;
 }
 #upshrinkHeaderIC p.inline span {
 	margin: 0;
@@ -3743,7 +3748,7 @@ h3.profile_hd {
 }
 .xx {
 	background: url(../images/post/xx.png) 2px no-repeat;
-	padding: 25px 6px 25px 18px;
+	padding: 0 4px 0 0;
 }
 
 /* Those classes are sharing exact same gradient. */

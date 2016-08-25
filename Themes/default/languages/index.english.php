@@ -217,7 +217,7 @@ $txt['date_registered'] = 'Date Registered';
 
 $txt['recent_view'] = 'View the most recent posts on the forum.';
 $txt['recent_updated'] = 'is the most recently updated topic';
-$txt['is_recent_updated'] = '%1$s is the most recently updated topic';
+$txt['is_recent_updated'] = '<strong>&quot;%1$s&quot;</strong> is the most recently updated topic';
 
 $txt['male'] = 'Male';
 $txt['female'] = 'Female';

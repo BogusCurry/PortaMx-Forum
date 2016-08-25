@@ -86,7 +86,8 @@ function template_html_above()
 	echo '<!DOCTYPE html>
 	<html', $context['right_to_left'] ? ' dir="rtl"' : '', !empty($txt['lang_locale']) ? ' lang="' . str_replace("_", "-", substr($txt['lang_locale'], 0, strcspn($txt['lang_locale'], "."))) . '"' : '' , '>
 <head>
-	<meta charset="', $context['character_set'], '" />';
+	<meta charset="', $context['character_set'], '" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">';
 
 	// load in any css from mods or themes so they can overwrite if wanted
 	template_css();
@@ -96,10 +97,6 @@ function template_html_above()
 
 	echo '
 	<title>', $context['page_title_html_safe'], '</title>';
-
-	if(!empty($modSettings['isMobile']))
-		echo '
-	<meta name="viewport" content="width=device-width, initial-scale=1">';
 
 	// Content related meta tags, like description, keywords, Open Graph stuff, etc...
 	foreach ($context['meta_tags'] as $meta_tag)
@@ -333,9 +330,9 @@ function template_body_above()
 
 	template_menu();
 
-
 	echo '
 	</div>';
+
 	theme_linktree();
 
 	echo '
@@ -346,7 +343,7 @@ function template_body_above()
 	echo '
 		<div id="content_section">
 			<div id="main_content_section">
-				<script>fSetScreenSize();</script>';
+				<script>fSetContentHeight();</script>';
 }
 
 /**
@@ -354,7 +351,7 @@ function template_body_above()
  */
 function template_body_below()
 {
-	global $context, $txt, $scripturl, $boardurl, $modSettings, $user_info, $pmxCache;
+	global $context, $txt, $scripturl, $modSettings, $user_info, $pmxCache;
 
 	echo '
 			</div>
@@ -430,6 +427,7 @@ function theme_linktree($force_show = false)
 		echo '
 				<div class="navigate_section">
 					<ul'. (!empty(checkECL_Cookie()) ? ' id="top"' : '') .'>';
+
 		$context['linktree_first_call'] = true;
 	}
 	else

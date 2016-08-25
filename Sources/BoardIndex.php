@@ -24,7 +24,7 @@ if (!defined('PMX'))
  */
 function BoardIndex()
 {
-	global $txt, $user_info, $sourcedir, $modSettings, $context, $settings, $scripturl;
+	global $txt, $user_info, $sourcedir, $modSettings, $context, $settings, $options, $scripturl;
 
 	loadTemplate('BoardIndex');
 	$context['template_layers'][] = 'boardindex_outer';
@@ -139,7 +139,42 @@ function BoardIndex()
 	{
 		loadJavascriptFile('slippry.min.js', array(), 'pmx_jquery_slippry');
 		loadCSSFile('slider.min.css', array(), 'pmx_jquery_slider');
-	}
-}
 
+		addInlineJavascript('
+		jQuery("#pmx_slider").slippry({
+			pause: '. $settings['newsfader_time'] .',
+			adaptiveHeight: 0,
+			captions: 0,
+			controls: 0,
+		});', false);
+	}
+
+	// Info center collapse object.
+	if (!empty($context['info_center']))
+		addInlineJavascript('
+	var oInfoCenterToggle = new pmxc_Toggle({
+		bToggleEnabled: true,
+		bCurrentlyCollapsed: '. ($user_info['is_guest'] ? (empty($_COOKIE['upshrinkIC']) ? 'false' : 'true') : (empty($options['collapse_header_ic']) ? 'false' : 'true')) .',
+		aSwappableContainers: [
+			\'upshrinkHeaderIC\'],
+	aSwapImages: [{
+		sId: \'upshrink_ic\',
+		altExpanded: '. JavaScriptEscape($txt['hide_infocenter']) .',
+		altCollapsed: '. JavaScriptEscape($txt['show_infocenter']) .'
+	}],
+	aSwapLinks: [{
+		sId: \'upshrink_link\',
+		msgExpanded: '. JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])) .',
+		msgCollapsed: '. JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])) .'
+	}],
+	oThemeOptions: {
+		bUseThemeSettings: '. ($user_info['is_guest'] ? 'false' : 'true') .',
+		sOptionName: \'collapse_header_ic\',
+		sSessionId: pmx_session_id,
+		sSessionVar: pmx_session_var},
+	oCookieOptions: {
+		bUseCookie: '. ($user_info['is_guest'] ? 'true' : 'false') .',
+		sCookieName: \'upshrinkIC\'}
+	});', true);
+}
 ?>

@@ -98,6 +98,7 @@ td.days:hover {
 	font-size: 1.8em;
 	background: #e7eaef;
 	padding: 5px;
+	overflow: hidden;
 }
 #main_grid table td.weeks a:hover {
 	text-decoration: none;
@@ -301,13 +302,16 @@ span.hidelink {
 		border: none !important;
 	}
 	#main_grid .calendar_week .event_col:before {
-		content: "Events: ";
+		content: "Events: \a";
+		white-space: pre;
 	}
 	#main_grid .calendar_week .holiday_col:before {
-		content: "Holidays: ";
+		content: "Holidays: \a";
+		white-space: pre;
 	}
 	#main_grid .calendar_week .birthday_col:before {
-		content: "Birthdays: ";
+		content: "Birthdays: \a";
+		white-space: pre;
 	}
 	#main_grid .calendar_week .event_col:empty:before {
 		content: "Events: None";
