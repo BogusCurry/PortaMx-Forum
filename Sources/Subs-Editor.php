@@ -1653,17 +1653,17 @@ function create_control_richedit($editorOptions)
 
 	// prepare the cancel link
 	$isQuickReply = $editorOptions['id'] == 'quickReply';
-	$isAction = isset($_GET['action']) && in_array($_GET['action'], array('post', 'post2')) ? $_GET['action'] : false;
+	$isAction = isset($_GET['action']) && in_array($_GET['action'], array('post', 'post2', 'calendar')) ? $_GET['action'] : false;
 	if($isQuickReply || $isAction)
 	{
-		if($isQuickReply || in_array($isAction, array('post', 'post2')))
+		if($isQuickReply || in_array($isAction, array('post', 'post2')) || ($isAction == 'calendar'	&& isset($_GET['sa']) && $_GET['sa'] == 'post'))
 		{
 			if(!empty($modSettings['sef_enabled']))
 				$cururl = pmxsef_query(str_replace($boardurl, '', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $_SERVER['REQUEST_URL']));
 			else
 				$cururl = parse_url(rawurldecode(str_replace($scripturl .'?', '', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $_SERVER['REQUEST_URL'])));
 
-			if(!isset($cururl['action']) || (isset($cururl['action']) && !in_array($cururl['action'], array('post', 'post2')) && !isset($cururl['id_draft'])))
+			if(!isset($cururl['action']) || (isset($cururl['action']) && !in_array($cururl['action'], array('post', 'post2')) && (!isset($cururl['sa']) || (isset($cururl['sa']) && $cururl['sa'] !== 'post')) && !isset($cururl['id_draft'])))
 			{
 				$fromWhere = $isQuickReply ? $_SERVER['REQUEST_URL'] : $_SERVER['HTTP_REFERER'];
 				if(strpos($fromWhere, 'showposts') == false)
