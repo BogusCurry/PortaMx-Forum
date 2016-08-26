@@ -293,7 +293,7 @@ function template_results()
 				<span class="floatright">';
 					if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 					echo '
-							<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check">';
+							<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" style="margin-right:25px;">';
 				echo '
 				</span>
 				<span class="generic_icons filter"></span>&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
@@ -321,7 +321,7 @@ function template_results()
 			foreach ($topic['matches'] as $message)
 			{
 				echo '
-					<div class="topic_details floatleft" style="width: 94%">
+					<div class="topic_details floatleft" style="width:82%;">
 						<div class="counter">', $message['counter'], '</div>
 						<h5>', $topic['board']['link'], ' / <a href="', $scripturl, '?topic=', $topic['id'], '.msg', $message['id'], '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
 						<span class="smalltext">&#171;&nbsp;',$txt['by'],'&nbsp;<strong>', $message['member']['link'], '</strong>&nbsp;',$txt['on'],'&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>
@@ -330,7 +330,7 @@ function template_results()
 				if (!empty($options['display_quick_mod']))
 				{
 					echo '
-					<div class="floatright">';
+					<div class="floatright" style="width:40px;">';
 
 					if ($options['display_quick_mod'] == 1)
 					{
@@ -385,7 +385,7 @@ function template_results()
 		{
 			echo '
 			<div style="padding: 4px;">
-				<div class="floatright flow_auto">
+				<div class="floatright flow_auto" style="margin-bottom:10px; margin-right:-4px;">
 					<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 						<option value="">--------</option>';
 
@@ -399,7 +399,7 @@ function template_results()
 
 			if ($context['can_move'])
 				echo '
-				<span id="quick_mod_jump_to">&nbsp;</span>';
+				<span id="quick_mod_jump_to" style="margin-right:-3px;">&nbsp;</span>';
 
 			echo '
 					<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search2;params=' . $context['params'], '">

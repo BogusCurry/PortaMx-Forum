@@ -3050,7 +3050,7 @@ span.postby {
 }
 /* Investigate default select and button sizing. Something is slightly off there.*/
 .qaction.button_submit {
-	margin: 1px 4px 0 4px;
+	margin: 0 0 0 4px;
 }
 /* Icons and jump to */
 #topic_icons:before {
