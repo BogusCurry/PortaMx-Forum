@@ -2204,7 +2204,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	addInlineJavascript('
 	var footerOffset='. (!empty($modSettings['showCacheStatus']) && !empty($modSettings['timeLoadPageEnable']) ? '102' : (!empty($modSettings['showCacheStatus']) || !empty($modSettings['timeLoadPageEnable']) ? '82' : '62')) .';
 	function fSetContentHeight(){document.getElementById(\'content_section\').style.minHeight=window.innerHeight-(document.getElementById(\'content_section\').offsetTop+footerOffset)+\'px\';}
-	$(window).on(\'resize\', fSetContentHeight);');
+	window.addEventListener("resize", fSetContentHeight);');
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
